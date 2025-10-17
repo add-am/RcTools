@@ -1,9 +1,9 @@
 Package: RcTools
-Title: What the Package Does (One Line, Title Case)
+Title: A Collection of Report Card Tools
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Adam", "Shand", , "adamshand22@gmail.com", role = c("aut", "cre"))
+Description: This package makes a collection of Report Card functions available to the technical team of the Northern Three Partnerships. Tools are mostly focused on styling tabular outputs for inclusion in the Technical Report, this includes conditional formatting, assigning grades, and cell colouring.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -4,12 +4,12 @@
 \name{RcTools-package}
 \alias{RcTools}
 \alias{RcTools-package}
-\title{RcTools: What the Package Does (One Line, Title Case)}
+\title{RcTools: A Collection of Report Card Tools}
 \description{
-What the package does (one paragraph).
+This package makes a collection of Report Card functions available to the technical team of the Northern Three Partnerships. Tools are mostly focused on styling tabular outputs for inclusion in the Technical Report, this includes conditional formatting, assigning grades, and cell colouring.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com}
+\strong{Maintainer}: Adam Shand \email{adamshand22@gmail.com}
 
 }
 \keyword{internal}
