@@ -1,4 +1,4 @@
-#' Title
+#' Conditional Formatting with .xlsx Output
 #'
 #' @param df A standard dataframe, data.frame, table, etc.
 #' @param file_name String. The name to save the output under, without an extension.
@@ -10,6 +10,7 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' x <- data.frame(
 #'  Basin = c("Black", "Ross", "Haughton", "Suttor"),
 #'  DIN = c(51, 76, 27, 98),
@@ -22,7 +23,7 @@
 #'  target_rows = 2:5, 
 #'  include_letter = FALSE
 #' )
-#' 
+#' }
 cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, include_letter){
     
   #create a duplicate that doesn't get all columns converted to numeric
@@ -31,8 +32,8 @@ cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, incl
   #coerce all cols to numeric - cols may not be numeric if they contain "weird" Nan, NA, or ND values
   df[target_columns] <- purrr::map(df[target_columns], ~suppressWarnings(as.numeric(.)))
 
-  #convert cols and target_rowss into excel format
-  dimensions <- paste0(LETTERS[min(target_columns)], min(target_rows), ":", LETTERS[max(target_columns)], max(target_rows))
+  #convert target_columns and target_rows into excel format
+  dimensions <- paste0(LETTERS[min(target_columns)], min(target_rows)+1, ":", LETTERS[max(target_columns)], max(target_rows)+1)
  
   #create an empty workbook
   wb <- openxlsx2::wb_workbook()
@@ -41,23 +42,8 @@ cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, incl
   wb$add_worksheet("Data")
   wb$add_data("Data", df)
 
-  #create a list of colours to add to the workbook
-  col_vect <- list(
-    fnt_col = c("#000000", "#000000", "#000000", "#000000", "#000000"),
-    bkg_col = c("#00B050", "#92D050", "#FFFF00", "#FFC000", "#FF0000"),
-    col_nm = c("dark_green", "light_green", "yellow", "orange", "red")
-  )
-
-  #for each item in the list, add it to the workbook
-  for (i in seq_along(col_vect$fnt_col)) {
-    wb$styles_mgr$add(
-      openxlsx2::create_dxfs_style(
-        font_color = openxlsx2::wb_colour(col_vect$fnt_col[i]),
-        bgFill = openxlsx2::wb_colour(col_vect$bkg_col[i])
-      ),
-      col_vect$col_nm[i]
-    )
-  }
+  #add a list of colours to the workbook using the colour scheme helper
+  wb <- define_colour_scheme(wb, "Report Card")
     
   if (include_letter){ 
       
@@ -80,23 +66,23 @@ cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, incl
         
     }
       
+    #include row index
+    df <- df |> 
+      dplyr::mutate(RowId = dplyr::row_number())
+    
+    #slice out the target rows
+    df_slice <- df |> 
+      dplyr::slice(min(target_rows): max(target_rows))
+
+    #keep opposite
+    reverse_slice <- df |> 
+      dplyr::slice(-c(min(target_rows): max(target_rows)))
+
     #create a counter that starts at the first col designated by the user input
     x <- target_columns[1]
     
     #determine the index of the first new column that will be created by the loop
-    y <- ncol(df) + 1
-
-    #include row index
-    df <- df |> 
-      mutate(RowId = row_number())
-    
-    #slice out the target rows
-    df_slice <- df |> 
-      slice(min(target_rows): max(target_rows))
-
-    #keep opposite
-    reverse_slice <- df |> 
-      slice(-c(min(target_rows): max(target_rows)))
+    y <- ncol(df_slice) + 1
 
     #run the letter function the same number of times as there is columns to target, joining the 
     # outputted letter col back to the inputted score col each loop
@@ -121,8 +107,8 @@ cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, incl
     #join the slice back with the rest, order by row id, remove row id
     df <- df_slice |> 
       rbind(reverse_slice) |> 
-      arrange(RowId) |> 
-      select(-RowId)
+      dplyr::arrange(RowId) |> 
+      dplyr::select(-RowId)
       
     #add the new data to the workbook, over riding the old data that was added
     wb$add_data("Data", df)

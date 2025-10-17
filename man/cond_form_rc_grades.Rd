@@ -9,13 +9,13 @@ cond_form_rc_grades(df, file_name, target_columns, target_rows, include_letter)
 \arguments{
 \item{df}{A standard dataframe, data.frame, table, etc.}
 
-\item{file_name}{String. The name to save the output under, without an extension}
+\item{file_name}{String. The name to save the output under, without an extension.}
 
-\item{target_columns}{Numeric Vector. The columns colour grading should be applied to. e.g. 1:10}
+\item{target_columns}{Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.}
 
-\item{target_rows}{Numeric Vector. The rows colour grading should be applied to. e.g. 1:10}
+\item{target_rows}{Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.}
 
-\item{include_letter}{Boolean. Should a letter grade be attached to the score.}
+\item{include_letter}{Boolean. Should a letter grade be attached to the score?}
 }
 \value{
 A .xlsx output
@@ -24,11 +24,18 @@ A .xlsx output
 Title
 }
 \examples{
+\dontrun{
 x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
  DIN = c(51, 76, 27, 98),
  TP = c(90, 57, 34, 72)
 )
-cond_form_rc_grades(df = x, file_name = "final_scores", target_columns = 2:3, target_rows = 1:4, include_letter = FALSE)
-
+cond_form_rc_grades(
+ df = x, 
+ file_name = "final_scores", 
+ target_columns = 2:3, 
+ target_rows = 2:5, 
+ include_letter = FALSE
+)
+}
 }
