@@ -5,8 +5,9 @@
 #' @param target_columns Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.
 #' @param target_rows Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.
 #' @param scheme String. One of several options: Report Card, Rainfall, Temperature, Summary Stat, TBD. 
-#' This determines the colour scheme and conditional formatting schemes used
+#' This determines the colour scheme and conditional formatting schemes used.
 #' @param include_letter Boolean. Should a letter grade be attached to the score? This is specific to Report Card scores
+#' (under the Report Card scheme).
 #'
 #' @returns A .xlsx output
 #'
