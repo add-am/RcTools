@@ -2,3 +2,4 @@
 
 export(cond_form_rc_grades)
 importFrom(rlang,":=")
+importFrom(rlang,sym)

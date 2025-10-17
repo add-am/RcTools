@@ -13,4 +13,5 @@ Imports:
     openxlsx2,
     purrr,
     rlang,
+    stringr,
     tidyr

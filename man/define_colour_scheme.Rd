@@ -2,7 +2,7 @@
 % Please edit documentation in R/define_colour_scheme.R
 \name{define_colour_scheme}
 \alias{define_colour_scheme}
-\title{Title}
+\title{Helper to Select Various Colour Schemes}
 \usage{
 define_colour_scheme(workbook, scheme)
 }
@@ -15,7 +15,7 @@ define_colour_scheme(workbook, scheme)
 The supplied workbook object, now with the colour scheme embedded
 }
 \description{
-Title
+Helper to Select Various Colour Schemes
 }
 \examples{
 \dontrun{

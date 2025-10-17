@@ -2,12 +2,19 @@
 % Please edit documentation in R/cond_form_rc_grades.R
 \name{cond_form_rc_grades}
 \alias{cond_form_rc_grades}
-\title{Title}
+\title{Conditional Formatting with .xlsx Output}
 \usage{
-cond_form_rc_grades(df, file_name, target_columns, target_rows, include_letter)
+cond_form_rc_grades(
+  df,
+  file_name,
+  target_columns,
+  target_rows,
+  scheme,
+  include_letter
+)
 }
 \arguments{
-\item{df}{A standard dataframe, data.frame, table, etc.}
+\item{df}{A standard dataframe, data.frame, table, spreadsheet, etc.}
 
 \item{file_name}{String. The name to save the output under, without an extension.}
 
@@ -15,13 +22,16 @@ cond_form_rc_grades(df, file_name, target_columns, target_rows, include_letter)
 
 \item{target_rows}{Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.}
 
-\item{include_letter}{Boolean. Should a letter grade be attached to the score?}
+\item{scheme}{String. One of several options: Report Card, Rainfall, Temperature, Summary Stat, TBD.
+This determines the colour scheme and conditional formatting schemes used}
+
+\item{include_letter}{Boolean. Should a letter grade be attached to the score? This is specific to Report Card scores}
 }
 \value{
 A .xlsx output
 }
 \description{
-Title
+Conditional Formatting with .xlsx Output
 }
 \examples{
 \dontrun{
@@ -35,6 +45,7 @@ cond_form_rc_grades(
  file_name = "final_scores", 
  target_columns = 2:3, 
  target_rows = 2:5, 
+ scheme = "Report Card",
  include_letter = FALSE
 )
 }
