@@ -1,0 +1,71 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# RcTools
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of RcTools is to provide a collection of tools (functions) to be utilised by the Northern Three Report Cards' technical staff. These tools bridge the gap between R analysis and technical report writing, and largely focus on producing xlsx files that are pre-formatted ready to be inserted into the technical report.
+
+## Installation
+
+You can install the development version of RcTools from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("add-am/RcTools")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+#| echo: false
+#| output: false
+
+library(RcTools)
+
+#create a basic dataset
+df <- data.frame(
+  "Region" = c(rep("Dry Tropics", 10)),
+  "Basin" = c(rep(c("Black", "Ross"), each = 5)),
+  "SubBasin" = c(
+    "Black River", "Bluewater Creek", "Rollingstone Creek", "Crystal Creek", "Paluma",
+    "Upper Ross River", "Lower Ross River", "Bohle River", "Stuart Creek", "Alligator Creek"
+  ),
+  "DIN" = c(seq(1, 100, 10)),
+  "TP" = c(seq(100, 1, -10)),
+  "Nutrients" = c(75, 49, 45, 54, 2, 91, 88, 41, 100, 80)
+)
+
+#run the "save as n3 table" function
+save_n3_table(
+  df = df,
+  file_name = "output_file",
+  target_columns = 4:6,
+  target_rows = 3:8,
+  scheme = "Report Card",
+  include_letter = TRUE
+  )
+
+```
+
+The before and after of the above function is as follows:
+
+![Before Formatting](before.png)
+
+![After Formatting](after.png)
