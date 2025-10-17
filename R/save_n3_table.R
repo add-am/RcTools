@@ -18,7 +18,7 @@
 #'  DIN = c(51, 76, 27, 98),
 #'  TP = c(90, 57, 34, 72)
 #' )
-#' cond_form_rc_grades(
+#' save_n3_table(
 #'  df = x, 
 #'  file_name = "final_scores", 
 #'  target_columns = 2:3, 
@@ -27,7 +27,7 @@
 #'  include_letter = FALSE
 #' )
 #' }
-cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, scheme, include_letter){
+save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, include_letter){
     
   #create a duplicate that doesn't get all columns converted to numeric (see next)
   df_original <- df
