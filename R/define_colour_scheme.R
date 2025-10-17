@@ -1,4 +1,4 @@
-#' Title
+#' Helper to Select Various Colour Schemes
 #'
 #' @param workbook A excel workbook object created by openxlsx2
 #' @param scheme String. One of several options: Report Card, Rainfall, Temperature, Summary Stat, TBD.

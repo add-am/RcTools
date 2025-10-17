@@ -48,23 +48,23 @@ cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, incl
   if (include_letter){ 
       
     #create function that determines letter and binds it to the value
-    letters_on_grade <-  function(df_in, column_target) {
+    #letters_on_grade <-  function(df_in, column_target) {
 
       #get the column name based on the column index
-      col_name <- colnames(df_in[column_target])     
+    #  col_name <- colnames(df_in[column_target])     
 
       #create a new column with the letter grade based on the value in the target column
-      df_in |> 
-        dplyr::mutate("{col_name}_grade" := dplyr::case_when(
-          df_in[column_target] >= 0 & df_in[column_target] < 21 ~ "(E)",
-          df_in[column_target] >= 21 & df_in[column_target] < 41 ~ "(D)",
-          df_in[column_target] >= 41 & df_in[column_target] < 61 ~ "(C)",
-          df_in[column_target] >= 61 & df_in[column_target] < 81 ~ "(B)",
-          df_in[column_target] >= 81 & df_in[column_target] < 101 ~ "(A)",
-          TRUE ~ "")
-        )
+    #  df_in |> 
+    #    dplyr::mutate("{col_name}_grade" := dplyr::case_when(
+    #      df_in[column_target] >= 0 & df_in[column_target] < 21 ~ "(E)",
+    #      df_in[column_target] >= 21 & df_in[column_target] < 41 ~ "(D)",
+    #      df_in[column_target] >= 41 & df_in[column_target] < 61 ~ "(C)",
+    #      df_in[column_target] >= 61 & df_in[column_target] < 81 ~ "(B)",
+    #      df_in[column_target] >= 81 & df_in[column_target] < 101 ~ "(A)",
+    #      TRUE ~ "")
+    #    )
         
-    }
+    #}
       
     #include row index
     df <- df |> 
@@ -79,30 +79,32 @@ cond_form_rc_grades <- function(df, file_name, target_columns, target_rows, incl
       dplyr::slice(-c(min(target_rows): max(target_rows)))
 
     #create a counter that starts at the first col designated by the user input
-    x <- target_columns[1]
+    #x <- target_columns[1]
     
     #determine the index of the first new column that will be created by the loop
-    y <- ncol(df_slice) + 1
+    #y <- ncol(df_slice) + 1
 
     #run the letter function the same number of times as there is columns to target, joining the 
     # outputted letter col back to the inputted score col each loop
-    for (i in 1:length(target_columns)){
+    #for (i in 1:length(target_columns)){
 
       #run the letter function on the targeted column
-      df_slice <- letters_on_grade(df_slice, x)
+    #  df_slice <- letters_on_grade(df_slice, x)
 
       #get the name for the column that was input
-      col_name <- as.character(colnames(df_slice[x]))
+    #  col_name <- as.character(colnames(df_slice[x]))
         
       #coerce inputted score col to character and then join the number and letter
-      df_slice <- df_slice |> 
-        dplyr::mutate({{col_name}} := as.character(.data[[col_name]])) |>
-        tidyr::unite({{col_name}}, x, y, sep = " ", remove = T)
+    #  df_slice <- df_slice |> 
+    #    dplyr::mutate({{col_name}} := as.character(.data[[col_name]])) |>
+    #    tidyr::unite({{col_name}}, x, y, sep = " ", remove = T)
 
         
       #increase the column counter so that the next col is inputted before starting again
-      x = x + 1
-    }
+    #  x = x + 1
+    #}
+
+    df_slice <- letters_on_grade(df_slice, target_columns)
 
     #join the slice back with the rest, order by row id, remove row id
     df <- df_slice |> 

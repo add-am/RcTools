@@ -1,27 +1,54 @@
 #create function that determines letter and binds it to the value
 #' Helper to Extract A Letter Grade From Scores
 #'
-#' @param df_in
-#' @param column_target
+#' @param df A dataframe/table/spreadsheet
+#' @param columns Range. The column indices to be targeted.
 #'
-#' @returns
+#' @returns A dataframe
 #'
-#' @export
 #' @examples
-letters_on_grade <-  function(df_in, column_target) {
+#' column_index <- 1:10
+#' letters_on_grade(df, column_index)
+#' 
+letters_on_grade <-  function(df, columns) {
   
-  #get the column name based on the column index
-  col_name <- colnames(df_in[column_target])     
+  #get the column names based on the column indices provided
+  column_names <- colnames(df[columns])     
 
-  #create a new column with the letter grade based on the value in the target column
-  df_in |> 
-    dplyr::mutate("{col_name}_grade" := dplyr::case_when(
-      df_in[column_target] >= 0 & df_in[column_target] < 21 ~ "(E)",
-      df_in[column_target] >= 21 & df_in[column_target] < 41 ~ "(D)",
-      df_in[column_target] >= 41 & df_in[column_target] < 61 ~ "(C)",
-      df_in[column_target] >= 61 & df_in[column_target] < 81 ~ "(B)",
-      df_in[column_target] >= 81 & df_in[column_target] < 101 ~ "(A)",
-      TRUE ~ "")
+  #create new columns with the letter grades based on the values in the target columns
+  df <- df |> 
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::all_of(column_names),
+        ~ dplyr::case_when(
+          .x >= 0 & .x < 21 ~ "(E)",
+          .x >= 21 & .x < 41 ~ "(D)",
+          .x >= 41 & .x < 61 ~ "(C)",
+          .x >= 61 & .x < 81 ~ "(B)",
+          .x >= 81 & .x < 101 ~ "(A)",
+          TRUE ~ ""
+        ),
+        .names = "{.col}_grade"
+      )
     )
+  
+  #for each of the columns, combine the score and grade together
+  for (target_column in column_names){
+
+    #build the grade column name
+    grade_column_name <- paste0(target_column, "_grade")
+
+    #unite the columns
+    df <- df |> 
+      tidyr::unite(
+        !!sym(target_column), 
+        c(target_column, grade_column_name), 
+        sep = " ", 
+        remove = TRUE
+      )
+  }
+
+  return(df)
         
 }
+
