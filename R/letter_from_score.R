@@ -8,15 +8,27 @@
 #'
 #' @examples
 #' column_index <- 1:10
-#' letters_on_grade(df, column_index)
+#' letters_from score(df, column_index)
 #' 
-letters_on_grade <-  function(df, columns) {
+letters_from_score <-  function(df, columns, rows) {
+  
+  #create a new column that contains the original column index (for rebuilding)
+  df <- df |> 
+    dplyr::mutate(RowId = dplyr::row_number())
+    
+  #slice out the target rows
+  df_slice <- df |> 
+    dplyr::slice(min(rows): max(rows))
+
+  #keep opposite
+  reverse_slice <- df |> 
+    dplyr::slice(-c(min(rows): max(rows)))
   
   #get the column names based on the column indices provided
-  column_names <- colnames(df[columns])     
+  column_names <- colnames(df_slice[columns])     
 
   #create new columns with the letter grades based on the values in the target columns
-  df <- df |> 
+  df_slice <- df_slice |> 
     dplyr::mutate(
       dplyr::across(
         dplyr::all_of(column_names),
@@ -39,7 +51,7 @@ letters_on_grade <-  function(df, columns) {
     grade_column_name <- paste0(target_column, "_grade")
 
     #unite the columns
-    df <- df |> 
+    df_slice <- df_slice |> 
       tidyr::unite(
         !!sym(target_column), 
         c(target_column, grade_column_name), 
@@ -47,6 +59,12 @@ letters_on_grade <-  function(df, columns) {
         remove = TRUE
       )
   }
+
+  #join the slice back with the rest, order by row id, remove row id
+  df <- df_slice |> 
+    rbind(reverse_slice) |> 
+    dplyr::arrange(RowId) |> 
+    dplyr::select(-RowId)
 
   return(df)
         
