@@ -1,5 +1,7 @@
 #' A Helper That Presents Conditional Formatting Options
 #'
+#' @param data The main dataframe to run functions on
+#' @param data_og The original dataframe before "as.numeric" is applied per column.
 #' @param workbook An excel workbook object.
 #' @param target_columns Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.
 #' @param target_rows Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.
@@ -10,9 +12,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' conditional_formatter(workbook, target_columns, target_rows, scheme, file_name)
+#' conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, file_name)
 #' }
-conditional_formatter <- function(workbook, target_columns, target_rows, scheme, file_name){
+conditional_formatter <- function(data, data_og, workbook, target_columns, target_rows, scheme, file_name){
 
   #convert target_columns and target_rows into excel format
   dimensions <- paste0(
@@ -66,17 +68,17 @@ conditional_formatter <- function(workbook, target_columns, target_rows, scheme,
     }
 
     #replace everything that isnt supposed to be NA (i.e. character cells) with their original value
-    #for (cn in seq_len(ncol(df_original))) {
-    #  for (rn in seq_len(nrow(df_original))) {
-    #    if (is.na(df[rn,cn])) {
-    #      workbook$add_data(
-    #        "Data", 
-    #        as.character(df_original[rn,cn]), 
-    #        start_col = cn, 
-    #        target_rows = rn+1)
-    #    }
-    #  }
-    #}
+    for (column_number in seq_len(ncol(data_og))) {
+      for (row_number in seq_len(nrow(data_og))) {
+        if (is.na(data[row_number, column_number])) {
+          workbook$add_data(
+            "Data", 
+            as.character(data_og[row_number, column_number]), 
+            start_col = column_number, 
+            target_rows = row_number + 1)
+        }
+      }
+    }
 
   } else if (scheme == "rainfall") {
 
