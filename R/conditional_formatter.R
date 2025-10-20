@@ -75,7 +75,7 @@ conditional_formatter <- function(data, data_og, workbook, target_columns, targe
             "Data", 
             as.character(data_og[row_number, column_number]), 
             start_col = column_number, 
-            target_rows = row_number + 1)
+            start_row = row_number + 1)
         }
       }
     }
