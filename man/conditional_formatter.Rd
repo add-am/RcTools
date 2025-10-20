@@ -4,9 +4,21 @@
 \alias{conditional_formatter}
 \title{A Helper That Presents Conditional Formatting Options}
 \usage{
-conditional_formatter(workbook, target_columns, target_rows, scheme, file_name)
+conditional_formatter(
+  data,
+  data_og,
+  workbook,
+  target_columns,
+  target_rows,
+  scheme,
+  file_name
+)
 }
 \arguments{
+\item{data}{The main dataframe to run functions on}
+
+\item{data_og}{The original dataframe before "as.numeric" is applied per column.}
+
 \item{workbook}{An excel workbook object.}
 
 \item{target_columns}{Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.}
@@ -25,6 +37,6 @@ A Helper That Presents Conditional Formatting Options
 }
 \examples{
 \dontrun{
-conditional_formatter(workbook, target_columns, target_rows, scheme, file_name)
+conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, file_name)
 }
 }

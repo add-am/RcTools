@@ -15,3 +15,6 @@ Imports:
     rlang,
     stringr,
     tidyr
+Depends: 
+    R (>= 3.5)
+LazyData: true
