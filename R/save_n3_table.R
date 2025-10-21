@@ -28,8 +28,13 @@
 #'  include_letter = FALSE
 #' )
 #' }
-save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, include_letter){
-    
+save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, include_letter = FALSE){
+
+  #standardise inputs
+  scheme <- scheme |> 
+    stringr::str_to_lower() |> 
+    stringr::str_replace_all(" |\\.|-", "_")
+
   #create a duplicate that doesn't get all columns converted to numeric (used within conditional formatting func)
   df_original <- df
 
@@ -55,17 +60,8 @@ save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, in
     wb$add_data("Data", df)
 
   }
-
-  #translate scheme if needed
-  if (scheme == "Report Card"){
-    if (include_letter){
-      scheme <- "Report Card Grade"
-    } else {
-      scheme <- "Report Card Score"
-    }
-  }
     
-  #run the conditional formatting function
-  conditional_formatter(df, df_original, wb, target_columns, target_rows, scheme, file_name)
+  #run the conditional formatting function. This also saves the data
+  conditional_formatter(df, df_original, wb, target_columns, target_rows, scheme, include_letter, file_name)
     
 }

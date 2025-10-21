@@ -11,6 +11,7 @@ conditional_formatter(
   target_columns,
   target_rows,
   scheme,
+  include_letter,
   file_name
 )
 }
@@ -27,6 +28,8 @@ conditional_formatter(
 
 \item{scheme}{String. Defines the conditional formatting rules and colours. Options are Report Card Grade, Report Card Score, Rainfall Temperature, Summary Stat}
 
+\item{include_letter}{Boolean. Should a letter grade be attached to the score? This is specific to Report Card scores}
+
 \item{file_name}{String. The name of the file you want to save. Without the extension}
 }
 \value{
@@ -37,6 +40,6 @@ A Helper That Presents Conditional Formatting Options
 }
 \examples{
 \dontrun{
-conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, file_name)
+conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, include_letter, file_name)
 }
 }

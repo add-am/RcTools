@@ -12,8 +12,6 @@
 #' 
 define_colour_scheme <- function(workbook, scheme){
 
-  #standardise inputs
-  scheme <- stringr::str_to_lower(scheme)
   if (scheme == "report card"){#create a list of report card colours to add to the workbook
 
     colours_list <- list(

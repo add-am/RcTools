@@ -6,15 +6,16 @@
 #' @param target_columns Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.
 #' @param target_rows Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.
 #' @param scheme String. Defines the conditional formatting rules and colours. Options are Report Card Grade, Report Card Score, Rainfall Temperature, Summary Stat
+#' @param include_letter Boolean. Should a letter grade be attached to the score? This is specific to Report Card scores
 #' @param file_name String. The name of the file you want to save. Without the extension
 #'
 #' @returns An excel workbook object
 #'
 #' @examples
 #' \dontrun{
-#' conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, file_name)
+#' conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, include_letter, file_name)
 #' }
-conditional_formatter <- function(data, data_og, workbook, target_columns, target_rows, scheme, file_name){
+conditional_formatter <- function(data, data_og, workbook, target_columns, target_rows, scheme, include_letter, file_name){
 
   #convert target_columns and target_rows into excel format
   dimensions <- paste0(
@@ -25,8 +26,14 @@ conditional_formatter <- function(data, data_og, workbook, target_columns, targe
     max(target_rows)+1
   )
 
-  #standardise inputs
-  scheme <- stringr::str_to_lower(scheme)
+  #convert scheme, if need, to include either grade or score
+  if (scheme == "report card"){
+    if (include_letter){
+      scheme <- "report card grade"
+    } else {
+      scheme <- "report card score"
+    }
+  }
 
   if (scheme == "report card grade"){#use text based rules to colour with Report card styling
     

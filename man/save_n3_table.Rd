@@ -10,7 +10,7 @@ save_n3_table(
   target_columns,
   target_rows,
   scheme,
-  include_letter
+  include_letter = FALSE
 )
 }
 \arguments{
