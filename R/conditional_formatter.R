@@ -80,9 +80,24 @@ conditional_formatter <- function(data, data_og, workbook, target_columns, targe
       }
     }
 
-  } else if (scheme == "rainfall") {
+  } else if (scheme %in% c("rainfall", "temperature")) {#use numeric based rules to colour with Rainfall or Temperature styling
 
-  } else if (scheme == "temperature") {
+    #create a list of rule conditions to iterate on
+    match_conditions <- list(
+      match_vals = c("1", "2", "3", "4", "5", "6", "7"),
+      style = c("lowest", "very_much_below", "below", "average", "above", "very_much_above", "highest")
+    )
+
+    #for each item in the list, create a formatting rule
+    for (i in seq_along(match_conditions$match_vals)) {
+      workbook$add_conditional_formatting(
+        "Data",
+        dims = dimensions,
+        type = "containsText", 
+        rule = match_conditions$match_vals[i], 
+        style = match_conditions$style[i]
+      )
+    }
 
   } else if (scheme == "summary stat"){
 
