@@ -25,17 +25,17 @@ define_colour_scheme <- function(workbook, scheme){
   } else if (scheme == "rainfall"){#create a list of rainfall colours to add to the workbook
 
     colours_list <- list(
-      font_colour = c("#000000", "#000000", "#000000", "#000000", "#000000"),
-      bkgd_colour = c("#00B050", "#92D050", "#FFFF00", "#FFC000", "#FF0000"),
-      colour_name = c("dark_green", "light_green", "yellow", "orange", "red")
+      font_colour = c("#8C510A", "#D8B365", "#F6E8C3", "#F5F5F5", "#C7EAE5", "#5AB4AC", "#01665E"),
+      bkgd_colour = c("#8C510A", "#D8B365", "#F6E8C3", "#F5F5F5", "#C7EAE5", "#5AB4AC", "#01665E"),
+      colour_name = c("lowest", "very_much_below", "below", "average", "above", "very_much_above", "highest")
     )
 
   } else if (scheme == "temperature"){#create a list of temperature colours to add to the workbook
 
     colours_list <- list(
-      font_colour = c("#000000", "#000000", "#000000", "#000000", "#000000"),
-      bkgd_colour = c("#00B050", "#92D050", "#FFFF00", "#FFC000", "#FF0000"),
-      colour_name = c("dark_green", "light_green", "yellow", "orange", "red")
+      font_colour = c("#2166AC", "#67A9CF", "#D1E5F0", "#F7F7F7", "#FDDBC7", "#EF8A62", "#B2182B"),
+      bkgd_colour = c("#2166AC", "#67A9CF", "#D1E5F0", "#F7F7F7", "#FDDBC7", "#EF8A62", "#B2182B"),
+      colour_name = c("lowest", "very_much_below", "below", "average", "above", "very_much_above", "highest")
     )
 
   } else if (scheme == "summary stat"){#create a list of summary stat colours to add to the workbook
