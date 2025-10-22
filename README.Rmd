@@ -22,27 +22,38 @@ The goal of RcTools is to provide a collection of tools (functions) to be utilis
 
 ## Installation
 
-You can install the development version of RcTools from [GitHub](https://github.com/) with:
+To install this package you will first need to download the [RTools package](https://cran.r-project.org/bin/windows/Rtools/rtools45/rtools.html) and install it on your computer (accept the defaults everywhere during the installation process).
+
+Following this, you can install the development version of RcTools from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
 pak::pak("add-am/RcTools")
 ```
 
-## Example
+## Usage
 
-This is a basic example which shows you how to solve a common problem:
+This package currently offers 1 key function, `save_n3_table()`, which is designed to format data frames into a specific style that is used in the Northern Three Report Cards. The function takes a data frame and formats it according to the specifications of the report card, including adding letter grades and adjusting the layout.
+
+It has the following formatting options:
+
+ - Report Card (with or without letter grades): This colours cell from red to green based on the standard Report Card boundaries.
+ - Rainfall: This colours cells from brown to blue based on average rainfall codes (1 to 7).
+ - Temperature: This colours cells from blue to red based on average temperature codes (1 to 7).
+ - Summary Statistics: This compares mean/median values against WQOs and colours cells blue for pass and orange for fail.
+ - Presence Abesnce: This colours cells based on presence (blue) and absence (grey), used for fish observation data.
+
+Below is a basic example of how to use the `save_n3_table()` function to format a data frame for the Northern Three Report Card:
 
 ```{r example}
 #| echo: false
-#| output: false
+#| eval: false
 
+#load the package
 library(RcTools)
 
 #create a basic dataset
 df <- data.frame(
-  "Region" = c(rep("Dry Tropics", 10)),
-  "Basin" = c(rep(c("Black", "Ross"), each = 5)),
   "SubBasin" = c(
     "Black River", "Bluewater Creek", "Rollingstone Creek", "Crystal Creek", "Paluma",
     "Upper Ross River", "Lower Ross River", "Bohle River", "Stuart Creek", "Alligator Creek"
@@ -54,18 +65,34 @@ df <- data.frame(
 
 #run the "save as n3 table" function
 save_n3_table(
-  df = df,
-  file_name = "output_file",
-  target_columns = 4:6,
-  target_rows = 3:8,
-  scheme = "Report Card",
-  include_letter = TRUE
+  df = df, #select your data frame
+  file_name = "output_file", #pick a name for your output file
+  target_columns = 2:4, #specify which columns to format
+  target_rows = 1:nrow(df), #specify which rows to format
+  scheme = "Report Card", #define the formatting scheme
+  include_letter = TRUE #decide if you want to include letter grades
   )
 
 ```
 
-The before and after of the above function is as follows:
+### Output
 
-![Before Formatting](before.png)
+The output of the above function will be a .xlsx file with conditional formatting applied, which will look similar to the following:
 
-![After Formatting](after.png)
+![After Report Card Formatting](man/figures/README-after-report-card-formatting.png)
+
+Equally, rainfall data looks like this:
+
+![After Rainfall Formatting](man/figures/README-after-rainfall-formatting.png)
+
+temperature data looks like this:
+
+![After Temperature Formatting](man/figures/README-after-temperature-formatting.png)
+
+summary statistics data looks like this:
+
+![After Summary Statistic Formatting](man/figures/README-after-summary-statistic-formatting.png)
+
+and presence absence data looks like this:
+
+![After Presence Absence Formatting](man/figures/README-after-presence-absence-formatting.png)
