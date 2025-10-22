@@ -40,6 +40,8 @@ A Helper That Presents Conditional Formatting Options
 }
 \examples{
 \dontrun{
-conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, include_letter, file_name)
+conditional_formatter(
+data, data_og, workbook, target_columns, 
+target_rows, scheme, include_letter, file_name)
 }
 }

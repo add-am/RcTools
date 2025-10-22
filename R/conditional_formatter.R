@@ -13,7 +13,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' conditional_formatter(data, data_og, workbook, target_columns, target_rows, scheme, include_letter, file_name)
+#' conditional_formatter(
+#' data, data_og, workbook, target_columns, 
+#' target_rows, scheme, include_letter, file_name)
 #' }
 conditional_formatter <- function(
   data, data_og, workbook, target_columns, 
@@ -29,15 +31,15 @@ conditional_formatter <- function(
   )
 
   #convert scheme, if need, to include either grade or score
-  if (scheme == "report card"){
+  if (scheme == "report_card"){
     if (include_letter){
-      scheme <- "report card grade"
+      scheme <- "report_card_grade"
     } else {
-      scheme <- "report card score"
+      scheme <- "report_card_score"
     }
   }
 
-  if (scheme == "report card grade"){#use text based rules to colour with Report card styling
+  if (scheme == "report_card_grade"){#use text based rules to colour with Report card styling
     
     #create a list of rule conditions to iterate on
     match_conditions <- list(
@@ -56,7 +58,7 @@ conditional_formatter <- function(
       )
     }
 
-  } else if (scheme == "report card score") {#use numeric based rules to colour with Report card styling
+  } else if (scheme == "report_card_score") {#use numeric based rules to colour with Report card styling
     
     #create a list of min and max values to iterate on
     match_conditions <- list(
@@ -108,7 +110,27 @@ conditional_formatter <- function(
       )
     }
 
-  } else if (scheme == "summary stat"){
+  } else if (scheme == "summary_stat"){
+
+    #create a list of rule conditions to iterate on
+    match_conditions <- list(
+      match_vals = c(
+        paste0(LETTERS[min(target_columns)], "2 <= ", LETTERS[max(target_columns)+1], "2"),
+        paste0(LETTERS[min(target_columns)], "2 > ", LETTERS[max(target_columns)+1], "2")
+      ),
+      style = c("blue", "orange")
+    )
+
+    #for each item in the list, create a formatting rule
+    for (i in seq_along(match_conditions$match_vals)) {
+      workbook$add_conditional_formatting(
+        "Data",
+        dims = dimensions,
+        type = "expression", 
+        rule = match_conditions$match_vals[i], 
+        style = match_conditions$style[i]
+      )
+    }
 
   }
 

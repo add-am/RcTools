@@ -12,7 +12,7 @@
 #' 
 define_colour_scheme <- function(workbook, scheme){
 
-  if (scheme == "report card"){#create a list of report card colours to add to the workbook
+  if (scheme == "report_card"){#create a list of report card colours to add to the workbook
 
     colours_list <- list(
       font_colour = c("#000000", "#000000", "#000000", "#000000", "#000000"),
@@ -36,12 +36,12 @@ define_colour_scheme <- function(workbook, scheme){
       colour_name = c("lowest", "very_much_below", "below", "average", "above", "very_much_above", "highest")
     )
 
-  } else if (scheme == "summary stat"){#create a list of summary stat colours to add to the workbook
+  } else if (scheme == "summary_stat"){#create a list of summary stat colours to add to the workbook
 
     colours_list <- list(
-      font_colour = c("#000000", "#000000", "#000000", "#000000", "#000000"),
-      bkgd_colour = c("#00B050", "#92D050", "#FFFF00", "#FFC000", "#FF0000"),
-      colour_name = c("dark_green", "light_green", "yellow", "orange", "red")
+      font_colour = c("#000000", "#000000"),
+      bkgd_colour = c("#BDD7EE", "#F8CBAD"),
+      colour_name = c("blue", "orange")
     )
 
   }
