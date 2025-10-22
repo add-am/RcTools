@@ -46,7 +46,7 @@ It has the following formatting options:
 Below is a basic example of how to use the `save_n3_table()` function to format a data frame for the Northern Three Report Card:
 
 ```{r example}
-#| echo: false
+#| eval: false
 
 #load the package
 library(RcTools)

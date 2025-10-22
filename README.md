@@ -52,6 +52,32 @@ It has the following formatting options:
 Below is a basic example of how to use the `save_n3_table()` function to
 format a data frame for the Northern Three Report Card:
 
+``` r
+#load the package
+library(RcTools)
+
+#create a basic dataset
+df <- data.frame(
+  "SubBasin" = c(
+    "Black River", "Bluewater Creek", "Rollingstone Creek", "Crystal Creek", "Paluma",
+    "Upper Ross River", "Lower Ross River", "Bohle River", "Stuart Creek", "Alligator Creek"
+  ),
+  "DIN" = c(seq(1, 100, 10)),
+  "TP" = c(seq(100, 1, -10)),
+  "Nutrients" = c(75, 49, 45, 54, 2, 91, 88, 41, 100, 80)
+)
+
+#run the "save as n3 table" function
+save_n3_table(
+  df = df, #select your data frame
+  file_name = "output_file", #pick a name for your output file
+  target_columns = 2:4, #specify which columns to format
+  target_rows = 1:nrow(df), #specify which rows to format
+  scheme = "Report Card", #define the formatting scheme
+  include_letter = TRUE #decide if you want to include letter grades
+  )
+```
+
 ### Output
 
 The output of the above function will be a .xlsx file with conditional
