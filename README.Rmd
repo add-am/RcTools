@@ -47,7 +47,6 @@ Below is a basic example of how to use the `save_n3_table()` function to format 
 
 ```{r example}
 #| echo: false
-#| eval: false
 
 #load the package
 library(RcTools)
