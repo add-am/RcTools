@@ -57,42 +57,20 @@ format a data frame for the Northern Three Report Card:
 The output of the above function will be a .xlsx file with conditional
 formatting applied, which will look similar to the following:
 
-<figure>
-<img src="man/figures/README-after-report-card-formatting.png"
-alt="After Report Card Formatting" />
-<figcaption aria-hidden="true">After Report Card Formatting</figcaption>
-</figure>
+![](man/figures/README-after-report-card-formatting.png)
 
 Equally, rainfall data looks like this:
 
-<figure>
-<img src="man/figures/README-after-rainfall-formatting.png"
-alt="After Rainfall Formatting" />
-<figcaption aria-hidden="true">After Rainfall Formatting</figcaption>
-</figure>
+![](man/figures/README-after-rainfall-formatting.png)
 
 temperature data looks like this:
 
-<figure>
-<img src="man/figures/README-after-temperature-formatting.png"
-alt="After Temperature Formatting" />
-<figcaption aria-hidden="true">After Temperature Formatting</figcaption>
-</figure>
+![](man/figures/README-after-temperature-formatting.png)
 
 summary statistics data looks like this:
 
-<figure>
-<img src="man/figures/README-after-summary-statistic-formatting.png"
-alt="After Summary Statistic Formatting" />
-<figcaption aria-hidden="true">After Summary Statistic
-Formatting</figcaption>
-</figure>
+![](man/figures/README-after-summary-statistic-formatting.png)
 
 and presence absence data looks like this:
 
-<figure>
-<img src="man/figures/README-after-presence-absence-formatting.png"
-alt="After Presence Absence Formatting" />
-<figcaption aria-hidden="true">After Presence Absence
-Formatting</figcaption>
-</figure>
+![](man/figures/README-after-presence-absence-formatting.png)

@@ -79,20 +79,20 @@ save_n3_table(
 
 The output of the above function will be a .xlsx file with conditional formatting applied, which will look similar to the following:
 
-![After Report Card Formatting](man/figures/README-after-report-card-formatting.png)
+![](man/figures/README-after-report-card-formatting.png)
 
 Equally, rainfall data looks like this:
 
-![After Rainfall Formatting](man/figures/README-after-rainfall-formatting.png)
+![](man/figures/README-after-rainfall-formatting.png)
 
 temperature data looks like this:
 
-![After Temperature Formatting](man/figures/README-after-temperature-formatting.png)
+![](man/figures/README-after-temperature-formatting.png)
 
 summary statistics data looks like this:
 
-![After Summary Statistic Formatting](man/figures/README-after-summary-statistic-formatting.png)
+![](man/figures/README-after-summary-statistic-formatting.png)
 
 and presence absence data looks like this:
 
-![After Presence Absence Formatting](man/figures/README-after-presence-absence-formatting.png)
+![](man/figures/README-after-presence-absence-formatting.png)
