@@ -110,7 +110,7 @@ conditional_formatter <- function(
       )
     }
 
-  } else if (scheme == "summary_stat"){
+  } else if (scheme == "summary_statistic"){
 
     #create a list of rule conditions to iterate on
     match_conditions <- list(
@@ -127,6 +127,25 @@ conditional_formatter <- function(
         "Data",
         dims = dimensions,
         type = "expression", 
+        rule = match_conditions$match_vals[i], 
+        style = match_conditions$style[i]
+      )
+    }
+
+  } else if (scheme == "presence_absence") {#use numeric based rules to colour with Presence Absence styling
+
+    #create a list of rule conditions to iterate on
+    match_conditions <- list(
+      match_vals = c("1", "0"),
+      style = c("blue", "grey")
+    )
+
+    #for each item in the list, create a formatting rule
+    for (i in seq_along(match_conditions$match_vals)) {
+      workbook$add_conditional_formatting(
+        "Data",
+        dims = dimensions,
+        type = "containsText", 
         rule = match_conditions$match_vals[i], 
         style = match_conditions$style[i]
       )
