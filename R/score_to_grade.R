@@ -1,8 +1,7 @@
 #' Function that converts scores to grades
 #'
 #' @param score Numeric Vector. Any vector of numbers that are scores, usually from 0 to 100
-#' @param grading_type String. Defining the type of scoring to use
-#'
+#' 
 #' @returns A vector. Code suggesting provided for imbedding the vector back into a df
 #'
 #' @export
@@ -16,16 +15,14 @@
 #'   mutate(across(
 #'     Score,
 #'     .names = "{.col}_Grade",
-#'     ~ score_to_grade(., "Water Quality")))
+#'     ~ score_to_grade(.)))
 #'  
 #' }
 score_to_grade <- function(score, grading_type){
 
-  if (grading_type == "Water Quality" {
+  ifelse(score >= 81, "A",
+  ifelse(score >= 61, "B",
+  ifelse(score >= 41, "C",
+  ifelse(score >= 21, "D", "E"))))
 
-  } else if () {
-    
-  }
-
-    
 }

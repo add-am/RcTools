@@ -3,6 +3,7 @@
 #' @param value Numeric Vector. Any vector of numbers that are values.
 #' @param value_type String. Defines the type of values that will be scored. One of: "water quality", "wetlands", "mangroves and saltmarsh"
 #' @param indicator String Vector. Defines the indicator that will be scored. Only relevant for water quality and fish. Provide as a vector of equal length to values.
+#' @param water_type String. Defines the type of water quality scoring to use. One of "Freshwater", "Estuarine", or "Marine"
 #' @param wqo Integer. The water quality objective. Only relevant for water quality
 #' @param sf Integer.  The scaling factor. Only relevant for freshwater and estuarine water quality
 #' @param eightieth Integer. The eightieth percentile. Only relevant for freshwater and estuarine water quality
@@ -23,7 +24,7 @@
 #'     ~ value_to_score(.)))
 #'  
 #' }
-value_to_score <- function(value, value_type, indicator = NULL, wqo = NULL, sf = NULL, eightieth = NULL, twentieth = NULL){
+value_to_score <- function(value, value_type, indicator = NULL, water_type = NULL, wqo = NULL, sf = NULL, eightieth = NULL, twentieth = NULL){
 
   #clean value type inputs
   value_type <- stringr::str_to_lower(value_type)
@@ -33,41 +34,46 @@ value_to_score <- function(value, value_type, indicator = NULL, wqo = NULL, sf =
     #clean indicator inputs
     indicator <- stringr::str_replace_all(stringr::str_to_lower(indicator), "_", " ")
 
-    #determine if the values are freshwater and estuarine, or marine
-    if (max(value > 5)){environment <- "land"} else {enviroment <- "marine"}
+    #clean water type inputs
+    water_type <- stringr::str_replace_all(stringr::str_to_lower(water_type), "_", " ")
 
     #start the land based water quality scoring
-    if (environment == "land"){
+    if (water_type %in% c("freshwater", "estuarine")){
 
       #check for the required secondary inputs
       if (any(is.null(indicator), is.null(wqo), is.null(sf), is.null(eightieth), is.null(twentieth))){
-        print("Please supply all required arguements to score water quality values")
+        stop("Please supply all required arguements to score water quality values")
       }
+      wqo        <- suppressWarnings(as.numeric(wqo))
+      sf         <- suppressWarnings(as.numeric(sf))
+      eightieth  <- suppressWarnings(as.numeric(eightieth))
+      twentieth  <- suppressWarnings(as.numeric(twentieth))
+      value      <- suppressWarnings(as.numeric(value))
 
       #calculate scores, reverse method if indicator is low do
-      if (indicator != "low do") {
-
+      ifelse(
+        indicator == "low do",
         return(
-          ifelse(value > wqo, pmax(60.9 - (60.9 * (abs((value - wqo)/(sf - wqo)))), 0), #scores from 0 to 61
-          ifelse(value <= wqo & eightieth > wqo, 80.99 - (19.9 * (abs((eightieth - wqo)/(eightieth - value)))), 90)) #scores from 61 to 81, then 90
-        ) 
-
-      } else {
-
-        return(
-          ifelse(value < wqo, pmax(60.9 - (60.9 * (abs((value - wqo)/(sf - wqo)))), 0), #scores from 0 to 61
-          ifelse(value >= wqo & twentieth < wqo, 80.99 - (19.9 * (abs((wqo - twentieth)/(value - twentieth)))), 90)) #scores from 61 to 81, then 90
+          ifelse(
+            value > wqo, pmax(60.9 - (60.9 * (abs((value - wqo)/(sf - wqo)))), 0), #scores from 0 to 61
+            ifelse(value <= wqo & eightieth > wqo, 80.99 - (19.9 * (abs((eightieth - wqo)/(eightieth - value)))), 90) #scores from 61 to 81, then 90
+          )
+        ),
+        return(  
+          ifelse(
+            value < wqo, pmax(60.9 - (60.9 * (abs((value - wqo)/(sf - wqo)))), 0), #scores from 0 to 61
+            ifelse(value >= wqo & twentieth < wqo, 80.99 - (19.9 * (abs((wqo - twentieth)/(value - twentieth)))), 90) #scores from 61 to 81, then 90
+          )
         )
-      
-      }
+      )
 
     }
 
-    if (environment == "marine"){
+    if (water_type == "marine"){
 
       #check for the required secondary inputs
       if (any(is.null(indicator), is.null(wqo))){
-        print("Please supply all required arguements to score water quality values")
+        stop("Please supply all required arguements to score water quality values")
       }
 
       #calculate scores, reverse method if indicator is secchi depth
@@ -124,42 +130,44 @@ value_to_score <- function(value, value_type, indicator = NULL, wqo = NULL, sf =
 
     #check for the required secondary inputs
     if (is.null(indicator)){
-      print("Please supply all required arguements to score fish values")
+      stop("Please supply all required arguements to score fish values")
     }
 
-    if (indicator == "poise"){
-
+    ifelse(
+      indicator == "poise",
       return(
-        ifelse(value > 0.8, 81 + abs((19 + ((POISE_val - 1) * (19 / 0.2)))), #scores from 100 to 81
-        ifelse(value > 0.67, 61 + abs((19.9 + ((POISE_val - 0.7999) * (19.9 / 0.1329)))), #scores from 80 to 61
-        ifelse(value > 0.53, 41 + abs((19.9 + ((POISE_val - 0.6669) * (19.9 / 0.1339)))), #scores from 60 to 41
-        ifelse(value > 0.4, 21 + abs((19.9 + ((POISE_val - 0.5329) * (19.9 / 0.1329)))), abs(20.9 + ((POISE_val - 0.3999) * (20.9 / 0.3999))))))) #scores from 40 down
-      )
-
-    }
-
-    if (indicator == "ponis"){
-
+        ifelse(value > 0.8, 81 + abs((19 + ((value - 1) * (19 / 0.2)))), #scores from 100 to 81
+        ifelse(value > 0.67, 61 + abs((19.9 + ((value - 0.7999) * (19.9 / 0.1329)))), #scores from 80 to 61
+        ifelse(value > 0.53, 41 + abs((19.9 + ((value - 0.6669) * (19.9 / 0.1339)))), #scores from 60 to 41
+        ifelse(value > 0.4, 21 + abs((19.9 + ((value - 0.5329) * (19.9 / 0.1329)))), abs(20.9 + ((value - 0.3999) * (20.9 / 0.3999))))))) #scores from 40 down
+      ),
       return(
-        ifelse(value < 0.03, 81 + abs((19 - ((PONIS_val - 0) * (19 / 0.025)))), #scores from 100 to 81
-        ifelse(value < 0.05, 61 + abs((19.9 - ((PONIS_val - 0.0251) * (19.9 / 0.0249)))), #scores from 80 to 61
-        ifelse(value < 0.1, 41 + abs((19.9 - ((PONIS_val - 0.051) * (19.9 / 0.049)))), #scores from 60 to 41
-        ifelse(value < 0.2, 21 + abs((19.9 - ((PONIS_val - 0.101) * (19.9 / 0.099)))), abs(20.9 - ((PONIS_val - 0.201) * (20.9 / 0.799))))))) #scores from 40 down
+        ifelse(value < 0.03, 81 + abs((19 - ((value - 0) * (19 / 0.025)))), #scores from 100 to 81
+        ifelse(value < 0.05, 61 + abs((19.9 - ((value - 0.0251) * (19.9 / 0.0249)))), #scores from 80 to 61
+        ifelse(value < 0.1, 41 + abs((19.9 - ((value - 0.051) * (19.9 / 0.049)))), #scores from 60 to 41
+        ifelse(value < 0.2, 21 + abs((19.9 - ((value - 0.101) * (19.9 / 0.099)))), abs(20.9 - ((value - 0.201) * (20.9 / 0.799))))))) #scores from 40 down
       )
-
-    }              
+    )              
   }
 
 }
 
 testing_data <- readr::read_csv("testing_data.csv")
 
-#need to evaluate on a row by row basis
-value_to_score(testing_data$fish_indicator, value_type = "fish", indicator = testing_data$fish_indicator) #fail
 
-value_to_score(testing_data$fish_indicator, value_type = "water quality", indicator = testing_data$water_quality_test_1) #untested
+value_to_score(
+  value = testing_data$water_quality_test_1,
+  value_type = "water quality", 
+  indicator = testing_data$`water_quality indicator`, 
+  water_type = "freshwater",
+  wqo = testing_data$wqo,
+  sf = testing_data$sf,
+  eightieth = testing_data$eightieth,
+  twentieth = testing_data$twentieth
+) #success
 
-
+value_to_score(testing_data$fish_test, value_type = "fish", indicator = testing_data$fish_indicator) #success
 value_to_score(testing_data$wetland_test, value_type = "wetlands") #success
 value_to_score(testing_data$wetland_test, value_type = "riparian") #success
 value_to_score(testing_data$wetland_test, value_type = "mangroves and saltmarsh") #success
+
