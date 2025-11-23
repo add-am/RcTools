@@ -151,23 +151,3 @@ value_to_score <- function(value, value_type, indicator = NULL, water_type = NUL
   }
 
 }
-
-testing_data <- readr::read_csv("testing_data.csv")
-
-
-value_to_score(
-  value = testing_data$water_quality_test_1,
-  value_type = "water quality", 
-  indicator = testing_data$`water_quality indicator`, 
-  water_type = "freshwater",
-  wqo = testing_data$wqo,
-  sf = testing_data$sf,
-  eightieth = testing_data$eightieth,
-  twentieth = testing_data$twentieth
-) #success
-
-value_to_score(testing_data$fish_test, value_type = "fish", indicator = testing_data$fish_indicator) #success
-value_to_score(testing_data$wetland_test, value_type = "wetlands") #success
-value_to_score(testing_data$wetland_test, value_type = "riparian") #success
-value_to_score(testing_data$wetland_test, value_type = "mangroves and saltmarsh") #success
-
