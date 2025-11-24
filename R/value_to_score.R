@@ -1,153 +1,224 @@
 #' Function that converts values to score
 #'
-#' @param value Numeric Vector. Any vector of numbers that are values.
-#' @param value_type String. Defines the type of values that will be scored. One of: "water quality", "wetlands", "mangroves and saltmarsh"
-#' @param indicator String Vector. Defines the indicator that will be scored. Only relevant for water quality and fish. Provide as a vector of equal length to values.
+#' @param df Dataframe. The table that contains the value(s) you are interested in.
+#' @param value Numeric column(s). Any number of numeric columns that contain values to be scored. Values ranges can vary 
+#' significantly depending on the indicator.
+#' @param value_type String. Defines the type of values that will be scored. One of: "water quality", "wetlands", 
+#' "mangroves and saltmarsh".
+#' @param indicator String column. Defines the indicator that will be scored. Only relevant for water quality and fish. 
+#' Should be sourced from the same df as the value column(s).
 #' @param water_type String. Defines the type of water quality scoring to use. One of "Freshwater", "Estuarine", or "Marine"
-#' @param wqo Integer. The water quality objective. Only relevant for water quality
-#' @param sf Integer.  The scaling factor. Only relevant for freshwater and estuarine water quality
-#' @param eightieth Integer. The eightieth percentile. Only relevant for freshwater and estuarine water quality
-#' @param twentieth Integer. The twentieth percentil. Only relevant for freshwater and estuarine water quality
-#' @returns A vector. Code suggesting provided for imbedding the vector back into a df
+#' @param wqo Numeric column. The water quality objective associated with each value. Only relevant for water quality. 
+#' Should be sourced from the same df as the value column(s).
+#' @param sf Numeric column. The scaling factor associated with each value. Only relevant for freshwater and estuarine 
+#' water quality. Should be sourced from the same df as the value column(s).
+#' @param eightieth Numeric column. The eightieth percentile associated with each value. Only relevant for freshwater 
+#' and estuarine water quality. Should be sourced from the same df as the value column(s).
+#' @param twentieth Numeric column. The twentieth percentile associated with each value. Only relevant for freshwater 
+#' and estuarine water quality. Should be sourced from the same df as the value column(s).
+#' 
+#' @returns The original dataframe with new score columns added. Names are inherited from the targeted columns.
 #'
 #' @export
 #' @examples
 #' \dontrun{
 #' x <- data.frame(
 #'  Basin = c("Black", "Ross", "Haughton", "Suttor"),
-#'  Value = c(, 76, 27, 98)
+#'  Indicator = c("DIN", "DIN", "Low_DO", "Low_DO"),
+#'  Value = c(0.002, 0.017, 87.6, 104),
+#'  Wqo = c(0.02, 0.02, 90, 90),
+#'  Sf = c(0.38, 0.38, 70, 70),
+#'  Eightieth = c(0.0154, 0.0154, 101.12, 101.12),
+#'  Twentieth = c(0.0026, 0.0026, 75.84, 75.84)
 #' )
+#' 
 #' x <- x |> 
-#'   mutate(across(
-#'     Score,
-#'     .names = "{.col}_Score",
-#'     ~ value_to_score(.)))
+#'   value_to_score(
+#'     value_type = "Water Quality",
+#'     water_type = "Freshwater",
+#'     indicator = Indicator,
+#'     wqo = Wqo,
+#'     sf = Sf,
+#'     eightieth = Eightieth,
+#'     twentieth = Twentieth
+#'   )
 #'  
 #' }
-value_to_score <- function(value, value_type, indicator = NULL, water_type = NULL, wqo = NULL, sf = NULL, eightieth = NULL, twentieth = NULL){
+value_to_score <- function(
+  df, 
+  value, 
+  value_type = c("Water Quality", "Wetlands", "Mangroves and Saltmarsh", "Riparian", "Fish"), 
+  water_type = NULL, 
+  indicator = NULL, 
+  wqo = NULL, 
+  sf = NULL, 
+  eightieth = NULL, 
+  twentieth = NULL){
+  
+  #check required arguments
+  if (missing(df)) {stop("You must supply a dataframe")}
+  if (missing(value)) {stop("You must supply a value column")}
 
-  #clean value type inputs
-  value_type <- stringr::str_to_lower(value_type)
+  #check value type input
+  value_type <- match.arg(value_type, c("Water Quality", "Wetlands", "Mangroves and Saltmarsh", "Riparian", "Fish"))
+  
+  #check water type input, it can be NULL or one of three, if value type is water quality it must be one of three
+  if (value_type == "Water Quality"){water_type <- match.arg(water_type, c("Freshwater", "Estuarine", "Marine"))}
 
-  if (value_type == "water quality"){
+  #check the supplied indicator is correct
+  if (!is.null(indicator)){ # first - confirm it is not NULL (some scoring methods don't need an indicator)
 
-    #clean indicator inputs
-    indicator <- stringr::str_replace_all(stringr::str_to_lower(indicator), "_", " ")
+    #extract the actual name of the column that was provided by the user
+    indicator_col_name <- rlang::quo_name(rlang::enquo(indicator))
 
-    #clean water type inputs
-    water_type <- stringr::str_replace_all(stringr::str_to_lower(water_type), "_", " ")
+    #standardise the input values
+    df <- dplyr::mutate(df, {{ indicator }} := stringr::str_replace_all(stringr::str_to_lower({{ indicator }}), "_", " "))
 
-    #start the land based water quality scoring
-    if (water_type %in% c("freshwater", "estuarine")){
-
-      #check for the required secondary inputs
-      if (any(is.null(indicator), is.null(wqo), is.null(sf), is.null(eightieth), is.null(twentieth))){
-        stop("Please supply all required arguements to score water quality values")
-      }
-      wqo        <- suppressWarnings(as.numeric(wqo))
-      sf         <- suppressWarnings(as.numeric(sf))
-      eightieth  <- suppressWarnings(as.numeric(eightieth))
-      twentieth  <- suppressWarnings(as.numeric(twentieth))
-      value      <- suppressWarnings(as.numeric(value))
-
-      #calculate scores, reverse method if indicator is low do
-      ifelse(
-        indicator == "low do",
-        return(
-          ifelse(
-            value > wqo, pmax(60.9 - (60.9 * (abs((value - wqo)/(sf - wqo)))), 0), #scores from 0 to 61
-            ifelse(value <= wqo & eightieth > wqo, 80.99 - (19.9 * (abs((eightieth - wqo)/(eightieth - value)))), 90) #scores from 61 to 81, then 90
-          )
-        ),
-        return(  
-          ifelse(
-            value < wqo, pmax(60.9 - (60.9 * (abs((value - wqo)/(sf - wqo)))), 0), #scores from 0 to 61
-            ifelse(value >= wqo & twentieth < wqo, 80.99 - (19.9 * (abs((wqo - twentieth)/(value - twentieth)))), 90) #scores from 61 to 81, then 90
-          )
-        )
-      )
-
-    }
-
-    if (water_type == "marine"){
-
-      #check for the required secondary inputs
-      if (any(is.null(indicator), is.null(wqo))){
-        stop("Please supply all required arguements to score water quality values")
-      }
-
-      #calculate scores, reverse method if indicator is secchi depth
-      if (!stringr::str_detect(indicator, "secchi")){
-
-        val <- ifelse(log2(wqo/value) <= -1, -1, #if Wqo/Value is less than -1, cap at -1
-               ifelse(log2(wqo/value) >= 1, 1, log2(wqo/value))) #if Wqo/Value is greater than 1, cap at 1, else keep calculated value.
-
-      } else {
-
-        val <- ifelse(log2(value/wqo) <= -1, -1, #if Value/Wqo is less than -1, cap at -1
-               ifelse(log2(value/wqo) >= 1, 1, log2(value/wqo))) #if Value/Wqo is greater than 1, cap at 1, else keep calculated value.
-
-      }
-
-      #convert the -1 to +1 range to a score from 0 to 100
-
-      return(
-        ifelse(val >= 0.51, 100 - (19 - ((val - 0.51) * (19/0.49))), #scores from 100 to 81
-        ifelse(val >= 0 & val < .51, 80.9 - (19.9 - (val * (19.9/0.50))), #scores from 80 to 61
-        ifelse(val >= -0.33 & val < -0.01, 60.9 - (19.9 - ((val + 0.33) * (19.9/0.32))), #scores from 60 to 41
-        ifelse(val >= -0.66 & val < -0.34, 40.9 - (19.9 - ((val + 0.66) * (19.9/0.32))), 20.9 - (20.9 - ((val + 1) * (20.9/0.34))))))) #scores from 40 down
-      )
+    #create a list of allowed indicator names
+    allowed_indicator_names <- c(
+      "din", "tp", "ammonia", "nox", "turbidity", "high do", "low do", 
+      "frp", "pn", "pp", "tn", "tss", "secchi", "chla", "poise", "ponis")
     
+    #compare the values in the supplied column against the allowed names. keep values that are different
+    bad_values <- setdiff(unique(df[[indicator_col_name]]), allowed_indicator_names)
+
+    #if there are any values, stop and return an error
+    if (length(bad_values) > 0) {stop("Indicator column contains invalid values: ", paste(bad_values, collapse = ", "))}
+
+  }
+
+  if (value_type == "Water Quality"){
+
+    #all water quality scoring requires at least an indicator column, a value, and a wqo object
+    if (!rlang::quo_name(rlang::enquo(indicator)) %in% names(df)){stop("The indicator column does not exists in the dataframe")}
+    if (!rlang::quo_name(rlang::enquo(value)) %in% names(df)){stop("The value column does not exists in the dataframe")}
+    if (!rlang::quo_name(rlang::enquo(wqo)) %in% names(df)){stop("The wqo column does not exists in the dataframe")}   
+
+    if (water_type %in% c("Freshwater", "Estuarine")){
+
+      #fw and est also require an sf, 80th, and 20th
+      if (!rlang::quo_name(rlang::enquo(sf)) %in% names(df)){stop("The sf column does not exists in the dataframe")}
+      if (!rlang::quo_name(rlang::enquo(eightieth)) %in% names(df)){stop("The eightieth column does not exists in the dataframe")}
+      if (!rlang::quo_name(rlang::enquo(twentieth)) %in% names(df)){stop("The twentieth column does not exists in the dataframe")}
+
+      #complete the score calculation
+        df <- df |> 
+          dplyr::mutate(
+            Score = dplyr::case_when(
+              stringr::str_detect({{ indicator }}, "low do") & {{ value }} > {{ wqo }} ~ 
+                pmax(60.9 - (60.9 * (abs(({{ value }} - {{ wqo }})/({{ sf }} - {{ wqo }})))), 0), #scores from 0 to 61,
+              stringr::str_detect({{ indicator }}, "low do") & {{ value }} <= {{ wqo }} & {{ eightieth }} > {{ wqo }} ~ 
+                80.99 - (19.9 * (abs(({{ eightieth }} - {{ wqo }})/({{ eightieth }} - {{ value }})))), #scores from 61 to 81, 
+              !stringr::str_detect({{ indicator }}, "low do") & {{ value }} < {{ wqo }} ~ 
+                pmax(60.9 - (60.9 * (abs(({{ value }} - {{ wqo }})/({{ sf }} - {{ wqo }})))), 0), #scores from 0 to 61,
+              !stringr::str_detect({{ indicator }}, "low do") & {{ value }} >= {{ wqo }} & {{ twentieth }} < {{ wqo }} ~ 
+                80.99 - (19.9 * (abs(({{ wqo }} - {{ twentieth }})/({{ value }} - {{ twentieth }})))), #scores from 61 to 81,
+              TRUE ~ 90 #otherwise 90
+            )
+          ) |> 
+          dplyr::mutate(Score = round(Score, 3))
+        
+        return(df)
+
+    } 
+    
+    if (water_type == "Marine") {
+
+      #complete the score calculation
+        df <- df |> 
+          dplyr::mutate(
+            Score = dplyr::case_when(
+              stringr::str_detect({{ indicator }}, "secchi") & log2({{ wqo }}/{{ value }}) <= -1 ~ 1,  #if Wqo/Value is less than -1, cap at -1
+              stringr::str_detect({{ indicator }}, "secchi") & log2({{ wqo }}/{{ value }}) >= 1 ~ 1, #if Wqo/Value is greater than 1, cap at 1
+              stringr::str_detect({{ indicator }}, "secchi") ~ log2({{ wqo }}/{{ value }}), #take the actual value
+              !stringr::str_detect({{ indicator }}, "secchi") & log2({{ value }}/{{ wqo }}) <= -1 ~ -1,  #if Value/Wqo is less than -1, cap at -1
+              !stringr::str_detect({{ indicator }}, "secchi") & log2({{ value }}/{{ wqo }}) >= 1 ~ 1, #if Value/Wqo is greater than 1, cap at 1
+              TRUE ~ log2({{ value }}/{{ wqo }}) #take the actual value
+            )
+          ) |> 
+          dplyr::mutate(
+            Score = dplyr::case_when(
+              Score >= 0.51 ~ 100 - (19 - ((Score - 0.51) * (19/0.49))), #scores from 100 to 81
+              Score >= 0 ~ 80.9 - (19.9 - (Score * (19.9/0.50))), #scores from 80 to 61
+              Score >=-0.33 ~ 60.9 - (19.9 - ((Score + 0.33) * (19.9/0.32))),  #scores from 60 to 41
+              Score >= -0.66 ~ 40.9 - (19.9 - ((Score + 0.66) * (19.9/0.32))), #scores from 40 to 21
+              TRUE ~ 20.9 - (20.9 - ((Score + 1) * (20.9/0.34))) #scores from 20 down
+            )
+          ) |> 
+          dplyr::mutate(Score = round(Score, 3))
+        
+        return(df)
     }
-  }
-
-  if (value_type %in% c("wetlands", "mangroves and saltmarsh")){
-
-    return(
-      ifelse(value > 0, floor(100-abs(19-((abs(value)-0)*(19/99.9)))), #scores from 100 to 81
-      ifelse(value >= -0.1, floor(61+abs(19.9-((abs(value)-0)*(19.9/0.1)))), #scores from 80 to 61
-      ifelse(value >= -0.5, floor(41+abs(19.9-((abs(value)-0.11)*(19.9/0.39)))), #scores from 60 to 41
-      ifelse(value >= -3, floor(21+abs(19.9-((abs(value)-0.51)*(19.9/2.49)))), floor(abs(20.9-((abs(value)-3.01)*(20.9/96.99)))))))) #scores from 40 down to 0
-    )
 
   }
 
-  if (value_type == "riparian"){
+  if (value_type %in% c("Wetlands", "Mangroves and Saltmarsh")){
 
-    return(
-      ifelse(value > 0, floor(100-abs(19-((abs(value)-0)*(19/99.9)))), #scores from 100 to 81
-      ifelse(value >= -0.1, floor(61+abs(19.9-((abs(value)-0)*(19.9/0.1)))), #scores from 80 to 61
-      ifelse(value >= -0.5, floor(41+abs(19.9-((abs(value)-0.11)*(19.9/0.39)))), #scores from 60 to 41
-      ifelse(value >= -1, floor(21+abs(19.9-((abs(value)-0.51)*(19.9/0.49)))), floor(abs(20.9-((abs(value)-1.01)*(20.9/98.99))))))))  #scores from 40 down to 0
-    )
+    df <- df |> 
+      dplyr::mutate(
+        Score = dplyr::case_when(
+          {{ value }} > 0 ~ 100-abs(19-((abs({{ value }})-0)*(19/99.9))),
+          {{ value }} >= -0.1 ~61+abs(19.9-((abs({{ value }})-0)*(19.9/0.1))),
+          {{ value }} >= -0.5 ~ 41+abs(19.9-((abs({{ value }})-0.11)*(19.9/0.39))),
+          {{ value }} >= -3 ~ 21+abs(19.9-((abs({{ value }})-0.51)*(19.9/2.49))),
+          TRUE ~ abs(20.9-((abs({{ value }})-3.01)*(20.9/96.99)))
+        )
+      ) |> 
+      dplyr::mutate(Score = round(Score, 3))
+    
+    return(df)
 
   }
 
-  if (value_type == "fish"){
+  if (value_type == "Riparian"){
 
-    #clean indicator inputs
-    indicator <- stringr::str_replace_all(stringr::str_to_lower(indicator), "_", " ")
+    df <- df |> 
+      dplyr::mutate(
+        Score = dplyr::case_when(
+          {{ value }} > 0 ~ 100-abs(19-((abs({{ value }})-0)*(19/99.9))),
+          {{ value }} >= -0.1 ~ 61+abs(19.9-((abs({{ value }})-0)*(19.9/0.1))),
+          {{ value }} >= -0.5 ~ 41+abs(19.9-((abs({{ value }})-0.11)*(19.9/0.39))),
+          {{ value }} >= -1 ~ 21+abs(19.9-((abs({{ value }})-0.51)*(19.9/0.49))),
+          TRUE ~ abs(20.9-((abs({{ value }})-1.01)*(20.9/98.99)))
+        )
+      ) |> 
+      dplyr::mutate(Score = round(Score, 3))
+    
+    return(df)
 
-    #check for the required secondary inputs
-    if (is.null(indicator)){
-      stop("Please supply all required arguements to score fish values")
-    }
-
-    ifelse(
-      indicator == "poise",
-      return(
-        ifelse(value > 0.8, 81 + abs((19 + ((value - 1) * (19 / 0.2)))), #scores from 100 to 81
-        ifelse(value > 0.67, 61 + abs((19.9 + ((value - 0.7999) * (19.9 / 0.1329)))), #scores from 80 to 61
-        ifelse(value > 0.53, 41 + abs((19.9 + ((value - 0.6669) * (19.9 / 0.1339)))), #scores from 60 to 41
-        ifelse(value > 0.4, 21 + abs((19.9 + ((value - 0.5329) * (19.9 / 0.1329)))), abs(20.9 + ((value - 0.3999) * (20.9 / 0.3999))))))) #scores from 40 down
-      ),
-      return(
-        ifelse(value < 0.03, 81 + abs((19 - ((value - 0) * (19 / 0.025)))), #scores from 100 to 81
-        ifelse(value < 0.05, 61 + abs((19.9 - ((value - 0.0251) * (19.9 / 0.0249)))), #scores from 80 to 61
-        ifelse(value < 0.1, 41 + abs((19.9 - ((value - 0.051) * (19.9 / 0.049)))), #scores from 60 to 41
-        ifelse(value < 0.2, 21 + abs((19.9 - ((value - 0.101) * (19.9 / 0.099)))), abs(20.9 - ((value - 0.201) * (20.9 / 0.799))))))) #scores from 40 down
-      )
-    )              
   }
 
+  if (value_type == "Fish"){
+
+    df <- df |> 
+      dplyr::mutate(
+        Score = dplyr::case_when(
+          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.8 ~ 
+            81 + abs((19 + (({{ value }} - 1) * (19 / 0.2)))), #scores from 100 to 81
+          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.67 ~ 
+            61 + abs((19.9 + (({{ value }} - 0.7999) * (19.9 / 0.1329)))), #scores from 80 to 61
+          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.53 ~ 
+            41 + abs((19.9 + (({{ value }} - 0.6669) * (19.9 / 0.1339)))), #scores from 60 to 41
+          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.4 ~ 
+            21 + abs((19.9 + (({{ value }} - 0.5329) * (19.9 / 0.1329)))),  #scores from 40 to 21
+          stringr::str_detect({{ indicator }}, "POISE") ~ 
+            pmax(abs(20.9 + (({{ value }} - 0.3999) * (20.9 / 0.3999))), 0), #scores from 20 to 0
+          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.03 ~ 
+            pmin(abs((19 - (({{ value }} - 0) * (19 / 0.025)))), 100), #scores from 100 to 81
+          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.05 ~ 
+            abs((19.9 - (({{ value }} - 0.0251) * (19.9 / 0.0249)))), #scores from 80 to 61
+          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.1 ~ 
+            abs((19.9 - (({{ value }} - 0.051) * (19.9 / 0.049)))), #scores from 60 to 41
+          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.2 ~ 
+            abs((19.9 - (({{ value }} - 0.101) * (19.9 / 0.099)))), #scores from 40 to 21
+          stringr::str_detect({{ indicator }}, "PONIS") ~ 
+            pmax(abs(20.9 - (({{ value }} - 0.201) * (20.9 / 0.799))), 0) #scores from 20 to 0
+        )
+      ) |> 
+      dplyr::mutate(Score = round(Score, 3))
+    
+    return(df)
+           
+  }
 }
+
