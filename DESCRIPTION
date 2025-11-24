@@ -3,7 +3,7 @@ Title: A Collection of Report Card Tools
 Version: 0.0.0.9000
 Authors@R: 
     person("Adam", "Shand", , "adamshand22@gmail.com", role = c("aut", "cre"))
-Description: This package makes a collection of Report Card functions available to the technical team of the Northern Three Partnerships. Tools are mostly focused on styling tabular outputs for inclusion in the Technical Report, this includes conditional formatting, assigning grades, and cell colouring.
+Description: "This package makes a collection of Report Card functions available to the technical team of the Northern Three Partnerships. Tools are focused on the final steps of anaylsis and report writing, such as styling tabular outputs for inclusion in the Technical Report, and providing scoring functions and grading functions."
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

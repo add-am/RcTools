@@ -47,7 +47,7 @@
 value_to_score <- function(
   df, 
   value, 
-  value_type = c("Water Quality", "Wetlands", "Mangroves and Saltmarsh", "Riparian", "Fish"), 
+  value_type, 
   water_type = NULL, 
   indicator = NULL, 
   wqo = NULL, 
@@ -58,27 +58,40 @@ value_to_score <- function(
   #check required arguments
   if (missing(df)) {stop("You must supply a dataframe")}
   if (missing(value)) {stop("You must supply a value column")}
+  if (missing(value_type)) {stop("You must supply a value_type column")}
 
   #check value type input
-  value_type <- match.arg(value_type, c("Water Quality", "Wetlands", "Mangroves and Saltmarsh", "Riparian", "Fish"))
-  
-  #check water type input, it can be NULL or one of three, if value type is water quality it must be one of three
-  if (value_type == "Water Quality"){water_type <- match.arg(water_type, c("Freshwater", "Estuarine", "Marine"))}
+  value_type_choices <- c("Water Quality", "Wetlands", "Mangroves and Saltmarsh", "Riparian", "Fish")
+  if (!(value_type %in% value_type_choices)){
+    stop("Invalid value_type: must be one of ", paste(value_type_choices, collapse = ", "))
+  }
 
-  #check the supplied indicator is correct
-  if (!is.null(indicator)){ # first - confirm it is not NULL (some scoring methods don't need an indicator)
+  #check water type input it can be NULL or one of three, if value type is water quality it must be one of three
+  if (value_type == "Water Quality"){
+    if (is.null(water_type)){stop("A water type must be supplied when scoring water quality values.")}
+    water_type_choices <- c("Freshwater", "Estuarine", "Marine")
+    if (!(water_type %in% water_type_choices)){
+      stop("Invalid water_type: must be one of ", paste(water_type_choices, collapse = ", "))
+    }
+  }
+
+  #check the supplied indicator is correct (only relevant for water quality and fish)
+  if (value_type %in% c("Water Quality", "Fish")){
+    
+    if (is.null(indicator)){stop("An indicator column must be supplied when scoring water quality or fish values.")}
 
     #extract the actual name of the column that was provided by the user
     indicator_col_name <- rlang::quo_name(rlang::enquo(indicator))
 
     #standardise the input values
-    df <- dplyr::mutate(df, {{ indicator }} := stringr::str_replace_all(stringr::str_to_lower({{ indicator }}), "_", " "))
+    df <- df |> 
+      dplyr::mutate({{ indicator }} := stringr::str_replace_all(stringr::str_to_lower({{ indicator }}), "_", " "))
 
     #create a list of allowed indicator names
     allowed_indicator_names <- c(
       "din", "tp", "ammonia", "nox", "turbidity", "high do", "low do", 
       "frp", "pn", "pp", "tn", "tss", "secchi", "chla", "poise", "ponis")
-    
+      
     #compare the values in the supplied column against the allowed names. keep values that are different
     bad_values <- setdiff(unique(df[[indicator_col_name]]), allowed_indicator_names)
 
@@ -193,25 +206,25 @@ value_to_score <- function(
     df <- df |> 
       dplyr::mutate(
         Score = dplyr::case_when(
-          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.8 ~ 
+          stringr::str_detect({{ indicator }}, "poise") & {{ value }} > 0.8 ~ 
             81 + abs((19 + (({{ value }} - 1) * (19 / 0.2)))), #scores from 100 to 81
-          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.67 ~ 
+          stringr::str_detect({{ indicator }}, "poise") & {{ value }} > 0.67 ~ 
             61 + abs((19.9 + (({{ value }} - 0.7999) * (19.9 / 0.1329)))), #scores from 80 to 61
-          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.53 ~ 
+          stringr::str_detect({{ indicator }}, "poise") & {{ value }} > 0.53 ~ 
             41 + abs((19.9 + (({{ value }} - 0.6669) * (19.9 / 0.1339)))), #scores from 60 to 41
-          stringr::str_detect({{ indicator }}, "POISE") & {{ value }} > 0.4 ~ 
+          stringr::str_detect({{ indicator }}, "poise") & {{ value }} > 0.4 ~ 
             21 + abs((19.9 + (({{ value }} - 0.5329) * (19.9 / 0.1329)))),  #scores from 40 to 21
-          stringr::str_detect({{ indicator }}, "POISE") ~ 
+          stringr::str_detect({{ indicator }}, "poise") ~ 
             pmax(abs(20.9 + (({{ value }} - 0.3999) * (20.9 / 0.3999))), 0), #scores from 20 to 0
-          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.03 ~ 
+          stringr::str_detect({{ indicator }}, "ponis") & {{ value }} < 0.03 ~ 
             pmin(abs((19 - (({{ value }} - 0) * (19 / 0.025)))), 100), #scores from 100 to 81
-          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.05 ~ 
+          stringr::str_detect({{ indicator }}, "ponis") & {{ value }} < 0.05 ~ 
             abs((19.9 - (({{ value }} - 0.0251) * (19.9 / 0.0249)))), #scores from 80 to 61
-          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.1 ~ 
+          stringr::str_detect({{ indicator }}, "ponis") & {{ value }} < 0.1 ~ 
             abs((19.9 - (({{ value }} - 0.051) * (19.9 / 0.049)))), #scores from 60 to 41
-          stringr::str_detect({{ indicator }}, "PONIS") & {{ value }} < 0.2 ~ 
+          stringr::str_detect({{ indicator }}, "ponis") & {{ value }} < 0.2 ~ 
             abs((19.9 - (({{ value }} - 0.101) * (19.9 / 0.099)))), #scores from 40 to 21
-          stringr::str_detect({{ indicator }}, "PONIS") ~ 
+          stringr::str_detect({{ indicator }}, "ponis") ~ 
             pmax(abs(20.9 - (({{ value }} - 0.201) * (20.9 / 0.799))), 0) #scores from 20 to 0
         )
       ) |> 
