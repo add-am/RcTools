@@ -244,8 +244,3 @@ value_to_score <- function(
            
   }
 }
-
-
-tbl5 <- readr::read_csv("data/testing_data.csv")
-
-save(tbl5, file = "data/tbl5.rda")
