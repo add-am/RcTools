@@ -18,9 +18,9 @@
 #' )
 #' column_indicies <- 2:3
 #' row_indicies <- 1:4
-#' letter_from_score(df, column_indicies, row_indicies)
+#' bind_letter_to_score(df, column_indicies, row_indicies)
 #' }
-letter_from_score <- function(df, columns, rows) {
+bind_letter_to_score <- function(df, columns, rows) {
 
   #create a new column that contains the original column index (for rebuilding)
   df <- df |> 

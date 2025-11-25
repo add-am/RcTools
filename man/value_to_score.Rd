@@ -19,13 +19,14 @@ value_to_score(
 \arguments{
 \item{df}{Dataframe. The table that contains the value(s) you are interested in.}
 
-\item{value}{Numeric column(s). Any number of numeric columns that contain values to be scored. Values ranges can vary
+\item{value}{Numeric column. One numeric column that contain values to be scored. Values ranges can vary
 significantly depending on the indicator.}
 
-\item{value_type}{String. Defines the type of values that will be scored. One of: "water quality", "wetlands",
-"mangroves and saltmarsh".}
+\item{value_type}{String. Defines the type of values that will be scored. One of: "Water Quality", "Wetlands",
+"Mangroves and Saltmarsh", "Riparian", or "Fish".}
 
-\item{water_type}{String. Defines the type of water quality scoring to use. One of "Freshwater", "Estuarine", or "Marine"}
+\item{water_type}{String. Defines the type of water quality scoring to use. Only relevant for water quality. One of
+"Freshwater", "Estuarine", or "Marine"}
 
 \item{indicator}{String column. Defines the indicator that will be scored. Only relevant for water quality and fish.
 Should be sourced from the same df as the value column(s).}

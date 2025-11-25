@@ -54,7 +54,7 @@ save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, in
   if (include_letter){ 
 
     #run the letter from grade function
-    df <- letter_from_score(df, target_columns, target_rows)
+    df <- bind_letter_to_score(df, target_columns, target_rows)
       
     #put the new data to the workbook, over riding the old data that was added
     wb$add_data("Data", df)

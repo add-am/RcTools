@@ -1,13 +1,14 @@
 #' Function that converts values to score
 #'
 #' @param df Dataframe. The table that contains the value(s) you are interested in.
-#' @param value Numeric column(s). Any number of numeric columns that contain values to be scored. Values ranges can vary 
+#' @param value Numeric column. One numeric column that contain values to be scored. Values ranges can vary 
 #' significantly depending on the indicator.
-#' @param value_type String. Defines the type of values that will be scored. One of: "water quality", "wetlands", 
-#' "mangroves and saltmarsh".
+#' @param value_type String. Defines the type of values that will be scored. One of: "Water Quality", "Wetlands", 
+#' "Mangroves and Saltmarsh", "Riparian", or "Fish".
 #' @param indicator String column. Defines the indicator that will be scored. Only relevant for water quality and fish. 
 #' Should be sourced from the same df as the value column(s).
-#' @param water_type String. Defines the type of water quality scoring to use. One of "Freshwater", "Estuarine", or "Marine"
+#' @param water_type String. Defines the type of water quality scoring to use. Only relevant for water quality. One of 
+#' "Freshwater", "Estuarine", or "Marine"
 #' @param wqo Numeric column. The water quality objective associated with each value. Only relevant for water quality. 
 #' Should be sourced from the same df as the value column(s).
 #' @param sf Numeric column. The scaling factor associated with each value. Only relevant for freshwater and estuarine 
