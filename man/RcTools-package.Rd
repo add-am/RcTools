@@ -6,7 +6,7 @@
 \alias{RcTools-package}
 \title{RcTools: A Collection of Report Card Tools}
 \description{
-This package makes a collection of Report Card functions available to the technical team of the Northern Three Partnerships. Tools are mostly focused on styling tabular outputs for inclusion in the Technical Report, this includes conditional formatting, assigning grades, and cell colouring.
+"This package makes a collection of Report Card functions available to the technical team of the Northern Three Partnerships. Tools are focused on the final steps of anaylsis and report writing, such as styling tabular outputs for inclusion in the Technical Report, and providing scoring functions and grading functions."
 }
 \author{
 \strong{Maintainer}: Adam Shand \email{adamshand22@gmail.com}

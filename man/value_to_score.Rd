@@ -5,10 +5,11 @@
 \title{Function that converts values to score}
 \usage{
 value_to_score(
+  df,
   value,
   value_type,
-  indicator = NULL,
   water_type = NULL,
+  indicator = NULL,
   wqo = NULL,
   sf = NULL,
   eightieth = NULL,
@@ -16,24 +17,33 @@ value_to_score(
 )
 }
 \arguments{
-\item{value}{Numeric Vector. Any vector of numbers that are values.}
+\item{df}{Dataframe. The table that contains the value(s) you are interested in.}
 
-\item{value_type}{String. Defines the type of values that will be scored. One of: "water quality", "wetlands", "mangroves and saltmarsh"}
+\item{value}{Numeric column(s). Any number of numeric columns that contain values to be scored. Values ranges can vary
+significantly depending on the indicator.}
 
-\item{indicator}{String Vector. Defines the indicator that will be scored. Only relevant for water quality and fish. Provide as a vector of equal length to values.}
+\item{value_type}{String. Defines the type of values that will be scored. One of: "water quality", "wetlands",
+"mangroves and saltmarsh".}
 
 \item{water_type}{String. Defines the type of water quality scoring to use. One of "Freshwater", "Estuarine", or "Marine"}
 
-\item{wqo}{Integer. The water quality objective. Only relevant for water quality}
+\item{indicator}{String column. Defines the indicator that will be scored. Only relevant for water quality and fish.
+Should be sourced from the same df as the value column(s).}
 
-\item{sf}{Integer.  The scaling factor. Only relevant for freshwater and estuarine water quality}
+\item{wqo}{Numeric column. The water quality objective associated with each value. Only relevant for water quality.
+Should be sourced from the same df as the value column(s).}
 
-\item{eightieth}{Integer. The eightieth percentile. Only relevant for freshwater and estuarine water quality}
+\item{sf}{Numeric column. The scaling factor associated with each value. Only relevant for freshwater and estuarine
+water quality. Should be sourced from the same df as the value column(s).}
 
-\item{twentieth}{Integer. The twentieth percentil. Only relevant for freshwater and estuarine water quality}
+\item{eightieth}{Numeric column. The eightieth percentile associated with each value. Only relevant for freshwater
+and estuarine water quality. Should be sourced from the same df as the value column(s).}
+
+\item{twentieth}{Numeric column. The twentieth percentile associated with each value. Only relevant for freshwater
+and estuarine water quality. Should be sourced from the same df as the value column(s).}
 }
 \value{
-A vector. Code suggesting provided for imbedding the vector back into a df
+The original dataframe with new score columns added. Names are inherited from the targeted columns.
 }
 \description{
 Function that converts values to score
@@ -42,13 +52,24 @@ Function that converts values to score
 \dontrun{
 x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
- Value = c(, 76, 27, 98)
+ Indicator = c("DIN", "DIN", "Low_DO", "Low_DO"),
+ Value = c(0.002, 0.017, 87.6, 104),
+ Wqo = c(0.02, 0.02, 90, 90),
+ Sf = c(0.38, 0.38, 70, 70),
+ Eightieth = c(0.0154, 0.0154, 101.12, 101.12),
+ Twentieth = c(0.0026, 0.0026, 75.84, 75.84)
 )
+
 x <- x |> 
-  mutate(across(
-    Score,
-    .names = "{.col}_Score",
-    ~ value_to_score(.)))
+  value_to_score(
+    value_type = "Water Quality",
+    water_type = "Freshwater",
+    indicator = Indicator,
+    wqo = Wqo,
+    sf = Sf,
+    eightieth = Eightieth,
+    twentieth = Twentieth
+  )
  
 }
 }

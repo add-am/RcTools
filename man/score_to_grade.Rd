@@ -4,13 +4,16 @@
 \alias{score_to_grade}
 \title{Function that converts scores to grades}
 \usage{
-score_to_grade(score, grading_type)
+score_to_grade(df, score_cols)
 }
 \arguments{
-\item{score}{Numeric Vector. Any vector of numbers that are scores, usually from 0 to 100}
+\item{df}{Dataframe. The table that contains the score(s) you are interested in.}
+
+\item{score_cols}{Numeric column(s). Any number of numeric columns that contain scores. Values are expected to
+range from 0 to 100}
 }
 \value{
-A vector. Code suggesting provided for imbedding the vector back into a df
+The original dataframe with new grade columns added. Names are inherited from the targeted columns.
 }
 \description{
 Function that converts scores to grades
@@ -19,13 +22,11 @@ Function that converts scores to grades
 \dontrun{
 x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
- Score = c(51, 76, 27, 98)
+ ScoreA = c(51, 76, 27, 98),
+ ScoreB = c(7, 42, 89, 63),
+ ScoreC = c(15, 34, 56, 21),
 )
-x <- x |> 
-  mutate(across(
-    Score,
-    .names = "{.col}_Grade",
-    ~ score_to_grade(.)))
- 
+x <- score_to_grade(x, c("ScoreA", "ScoreB", "ScoreC"))
+  
 }
 }

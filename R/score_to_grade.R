@@ -22,7 +22,7 @@ score_to_grade <- function(df, score_cols){
 
   df |> 
     dplyr::mutate(
-      across(
+      dplyr::across(
         {{ score_cols }},
         ~ dplyr::case_when(
           .x >= 81 ~ "A",
