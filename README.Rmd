@@ -57,13 +57,47 @@ Currently this function can score the following indices/indicators:
 
 Depending on the index/indicator a different amount of inputs are requried. Below is a basic example of how to use the `value_to_score()` function to calculate scores:
 
-```{r example}
+```{r v2s example}
 #| eval: FALSE
 
 #load the package
 library(RcTools)
 
 #create an example dataframe
+df <- data.frame(
+  WQIndicator = c(rep("DIN", 3), rep("Low DO", 3)),
+  WQObjective = c(rep(0.02, 3), rep(90, 3)),
+  WQScalingFactor = c(rep(0.38, 3), rep(70, 3)),
+  WQValue = c(0.002, 0.017, 0.029, 65, 93, 101)
+)
+
+#calculate the twentieth and eightieth percentile values
+df <- df |> 
+  dplyr::mutate(
+    WQEightieth = quantile(WQValue, probs = 0.8),
+    WQTwentieth = quantile(WQValue, probs = 0.2)
+  )
+
+#run the scoring function
+df <- df |> 
+  value_to_score(
+    value = WQValue,
+    value_type = "Water Quality",
+    water_type = "Freshwater",
+    indicator = WQIndicator,
+    wqo = WQObjective,
+    sf = WQScalingFactor,
+    eightieth = WQEightieth,
+    twentieth = WQTwentieth
+  )
+
+```
+
+The output of the function is the original table, now with an additional score column. The example table above would look like this:
+
+```{r}
+
+df
 
 ```
 
@@ -83,7 +117,7 @@ It has the following formatting options:
 
 Below is a basic example of how to use the `save_n3_table()` function to format a data frame for the Northern Three Report Card:
 
-``` {r example}
+``` {r sn3 example}
 #| eval: false
 
 #load the package

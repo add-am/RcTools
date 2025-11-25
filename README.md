@@ -10,8 +10,9 @@
 The goal of RcTools is to provide a collection of tools (functions) to
 be utilised by the Northern Three Report Cards’ technical staff. These
 tools bridge the gap between R analysis and technical report writing,
-and largely focus on producing xlsx files that are pre-formatted ready
-to be inserted into the technical report.
+and primarily focus on end of anaylsis pipelines such as converting
+values to scores, score to grades, and dataframes into xlsx files that
+are pre-formatted ready to be inserted into the technical report.
 
 ## Installation
 
@@ -28,13 +29,98 @@ Following this, you can install the development version of RcTools from
 pak::pak("add-am/RcTools")
 ```
 
+Finally, load the package just like you would any other R package:
+
+``` r
+
+library(RcTools)
+```
+
 ## Usage
 
-This package currently offers 1 key function, `save_n3_table()`, which
-is designed to format data frames into a specific style that is used in
-the Northern Three Report Cards. The function takes a data frame and
-formats it according to the specifications of the report card, including
-adding letter grades and adjusting the layout.
+This package currently offers 3 key functions; `value_to_score`,
+`score_to_grade`, and `save_n3_table()`. Each of these functions are
+designed to work in sequence, starting from calculating report card
+scores, and finishing with saving an .xslx table. A summary of each
+function and an example use case is provided below.
+
+### value_to_score
+
+The `value_to_score` function is designed to calculate a variety of
+report card scores used by the Northern Three Report Cards. The function
+takes a dataframe and appends an additional column to the dataframe with
+the calculated scores.
+
+Currently this function can score the following indices/indicators:
+
+- All water quality indicators (freshwater, estuarine, and marine
+  environments)
+- Mangroves and saltmarsh
+- Wetlands
+- Riparian vegtation (freshwater and estuarine)
+- Fish
+
+Depending on the index/indicator a different amount of inputs are
+requried. Below is a basic example of how to use the `value_to_score()`
+function to calculate scores:
+
+``` r
+#load the package
+library(RcTools)
+
+#create an example dataframe
+df <- data.frame(
+  WQIndicator = c(rep("DIN", 3), rep("Low DO", 3)),
+  WQObjective = c(rep(0.02, 3), rep(90, 3)),
+  WQScalingFactor = c(rep(0.38, 3), rep(70, 3)),
+  WQValue = c(0.002, 0.017, 0.029, 65, 93, 101)
+)
+
+#calculate the twentieth and eightieth percentile values
+df <- df |> 
+  dplyr::mutate(
+    WQEightieth = quantile(WQValue, probs = 0.8),
+    WQTwentieth = quantile(WQValue, probs = 0.2)
+  )
+
+#run the scoring function
+df <- df |> 
+  value_to_score(
+    value = WQValue,
+    value_type = "Water Quality",
+    water_type = "Freshwater",
+    indicator = WQIndicator,
+    wqo = WQObjective,
+    sf = WQScalingFactor,
+    eightieth = WQEightieth,
+    twentieth = WQTwentieth
+  )
+```
+
+The output of the function is the original table, now with an additional
+score column. The example table above would look like this:
+
+``` r
+
+df
+#> function (x, df1, df2, ncp, log = FALSE) 
+#> {
+#>     if (missing(ncp)) 
+#>         .Call(C_df, x, df1, df2, log)
+#>     else .Call(C_dnf, x, df1, df2, ncp, log)
+#> }
+#> <bytecode: 0x0000017b73c63238>
+#> <environment: namespace:stats>
+```
+
+### score_to_grade
+
+### save_n3_table
+
+The `save_n3_table` is designed to format data frames into a specific
+style that is used in the Northern Three Report Cards. The function
+takes a data frame and formats it according to the specifications of the
+report card, including adding letter grades and adjusting the layout.
 
 It has the following formatting options:
 
@@ -46,7 +132,7 @@ It has the following formatting options:
   temperature codes (1 to 7).
 - Summary Statistics: This compares mean/median values against WQOs and
   colours cells blue for pass and orange for fail.
-- Presence Abesnce: This colours cells based on presence (blue) and
+- Presence Absence: This colours cells based on presence (blue) and
   absence (grey), used for fish observation data.
 
 Below is a basic example of how to use the `save_n3_table()` function to

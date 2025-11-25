@@ -92,6 +92,15 @@ value_to_score <- function(
         temp_indicator = {{ indicator }},
         temp_indicator = stringr::str_replace_all(stringr::str_to_lower(temp_indicator), "_", " ")
       )
+    
+    #catch a few specific edge cases that are common enough to worry about
+    string_map <- c("lowdo" = "low do", "highdo" = "high do", "secchi depth" = "secchi")
+
+    df <- df |> 
+      dplyr::mutate(
+        temp_indicator = stringr::str_replace_all(temp_indicator, string_map)
+      )
+
 
     #create a list of allowed indicator names
     allowed_indicator_names <- c(
@@ -102,7 +111,14 @@ value_to_score <- function(
     bad_values <- setdiff(unique(df[["temp_indicator"]]), allowed_indicator_names)
 
     #if there are any values, stop and return an error
-    if (length(bad_values) > 0) {stop("Indicator column contains invalid values: ", paste(bad_values, collapse = ", "))}
+    if (length(bad_values) > 0) {
+      stop(
+        "Indicator column contains invalid values: ", 
+        paste(bad_values, collapse = ", "), 
+        "Try one of: ", 
+        paste(allowed_indicator_names)
+      )
+    }
 
   }
 
