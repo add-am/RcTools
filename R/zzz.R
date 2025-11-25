@@ -1,0 +1,1 @@
+utils::globalVariables(c("Score", "temp_indicator"))
