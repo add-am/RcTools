@@ -38,15 +38,15 @@ library(RcTools)
 
 ## Usage
 
-This package currently offers 3 key functions; `value_to_score`,
-`score_to_grade`, and `save_n3_table()`. Each of these functions are
+This package currently offers 3 key functions; `value_to_score()`,
+`score_to_grade()`, and `save_n3_table()`. Each of these functions are
 designed to work in sequence, starting from calculating report card
 scores, and finishing with saving an .xslx table. A summary of each
 function and an example use case is provided below.
 
 ### value_to_score
 
-The `value_to_score` function is designed to calculate a variety of
+The `value_to_score()` function is designed to calculate a variety of
 report card scores used by the Northern Three Report Cards. The function
 takes a dataframe and appends an additional column to the dataframe with
 the calculated scores.
@@ -61,8 +61,11 @@ Currently this function can score the following indices/indicators:
 - Fish
 
 Depending on the index/indicator a different amount of inputs are
-requried. Below is a basic example of how to use the `value_to_score()`
-function to calculate scores:
+requried. Below is a example of how to use the `value_to_score()`
+function to calculate scores for water quality indicators in the
+freshwater environment.
+
+First you would need to have a table of data:
 
 ``` r
 #load the package
@@ -82,7 +85,15 @@ df <- df |>
     WQEightieth = quantile(WQValue, probs = 0.8),
     WQTwentieth = quantile(WQValue, probs = 0.2)
   )
+```
 
+Then you can call the function just like any other tidyverse function.
+Importantly, this function has been written to be “pipe-friendly”
+i.e. you can use the function by itself, or in a pipe. That is to say
+that `value_to_score(df, ...)` is the same as
+`df |> value_to_score(...)`:
+
+``` r
 #run the scoring function
 df <- df |> 
   value_to_score(
@@ -97,30 +108,102 @@ df <- df |>
   )
 ```
 
-The output of the function is the original table, now with an additional
-score column. The example table above would look like this:
+Note that the arguments that are **not** provided in quotes are flexible
+(i.e. they can be provided with or without quotes), this adheres to
+tidyverse principles. However, the two arguments that **have** been
+provided in quotes are not flexible - they must have quotes. These two
+arguments are handled by the function internally a different way.
+
+Another example of the same function used to score riparian vegetation
+this time is as follows. Note that for this scoring method a lot less
+information is required. Helpers will notify you when required
+information is missing.
 
 ``` r
+#create an example dataframe
+df <- data.frame(
+  RiparianValue = c(1, 0, -0.1, -1, -3, -5)
+)
 
-df
-#> function (x, df1, df2, ncp, log = FALSE) 
-#> {
-#>     if (missing(ncp)) 
-#>         .Call(C_df, x, df1, df2, log)
-#>     else .Call(C_dnf, x, df1, df2, ncp, log)
-#> }
-#> <bytecode: 0x0000017b73c63238>
-#> <environment: namespace:stats>
+#run the scoring function. As a demonstration, no pipe has been used this time.
+df <- value_to_score(
+        df = df,
+        value = RiparianValue,
+        value_type = "Riparian"
+      )
 ```
+
+In anycase, the output of the function is the original table, now with
+an additional score column. The name of the score column is inherited
+from the name of the value column + “Score” added to the end of it -
+this provides an easy link back to the source of the scores. The example
+table above would look like this:
+
+| RiparianValue | RiparianValueScore |
+|---------------|--------------------|
+| 1             | 81.19              |
+| 0             | 80.90              |
+| -0.1          | 61.00              |
+| -1            | 21.00              |
+| -3            | 20.48              |
+| -5            | 20.06              |
 
 ### score_to_grade
 
+The `score_to_grade()` function has been designed to directly follow the
+`value_to_score()` function. It takes a dataframe (with scores) and
+appends an additional column to the dataframe with the calculated
+grades.
+
+Currently this function will provide grades that adhere to the following
+range:
+
+- 81 to 100 = A
+- 61 to 80 = B
+- 41 to 60 = C
+- 21 to 40 = D
+- 0 to 20 = E
+
+Broadly speaking, the majority of grades follow this range, should any
+other range be required the function will be updated.
+
+Below is a basic example of how to use the `score_to_grade()` function.
+If for some reason you have multiple columns that contain scores,
+multiple columns can also be provided:
+
+``` r
+#create an example dataframe (duplicate of above table)
+df <- data.frame(
+  RiparianValue = c(1, 0, -0.1, -1, -3, -5),
+  RiparianValueScore = c(81.19, 80.90, 61.00, 21.00, 20.48, 20.06)
+)
+
+#run the grading function.
+df <- score_to_grade(df, RiparianValueScore)
+```
+
+By default, because this function is meant to directly follow the
+`value_to_score()` function, it will also detect if the supplied column
+name ends in “Score” and if so will replace it with “Grade”. This just
+keeps the column names cleaner. Thus, the final output would look like
+this:
+
+| RiparianValue | RiparianValueScore | RiparianValueGrade |
+|---------------|--------------------|--------------------|
+| 1             | 81.19              | A                  |
+| 0             | 80.90              | B                  |
+| -0.1          | 61.00              | B                  |
+| -1            | 21.00              | D                  |
+| -3            | 20.48              | E                  |
+| -5            | 20.06              | E                  |
+
 ### save_n3_table
 
-The `save_n3_table` is designed to format data frames into a specific
-style that is used in the Northern Three Report Cards. The function
-takes a data frame and formats it according to the specifications of the
-report card, including adding letter grades and adjusting the layout.
+The `save_n3_table()` function is designed to format data frames into a
+specific style that is used in the Northern Three Report Cards. The
+function takes a data frame and formats it according to the
+specifications of the report card, including adding letter grades and
+adjusting the layout.
 
 It has the following formatting options:
 

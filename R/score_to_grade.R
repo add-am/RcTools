@@ -13,9 +13,9 @@
 #'  Basin = c("Black", "Ross", "Haughton", "Suttor"),
 #'  ScoreA = c(51, 76, 27, 98),
 #'  ScoreB = c(7, 42, 89, 63),
-#'  ScoreC = c(15, 34, 56, 21),
+#'  ScoreC = c(15, 34, 56, 21)
 #' )
-#' x <- score_to_grade(x, c("ScoreA", "ScoreB", "ScoreC"))
+#' x <- score_to_grade(x, c(ScoreA, ScoreB, ScoreC))
 #'   
 #' }
 score_to_grade <- function(df, score_cols){
@@ -31,8 +31,9 @@ score_to_grade <- function(df, score_cols){
           .x >= 21 ~ "D",
           T ~ "E"
         ),
-        .names = "{.col}Grade"
+        .names = "{stringr::str_replace_all(.col, 'Score$', '')}Grade"
       )
     ) 
 
 }
+
