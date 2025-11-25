@@ -10,7 +10,7 @@
 #'   \item{eightieth}{A numeric column containing two different eightieth value options}
 #'   \item{twentieth}{A numeric column containing two different twentieth value options}
 #'   \item{water_quality_indicator}{A string column defining the type of water quality indicator scored for the row}
-#'   \item{fish_indicator}A string column defining the type of fish indicator scored for the row}
+#'   \item{fish_indicator}{A string column defining the type of fish indicator scored for the row}
 #'   \item{water_quality_test}{A numeric column containing a range of possible water quality values}
 #'   \item{wetland_test}{A numeric column containing a range of possible wetland values}
 #'   \item{riparian_test}{A numeric column containing a range of possible riparian values}
