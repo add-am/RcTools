@@ -183,11 +183,7 @@ df <- data.frame(
 df <- score_to_grade(df, RiparianValueScore)
 ```
 
-By default, because this function is meant to directly follow the
-`value_to_score()` function, therefore it will also detect if the
-supplied column name ends in “Score” and if so will replace it with
-“Grade”. This just keeps the column names cleaner. Thus, the final
-output would look like this:
+The final output would look like this:
 
 | RiparianValue | RiparianValueScore | RiparianValueGrade |
 |---------------|--------------------|--------------------|
