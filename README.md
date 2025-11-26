@@ -32,7 +32,6 @@ pak::pak("add-am/RcTools")
 Finally, load the package just like you would any other R package:
 
 ``` r
-
 library(RcTools)
 ```
 
@@ -42,7 +41,9 @@ This package currently offers 3 key functions; `value_to_score()`,
 `score_to_grade()`, and `save_n3_table()`. Each of these functions are
 designed to work in sequence, starting from calculating report card
 scores, and finishing with saving an .xslx table. A summary of each
-function and an example use case is provided below.
+function and an example use case is provided below. Alternatively,
+function documentation can be accessed with the command
+`?value_to_score` etc.
 
 ### value_to_score
 
@@ -204,16 +205,7 @@ from within R (such as the one above) and save it as an excel file with
 formatting in the specific style used by the Northern Three Report
 Cards. Below is a basic example of how to use the `save_n3_table()`
 function to format a data frame for the Northern Three Report Card. We
-will use the following table for each example:
-
-| RiparianValue | RiparianValueScore | RiparianValueGrade |
-|---------------|--------------------|--------------------|
-| 1             | 81.19              | A                  |
-| 0             | 80.90              | B                  |
-| -0.1          | 61.00              | B                  |
-| -1            | 21.00              | D                  |
-| -3            | 20.48              | E                  |
-| -5            | 20.06              | E                  |
+will use the table that we just created above for this example.
 
 In the first instance, we apply styling only to the score column:
 
@@ -230,7 +222,7 @@ save_n3_table(
 
 Which looks like this:
 
-![](man/figures/README-save_n3_table_example_1.png)
+![](man/figures/README-save_n3_table-example_1.png)
 
 It is also possible to apply styling to the grade column as well.
 However, a side effect of this is the score column inherits the grades
