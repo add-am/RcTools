@@ -150,7 +150,7 @@ Broadly speaking, the majority of grades follow this range, should any other ran
 
 Below is a basic example of how to use the `score_to_grade()` function. If for some reason you have multiple columns that contain scores, multiple columns can also be provided:
 
-```{r}
+```{r s2g example}
 #| eval: FALSE
 
 #create an example dataframe (duplicate of above table)
@@ -164,7 +164,7 @@ df <- score_to_grade(df, RiparianValueScore)
 
 ```
 
-By default, because this function is meant to directly follow the `value_to_score()` function, it will also detect if the supplied column name ends in "Score" and if so will replace it with "Grade". This just keeps the column names cleaner. Thus, the final output would look like this:
+By default, because this function is meant to directly follow the `value_to_score()` function, therefore it will also detect if the supplied column name ends in "Score" and if so will replace it with "Grade". This just keeps the column names cleaner. Thus, the final output would look like this:
 
 | RiparianValue | RiparianValueScore | RiparianValueGrade |
 |---------------|--------------------|--------------------|
@@ -177,65 +177,82 @@ By default, because this function is meant to directly follow the `value_to_scor
 
 ### save_n3_table
 
-The `save_n3_table()` function is designed to format data frames into a specific style that is used in the Northern Three Report Cards. The function takes a data frame and formats it according to the specifications of the report card, including adding letter grades and adjusting the layout.
+The `save_n3_table()` function is designed to take a finalised dataframe from within R (such as the one above) and save it as an excel file with formatting in the specific style used by the Northern Three Report Cards. Below is a basic example of how to use the `save_n3_table()` function to format a data frame for the Northern Three Report Card. We will use the following table for each example:
 
-It has the following formatting options:
+| RiparianValue | RiparianValueScore | RiparianValueGrade |
+|---------------|--------------------|--------------------|
+| 1             | 81.19              | A                  |
+| 0             | 80.90              | B                  |
+| -0.1          | 61.00              | B                  |
+| -1            | 21.00              | D                  |
+| -3            | 20.48              | E                  |
+| -5            | 20.06              | E                  |
 
- - Report Card (with or without letter grades): This colours cell from red to green based on the standard Report Card boundaries.
+In the first instance, we apply styling only to the score column:
+
+```{r sn3 example 1}
+#| eval: FALSE
+
+#run the "save as n3 table" function
+save_n3_table(
+  df = df,
+  file_name = "Riparian Scores and Grades", 
+  target_columns = 2, 
+  target_rows = 1:nrow(df), 
+  scheme = "Report Card",
+  )
+
+```
+
+Which looks like this:
+
+![](man/figures/README-save_n3_table_example_1.png)
+
+It is also possible to apply styling to the grade column as well. However, a side effect of this is the score column inherits the grades as well (as formatting is now done by character not value):
+
+```{r sn3 example 2}
+#| eval: FALSE
+
+#run the "save as n3 table" function
+save_n3_table(
+  df = df,
+  file_name = "Riparian Scores and Grades", 
+  target_columns = 2:3, #note we expanded the column range
+  target_rows = 1:nrow(df), 
+  scheme = "Report Card", 
+  include_letter = TRUE
+  )
+
+```
+
+Which looks like this:
+
+![](man/figures/README-save_n3_table-example_2.png)
+
+#### extensions
+
+The `save_n3_table()` offers several other extensions for styling choices, these are as follows:
+
+ - Report Card (with or without letter grades): This colours cell from red to green based on the standard Report Card boundaries. Demonstrated above.
  - Rainfall: This colours cells from brown to blue based on average rainfall codes (1 to 7).
  - Temperature: This colours cells from blue to red based on average temperature codes (1 to 7).
  - Summary Statistics: This compares mean/median values against WQOs and colours cells blue for pass and orange for fail.
  - Presence Absence: This colours cells based on presence (blue) and absence (grey), used for fish observation data.
 
-Below is a basic example of how to use the `save_n3_table()` function to format a data frame for the Northern Three Report Card:
+Each of these extended styling options are implimented the same way, with only the scheme argument changing. The other styling choices are as follows:
 
-``` {r sn3 example}
-#| eval: false
-
-#load the package
-library(RcTools)
-
-#create a basic dataset
-df <- data.frame(
-  "SubBasin" = c(
-    "Black River", "Bluewater Creek", "Rollingstone Creek", "Crystal Creek", "Paluma",
-    "Upper Ross River", "Lower Ross River", "Bohle River", "Stuart Creek", "Alligator Creek"
-  ),
-  "DIN" = c(seq(1, 100, 10)),
-  "TP" = c(seq(100, 1, -10)),
-  "Nutrients" = c(75, 49, 45, 54, 2, 91, 88, 41, 100, 80)
-)
-
-#run the "save as n3 table" function
-save_n3_table(
-  df = df, #select your data frame
-  file_name = "output_file", #pick a name for your output file
-  target_columns = 2:4, #specify which columns to format
-  target_rows = 1:nrow(df), #specify which rows to format
-  scheme = "Report Card", #define the formatting scheme
-  include_letter = TRUE #decide if you want to include letter grades
-  )
-
-```
-
-### Output
-
-The output of the above function will be a .xlsx file with conditional formatting applied, which will look similar to the following:
-
-![](man/figures/README-after-report-card-formatting.png)
-
-Equally, rainfall data looks like this:
+Rainfall:
 
 ![](man/figures/README-after-rainfall-formatting.png)
 
-temperature data looks like this:
+Temperature:
 
 ![](man/figures/README-after-temperature-formatting.png)
 
-summary statistics data looks like this:
+Summary statistics:
 
 ![](man/figures/README-after-summary-statistic-formatting.png)
 
-and presence absence data looks like this:
+Presence absence:
 
 ![](man/figures/README-after-presence-absence-formatting.png)
