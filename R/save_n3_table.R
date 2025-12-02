@@ -35,12 +35,6 @@ save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, in
     stringr::str_to_lower() |> 
     stringr::str_replace_all(" |\\.|-", "_")
 
-  #create a duplicate that doesn't get all columns converted to numeric (used within conditional formatting func)
-  df_original <- df
-
-  #coerce all cols to numeric - cols may not be numeric if they contain "weird" Nan, NA, or ND values
-  df[target_columns] <- purrr::map(df[target_columns], ~suppressWarnings(as.numeric(.)))
-
   #create an empty workbook
   wb <- openxlsx2::wb_workbook()
   
@@ -53,7 +47,7 @@ save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, in
      
   if (include_letter){ 
 
-    #run the letter from grade function
+    #run the bind letter to score function
     df <- bind_letter_to_score(df, target_columns, target_rows)
       
     #put the new data to the workbook, over riding the old data that was added
@@ -62,6 +56,6 @@ save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, in
   }
     
   #run the conditional formatting function. This also saves the data
-  conditional_formatter(df, df_original, wb, target_columns, target_rows, scheme, include_letter, file_name)
+  conditional_formatter(df, wb, target_columns, target_rows, scheme, include_letter, file_name)
     
 }

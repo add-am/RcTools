@@ -24,9 +24,9 @@ x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
  ScoreA = c(51, 76, 27, 98),
  ScoreB = c(7, 42, 89, 63),
- ScoreC = c(15, 34, 56, 21),
+ ScoreC = c(15, 34, 56, 21)
 )
-x <- score_to_grade(x, c("ScoreA", "ScoreB", "ScoreC"))
+x <- score_to_grade(x, c(ScoreA, ScoreB, ScoreC))
   
 }
 }

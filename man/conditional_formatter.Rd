@@ -6,7 +6,6 @@
 \usage{
 conditional_formatter(
   data,
-  data_og,
   workbook,
   target_columns,
   target_rows,
@@ -17,8 +16,6 @@ conditional_formatter(
 }
 \arguments{
 \item{data}{The main dataframe to run functions on}
-
-\item{data_og}{The original dataframe before "as.numeric" is applied per column.}
 
 \item{workbook}{An excel workbook object.}
 
@@ -41,7 +38,7 @@ A Helper That Presents Conditional Formatting Options
 \examples{
 \dontrun{
 conditional_formatter(
-data, data_og, workbook, target_columns, 
+data, workbook, target_columns, 
 target_rows, scheme, include_letter, file_name)
 }
 }

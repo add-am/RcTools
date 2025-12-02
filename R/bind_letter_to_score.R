@@ -48,6 +48,7 @@ bind_letter_to_score <- function(df, columns, rows) {
           .x >= 41 & .x < 61 ~ "(C)",
           .x >= 61 & .x < 81 ~ "(B)",
           .x >= 81 & .x < 101 ~ "(A)",
+          .x %in% c("A", "B", "C", "D", "E") ~ "",
           TRUE ~ ""
         ),
         .names = "{.col}_grade"

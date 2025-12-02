@@ -1,7 +1,6 @@
 #' A Helper That Presents Conditional Formatting Options
 #'
 #' @param data The main dataframe to run functions on
-#' @param data_og The original dataframe before "as.numeric" is applied per column.
 #' @param workbook An excel workbook object.
 #' @param target_columns Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.
 #' @param target_rows Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.
@@ -14,11 +13,11 @@
 #' @examples
 #' \dontrun{
 #' conditional_formatter(
-#' data, data_og, workbook, target_columns, 
+#' data, workbook, target_columns, 
 #' target_rows, scheme, include_letter, file_name)
 #' }
 conditional_formatter <- function(
-  data, data_og, workbook, target_columns, 
+  data, workbook, target_columns, 
   target_rows, scheme, include_letter, file_name){
 
   #convert target_columns and target_rows into excel format
@@ -43,7 +42,7 @@ conditional_formatter <- function(
     
     #create a list of rule conditions to iterate on
     match_conditions <- list(
-      match_vals = c("(A)", "(B)", "(C)", "(D)", "(E)"),
+      match_vals = c("A", "B", "C", "D", "E"),
       style = c("dark_green", "light_green", "yellow", "orange", "red")
     )
 
@@ -76,19 +75,6 @@ conditional_formatter <- function(
         rule = c(match_conditions$min_vals[i], match_conditions$max_vals[i]), 
         style = match_conditions$style[i]
       )
-    }
-
-    #replace everything that isnt supposed to be NA (i.e. character cells) with their original value
-    for (column_number in seq_len(ncol(data_og))) {
-      for (row_number in seq_len(nrow(data_og))) {
-        if (is.na(data[row_number, column_number])) {
-          workbook$add_data(
-            "Data", 
-            as.character(data_og[row_number, column_number]), 
-            start_col = column_number, 
-            start_row = row_number + 1)
-        }
-      }
     }
 
   } else if (scheme %in% c("rainfall", "temperature")) {#use numeric based rules to colour with Rainfall or Temperature styling
