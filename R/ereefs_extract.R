@@ -18,7 +18,7 @@
 #'   Variable = "Turbidity",
 #'   Downsample = 0)
 #' }
-ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
+ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0){
 
   #check required argument (all of them)
   if (any(missing(Region), missing(StartDate), missing(EndDate), missing(Region), missing(Downsample))){
@@ -48,9 +48,6 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   
   #define input link
   input_file <- "https://dapds00.nci.org.au/thredds/dodsC/fx3/GBR1_H2p0_B3p2_Cfur_Dnrt.ncml"
-
-  #turn off spherical geometry
-  sf::sf_use_s2(FALSE)
 
   #convert the sf object into a bounding box, then rearrange the order for how eReefs likes it
   Region <- sf::st_bbox(Region)
