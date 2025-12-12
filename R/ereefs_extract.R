@@ -61,13 +61,6 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   #turn off spherical geometry
   sf::sf_use_s2(FALSE)
 
-  #simplify and summarise the sf object
-  Region <- Region |> 
-    dplyr::summarise(geom = sf::st_union(geom)) |> 
-    dplyr::ungroup() |> 
-    sf::st_cast() |> 
-    sf::st_make_valid()
-
   #convert the sf object into a bounding box, then rearrange the order for how eReefs likes it
   Region <- sf::st_bbox(Region)
   Region <- c(Region[1], Region[3], Region[2], Region[4])
@@ -149,28 +142,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   #overwrite erroneous high values (note that a value of even 50 would be very very high)
   nc_data[(nc_data > 2000)] <- NA
 
-  #update the crs on the data (move from lat long to meters)
-  nc_data <- nc_data |> sf::st_transform("EPSG:7855")
-
-  #convert our curvilinear object into just a bbox
-  curvilinear_bbox <- nc_data |> 
-    sf::st_bbox() |>
-    sf::st_as_sfc()
-
-  #get a linear grid target with the same dimensions (number of cells) as our curvilinear grid 
-  reg_stars <- stars::st_as_stars(
-    curvilinear_bbox, #using the bbox to provide the xmin, xmax etc., 
-    nx = dim(nc_data)[[1]], #and the dimensions to provide the x and y count. 
-    ny = dim(nc_data)[[2]], 
-    values = NA_real_) #Fill each cell with NA
-
-  #run st warp, it requires a curvilinear object, and a regular object as a target
-  warped_data <- stars::st_warp(nc_data, reg_stars)
-
-  #drop the depth dimension as this only has one layer
-  final_data <- warped_data[drop = TRUE]
-
   #return the final dataset
-  final_data
+  nc_data
 }
  
