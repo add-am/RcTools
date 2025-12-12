@@ -34,7 +34,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   EndDate <- as.Date(EndDate)
   
   #check variables by comparing to allowed variables (at the moment)
-  var_choices <- c("Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "Secchi", "pH", "Wind")
+  var_choices <- c("Turbidity", "Chl_a_sum", "DIN", "NH4", "NO3", "Secchi", "PH", "Wind")
   if (!Variable %in% var_choices){
     stop("Invalid 'Variable': must be one of ", paste(var_choices, collapse = ", "))
   }
@@ -43,17 +43,8 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   if (any(stringr::str_detect(Variable, "Wind"))){
     Variable <- c(
       Variable[-which(stringr::str_detect(Variable, "Wind"))], 
-      c("Wind Direction", "Wind Stress", "Wind U Component", "Wind V Component"))
+      c("wind_dir", "wind_mag", "wind_u", "wind_v"))
   }
-
-  #rename all arguments into the format ereefs likes
-  var_rename <- c(
-    "Turbidity" = "Turbidity", "Chlorophyll a" = "Chl_a_sum", "DIN" = "DIN", "NH4" = "NH4", "NO3" = "NO3", "Secchi" = "Secchi", 
-    "pH" = "PH", "Wind Direction" = "wind_dir", "Wind Stress" = "wind_mag", "Wind U Component" = "wind_u", "Wind V Component" = "wind_v"
-  )
-
-  #create a new vector of these ereefs names
-  Variable <- unname(var_rename[Variable])
   
   #define input link
   input_file <- "https://dapds00.nci.org.au/thredds/dodsC/fx3/GBR1_H2p0_B3p2_Cfur_Dnrt.ncml"
@@ -128,19 +119,48 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   EndDateLayerIndex <- which.min(abs(EndDate - ds))
   DayCount <- EndDateLayerIndex - StartDateLayerIndex
 
-  #extract data using indices to define layer counts
-  nc_data <- stars::read_ncdf(
-    input_file, 
-    var = Variable,
-    downsample = Downsample,
-    ncsub = cbind(
-      start = c(first_row, first_col, 44, StartDateLayerIndex), 
-      count = c(num_of_rows, num_of_cols, 1, DayCount)
+  #if the user wants secchi or wind these don't have a depth layer
+  if (stringr::str_detect(Variable, "Secchi|Wind")){
+
+    #extract data using indices to define layer counts
+    nc_data <- stars::read_ncdf(
+      input_file, 
+      var = Variable,
+      downsample = Downsample,
+      ncsub = cbind(
+        start = c(first_row, first_col, StartDateLayerIndex), 
+        count = c(num_of_rows, num_of_cols, DayCount)
+      )
     )
-  )
+  } else {
+
+    #extract data using indices to define layer counts plus include depth
+    nc_data <- stars::read_ncdf(
+      input_file, 
+      var = Variable,
+      downsample = Downsample,
+      ncsub = cbind(
+        start = c(first_row, first_col, 44, StartDateLayerIndex), 
+        count = c(num_of_rows, num_of_cols, 1, DayCount)
+      )
+    )
+  }
 
   #overwrite erroneous high values (note that a value of even 50 would be very very high)
   nc_data[(nc_data > 2000)] <- NA
+
+  #drop dimensions with only 1 value (i.e. the depth dimension) as it doesn't contribute to the data and only makes things harder
+  nc_data <- nc_data[drop = TRUE]
+
+  #extract units from the input
+  data_unit <- ncmeta::nc_atts(input_file, Variable) |> 
+    dplyr::filter(name == "units")
+
+  #keep just the units
+  data_unit <- data_unit$value[[1]]
+
+  #put units into the data, they are not carried over well in stars objects so we will hide them in the attribute name
+  names(nc_data) <- paste0(Variable, " (", data_unit, ")")
 
   #return the final dataset
   nc_data

@@ -18,7 +18,8 @@ Imports:
     sf,
     stars,
     utils,
-    ereefs
+    ereefs,
+    ncmeta
 Remotes:
     open-AIMS/ereefs
 Depends: 
