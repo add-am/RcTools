@@ -13,7 +13,14 @@ Imports:
     openxlsx2,
     rlang,
     stringr,
-    tidyr
+    tidyr,
+    ncdf4,
+    sf,
+    stars,
+    utils,
+    ereefs
+Remotes:
+    open-AIMS/ereefs
 Depends: 
     R (>= 3.5)
 LazyData: true

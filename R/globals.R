@@ -1,1 +1,1 @@
-utils::globalVariables(c(".data", "RowId", "Score", "temp_indicator"))
+utils::globalVariables(c(".data", "RowId", "Score", "temp_indicator", "geom"))

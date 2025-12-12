@@ -63,13 +63,13 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
 
   #simplify and summarise the sf object
   Region <- Region |> 
-    dplyr::summarise(geom = st_union(geom)) |> 
+    dplyr::summarise(geom = sf::st_union(geom)) |> 
     dplyr::ungroup() |> 
     sf::st_cast() |> 
     sf::st_make_valid()
 
   #convert the sf object into a bounding box, then rearrange the order for how eReefs likes it
-  Region <- st_bbox(Region)
+  Region <- sf::st_bbox(Region)
   Region <- c(Region[1], Region[3], Region[2], Region[4])
 
   #get all grids
@@ -96,7 +96,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   first_row <- true_rows[1]
 
   #find the number of rows that contains a true value
-  num_of_rows <- tail(true_rows, n = 1) - first_row
+  num_of_rows <- utils::tail(true_rows, n = 1) - first_row
 
   #return the row index for every row that contains at least one true value:
   true_cols <- which(apply(true_false_array, 2, any))
@@ -105,7 +105,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   first_col <- true_cols[1]
 
   #find the number of cols that contains a true value
-  num_of_cols <- tail(true_cols, n = 1) - first_col
+  num_of_cols <- utils::tail(true_cols, n = 1) - first_col
 
   #open the nc file
   nc <- ereefs::safe_nc_open(input_file)
@@ -173,24 +173,4 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample){
   #return the final dataset
   final_data
 }
-
-
-my_sf <- sf::st_read("n3_region.gpkg")
-
-my_sf <- my_sf |> 
-  dplyr::filter(Region == "Dry Tropics", Environment == "Marine")
-
-
-
-
-test <- ereefs_extract(
-  my_sf,
-  StartDate = "2016-03-01",
-  EndDate = "2022-03-03",
-  Variable = "Turbidity",
-  Downsample = 0
-)
-
-
-
-  
+ 
