@@ -21,13 +21,13 @@
 ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0){
 
   #check required argument (all of them)
-  if (any(missing(Region), missing(StartDate), missing(EndDate), missing(Region), missing(Downsample))){
+  if (any(missing(Region), missing(StartDate), missing(EndDate), missing(Region))){
     stop("You must supply all parameters")
   }
 
   #check argument types
   if (!inherits(Region, "sf")){stop("You must supply an sf object to the 'Region' parameter")}
-  if (!is.numeric(Downsample)){stop("You must supply an numeric argument to the 'Region' parameter")}
+  if (!is.numeric(Downsample)){stop("You must supply a numeric argument to the 'Downsample' parameter")}
   
   #check dates (this will fail if not already a date object or not provided as the correct characters and gives an informative error message)
   StartDate <- as.Date(StartDate)
