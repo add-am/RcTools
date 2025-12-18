@@ -26,7 +26,7 @@ ereefs_plot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, L
   #check argument types
   if (!inherits(nc, "stars")){
     if (inherits(nc, "list")){
-      if (any(!purrr::map(nc, \(nc_object) inherits(nc_object, "stars")))){
+      if (any(!purrr::map_lgl(nc, \(nc_object) inherits(nc_object, "stars")))){
         stop("You must supply either a single netCDF (stars) object, or a list of netCDF (stars) objects")
       }
     } else {
