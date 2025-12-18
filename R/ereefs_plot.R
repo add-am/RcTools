@@ -52,7 +52,7 @@ ereefs_plot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, L
   )
 
   #take a subset of the data by iterating over each column in the sf object
-  sub_sampled_data <- purrr::map_dfr(full_data, \(x) {sample(x, SubSample)})
+  sub_sampled_data <- purrr::map_dfc(full_data, \(x) {sample(x, SubSample)})
 
   #edit the sub sampled data
   sub_sampled_data <- sub_sampled_data |> 
