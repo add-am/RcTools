@@ -19,7 +19,11 @@ Imports:
     stars,
     utils,
     ereefs,
-    ncmeta
+    ncmeta,
+    ggplot2,
+    lubridate,
+    scales,
+    purrr
 Remotes:
     open-AIMS/ereefs
 Depends: 

@@ -21,7 +21,7 @@
 ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0){
 
   #check required argument (all of them)
-  if (any(missing(Region), missing(StartDate), missing(EndDate), missing(Region))){
+  if (any(missing(Region), missing(StartDate), missing(EndDate), missing(Variable))){
     stop("You must supply all parameters")
   }
 
