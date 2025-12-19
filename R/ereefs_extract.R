@@ -130,7 +130,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
       )
     )
   #otherwise the user wants any of the other standard variables:
-  } else if (stringr::str_detect(Variable, "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "pH")) {
+  } else if (stringr::str_detect(Variable, "Turbidity|Chlorophyll a|DIN|NH4|NO3|pH")) {
 
     #extract data using indices to define layer counts plus include depth
     nc_data <- stars::read_ncdf(
