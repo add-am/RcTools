@@ -34,7 +34,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   EndDate <- as.Date(EndDate)
   
   #check variables by comparing to allowed variables (at the moment)
-  var_choices <- c("Turbidity", "Chl_a_sum", "DIN", "NH4", "NO3", "Secchi", "PH", "Wind")
+  var_choices <- c("Turbidity", "Chl_a_sum", "DIN", "NH4", "NO3", "Secchi", "PH", "Wind", "True Colour")
   if (!Variable %in% var_choices){
     stop("Invalid 'Variable': must be one of ", paste(var_choices, collapse = ", "))
   }
@@ -114,7 +114,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   #get the index for the closest days
   StartDateLayerIndex <- which.min(abs(StartDate - ds))
   EndDateLayerIndex <- which.min(abs(EndDate - ds))
-  DayCount <- EndDateLayerIndex - StartDateLayerIndex
+  DayCount <- pmax(EndDateLayerIndex - StartDateLayerIndex, 1)
 
   #if the user wants secchi or wind these don't have a depth layer
   if (stringr::str_detect(Variable, "Secchi|Wind")){
@@ -129,7 +129,8 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
         count = c(num_of_rows, num_of_cols, DayCount)
       )
     )
-  } else {
+  #otherwise the user wants any of the other standard variables:
+  } else if (stringr::str_detect(Variable, "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "pH")) {
 
     #extract data using indices to define layer counts plus include depth
     nc_data <- stars::read_ncdf(
@@ -143,21 +144,67 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
     )
   }
 
-  #overwrite erroneous high values (note that a value of even 50 would be very very high)
-  nc_data[(nc_data > 2000)] <- NA
+  #if the user wants true colour, this follows a slightly different path
+  if ("True Colour") {
 
-  #drop dimensions with only 1 value (i.e. the depth dimension) as it doesn't contribute to the data and only makes things harder
-  nc_data <- nc_data[drop = TRUE]
+    #create a list of the three colour channels to extract
+    colour_channels <- list("R_470", "R_555", "R645")
 
-  #extract units from the input
-  data_unit <- ncmeta::nc_atts(input_file, Variable) |> 
-    dplyr::filter(name == "units")
+    #extract each colour channel
+    nc_data <- purrr::map(colour_channels, \(x) {
 
-  #keep just the units
-  data_unit <- data_unit$value[[1]]
+      stars::read_ncdf(
+        input_file, 
+        var = x,
+        downsample = Downsample,
+        ncsub = cbind(
+          start = c(first_row, first_col, StartDateLayerIndex), 
+          count = c(num_of_rows, num_of_cols, DayCount)
+        )
+      )
+    })
 
-  #put units into the data, they are not carried over well in stars objects so we will hide them in the attribute name
-  names(nc_data) <- paste0(Variable, " (", data_unit, ")")
+    #create a scaling function
+    unscaledR <- c(0, 30, 60, 120, 190, 255)/255
+    scaledR   <- c(1, 110, 160, 210, 240, 255)/255
+    scalefun  <- approxfun(unscaledR, scaledR, yleft = 0, yright = 1)
+
+    #apply this scaling function plus some other adjustments
+    nc_data <- purrr::map(nc_data, \(x) {
+      x[x > 1] <- NA #change _FillValue cells to NA
+      x <- x * 10 #multiple base values by 10
+      vals <- x[[1]] #extract values
+      vals <- scalefun(vals)*255 #scale values up to rgb channels (0 to 255)
+      vals[vals > 255] <- 255 #cap vals
+      x[[1]] <- vals #put values back into the netCDF
+      x[drop = TRUE] #drop the time values
+    })
+
+    #join files into a single stars object
+    nc_data <- do.call(c, nc_data)
+
+    #merge the product of above
+    nc_data <- merge(nc_data)
+
+  #otherwise finish processing the data like normal
+  } else {
+
+    #overwrite erroneous high values (note that a value of even 50 would be very very high)
+    nc_data[(nc_data > 2000)] <- NA
+
+    #drop dimensions with only 1 value (i.e. the depth dimension) as it doesn't contribute to the data and only makes things harder
+    nc_data <- nc_data[drop = TRUE]
+
+    #extract units from the input
+    data_unit <- ncmeta::nc_atts(input_file, Variable) |> 
+      dplyr::filter(name == "units")
+
+    #keep just the units
+    data_unit <- data_unit$value[[1]]
+
+    #put units into the data, they are not carried over well in stars objects so we will hide them in the attribute name
+    names(nc_data) <- paste0(Variable, " (", data_unit, ")")
+  }
 
   #return the final dataset
   nc_data
