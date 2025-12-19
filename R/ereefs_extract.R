@@ -145,7 +145,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   }
 
   #if the user wants true colour, this follows a slightly different path
-  if ("True Colour") {
+  if (stringr::str_detect(Variable, "True Colour")) {
 
     #create a list of the three colour channels to extract
     colour_channels <- list("R_470", "R_555", "R645")
