@@ -167,7 +167,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
     #create a scaling function
     unscaledR <- c(0, 30, 60, 120, 190, 255)/255
     scaledR   <- c(1, 110, 160, 210, 240, 255)/255
-    scalefun  <- approxfun(unscaledR, scaledR, yleft = 0, yright = 1)
+    scalefun  <- stats::approxfun(unscaledR, scaledR, yleft = 0, yright = 1)
 
     #apply this scaling function plus some other adjustments
     nc_data <- purrr::map(nc_data, \(x) {

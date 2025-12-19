@@ -43,8 +43,22 @@ ereefs_plot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, L
   if (!is.null(Heading) & !is.character(Heading)){stop("You must supply a character argument to the 'Heading' parameter")}
   if (!is.logical(LogTransform)){stop("You must supply a logical (boolean) argument to the 'LogTransform' parameter")}
 
-  #if several netcdfs, combine the list into a single object
-  if (inherits(nc, "list")){nc <- do.call(c, nc)}
+  #if several netcdfs are provided in a list
+  if (inherits(nc, "list")){
+
+    #combine the list into a single object
+    nc_combine <- do.call(c, nc)
+
+    #use the same logical vector to pull date values associated with each of the datasets
+    data_dates <- do.call(c, purrr::map(nc, \(x) stars::st_get_dimension_values(x, "time")))
+
+    #update the date values in the compressed dataset
+    stars::st_dimensions(nc_combine)$time$values <- data_dates
+
+    #update name
+    nc <- nc_combine
+    
+  } 
 
   #convert the netcdf into a sf object (required by ggplot) and drop geometry
   full_data <- sf::st_drop_geometry(

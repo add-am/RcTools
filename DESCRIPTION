@@ -23,7 +23,8 @@ Imports:
     ggplot2,
     lubridate,
     scales,
-    purrr
+    purrr,
+    stats
 Remotes:
     open-AIMS/ereefs
 Depends: 

@@ -17,11 +17,11 @@ ereefs_plot(
 
 \item{SubSample}{Numeric String. The number of values per day to plot in the dot plot. Defaults to 500 values per day.}
 
+\item{Heading}{Character String. The heading of the plot. Defaults to NULL.}
+
+\item{YAxisName}{Character String. The yaxis label text for the plot. Defaults to NULL and returns "value" in the plot.}
+
 \item{LogTransform}{Boolean. Should the data be presented with a log transformation - useful for some variables such as Turbidity or Chlorophyll}
-
-\item{Variable}{Character String. The variable in the netCDF that is being mapped. One of: "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "Secchi", "pH", "Wind".}
-
-\item{Region}{Character String. The area in which the netCDF is located.}
 }
 \value{
 A ggplot object
@@ -31,6 +31,10 @@ Convert the eReefs object from curvilinear to a regular grid
 }
 \examples{
 \dontrun{
-x_plot <- ereefs_plot(nc, YAxisName = "Turbidity (NTU)", Heading = "Dry Tropics", LogTransform = TRUE)
+x_plot <- ereefs_plot(
+  nc = nc,
+  YAxisName = "Turbidity (NTU)", 
+  Heading = "Dry Tropics", 
+  LogTransform = TRUE)
 }
 }
