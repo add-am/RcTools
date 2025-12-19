@@ -148,7 +148,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   if (stringr::str_detect(Variable, "True Colour")) {
 
     #create a list of the three colour channels to extract
-    colour_channels <- list("R_645", "R_555", "R_470",)
+    colour_channels <- list("R_645", "R_555", "R_470")
 
     #extract each colour channel
     nc_data <- purrr::map(colour_channels, \(x) {
