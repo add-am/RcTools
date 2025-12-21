@@ -1,4 +1,4 @@
-#' Conditional Formatting with .xlsx Output
+#' Extracting eReefs Data
 #'
 #' @param Region SF Object. An sf object defining the area to extract data from
 #' @param StartDate POSIX time. Supplied as a string in the format YYYY-MM-DD that defines the first day to extract data from
@@ -182,9 +182,6 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
 
     #join files into a single stars object
     nc_data <- do.call(c, nc_data)
-
-    #merge the product of above
-    nc_data <- merge(nc_data)
 
   #otherwise finish processing the data like normal
   } else {

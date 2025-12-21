@@ -1,4 +1,4 @@
-#' Convert the eReefs object from curvilinear to a regular grid
+#' Plotting eReefs Data
 #'
 #' @param nc A NetCDF (stars) object or a list of NetCDF objects, generally produced by the [ereefs_extract()] function
 #' @param SubSample Numeric String. The number of values per day to plot in the dot plot. Defaults to 500 values per day.

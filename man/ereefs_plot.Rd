@@ -2,7 +2,7 @@
 % Please edit documentation in R/ereefs_plot.R
 \name{ereefs_plot}
 \alias{ereefs_plot}
-\title{Convert the eReefs object from curvilinear to a regular grid}
+\title{Plotting eReefs Data}
 \usage{
 ereefs_plot(
   nc,
@@ -27,7 +27,7 @@ ereefs_plot(
 A ggplot object
 }
 \description{
-Convert the eReefs object from curvilinear to a regular grid
+Plotting eReefs Data
 }
 \examples{
 \dontrun{

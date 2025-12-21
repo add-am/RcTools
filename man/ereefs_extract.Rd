@@ -2,7 +2,7 @@
 % Please edit documentation in R/ereefs_extract.R
 \name{ereefs_extract}
 \alias{ereefs_extract}
-\title{Conditional Formatting with .xlsx Output}
+\title{Extracting eReefs Data}
 \usage{
 ereefs_extract(Region, StartDate, EndDate, Variable, Downsample = 0)
 }
@@ -21,7 +21,7 @@ ereefs_extract(Region, StartDate, EndDate, Variable, Downsample = 0)
 A NetCDF (stars) object or list of NetCDF (stars) objects
 }
 \description{
-Conditional Formatting with .xlsx Output
+Extracting eReefs Data
 }
 \examples{
 \dontrun{
