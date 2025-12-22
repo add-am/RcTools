@@ -16,6 +16,10 @@ ereefs_map <- function(nc){
   #qld outline (can come from the AIMS dataset)
   #reef outline (can come from the AIMS dataset)
 
+  #data privded
+  #netcdf object, or a list of netcdf objects if looking for wind??
+  #lets just start with the one
+
   #types of map to create
   #rgb true colour
   #concentration
@@ -28,6 +32,8 @@ ereefs_map <- function(nc){
   #faceted annually
   #faceted by finacial year?
 
+  #steps:
+  
 
 
 
