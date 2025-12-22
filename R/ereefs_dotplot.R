@@ -11,14 +11,15 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' x_plot <- ereefs_plot(
+#' x_plot <- ereefs_dotplot(
 #'   nc = nc,
 #'   YAxisName = "Turbidity (NTU)", 
 #'   Heading = "Dry Tropics", 
-#'   LogTransform = TRUE)
+#'   LogTransform = TRUE
+#' )
 #' }
 
-ereefs_plot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, LogTransform = FALSE){
+ereefs_dotplot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, LogTransform = FALSE){
 
   #check required argument
   if (missing(nc)){stop("You must supply at least the 'nc' parameter.")}

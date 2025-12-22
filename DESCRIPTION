@@ -25,7 +25,8 @@ Imports:
     scales,
     purrr,
     stats, 
-    tmap
+    tmap,
+    climaemet
 Remotes:
     open-AIMS/ereefs
 Depends: 

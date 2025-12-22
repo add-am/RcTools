@@ -3,7 +3,7 @@
 #' @param Region SF Object. An sf object defining the area to extract data from
 #' @param StartDate POSIX time. Supplied as a string in the format YYYY-MM-DD that defines the first day to extract data from
 #' @param EndDate POSIX time. Supplied as a string in the format YYYY-MM-DD that defines the last day to extract data from
-#' @param Variable Character Vector. One or several variables to extract from eReefs, currently accessible: "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "Secchi", "pH", "Wind"
+#' @param Variable Character Vector. The variable to extract from eReefs, currently accessible: "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "Secchi", "pH", "Wind", "True Colour"
 #' @param Downsample Integer. A singular value that defines the level of downsampling to apply to the data (reduces data size and processing time, also reduces resolution)
 #'
 #' @returns A NetCDF (stars) object or list of NetCDF (stars) objects
@@ -38,14 +38,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   if (!Variable %in% var_choices){
     stop("Invalid 'Variable': must be one of ", paste(var_choices, collapse = ", "))
   }
-
-  #if wind is an argument, replace it with the four variables
-  if (any(stringr::str_detect(Variable, "Wind"))){
-    Variable <- c(
-      Variable[-which(stringr::str_detect(Variable, "Wind"))], 
-      c("wind_dir", "wind_mag", "wind_u", "wind_v"))
-  }
-  
+ 
   #define input link
   input_file <- "https://dapds00.nci.org.au/thredds/dodsC/fx3/GBR1_H2p0_B3p2_Cfur_Dnrt.ncml"
 
@@ -116,8 +109,8 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   EndDateLayerIndex <- which.min(abs(EndDate - ds))
   DayCount <- pmax(EndDateLayerIndex - StartDateLayerIndex, 1)
 
-  #if the user wants secchi or wind these don't have a depth layer
-  if (stringr::str_detect(Variable, "Secchi|Wind")){
+  #if the user wants secchi, this doesn't have a depth layer
+  if (stringr::str_detect(Variable, "Secchi")){
 
     #extract data using indices to define layer counts
     nc_data <- stars::read_ncdf(
@@ -129,7 +122,8 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
         count = c(num_of_rows, num_of_cols, DayCount)
       )
     )
-  #otherwise the user wants any of the other standard variables:
+
+  #if the user wants any of the other standard variables, these do have a depth layer, which we need to get rid off
   } else if (stringr::str_detect(Variable, "Turbidity|Chlorophyll a|DIN|NH4|NO3|pH")) {
 
     #extract data using indices to define layer counts plus include depth
@@ -142,17 +136,39 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
         count = c(num_of_rows, num_of_cols, 1, DayCount)
       )
     )
-  }
 
-  #if the user wants true colour, this follows a slightly different path
-  if (stringr::str_detect(Variable, "True Colour")) {
+    #drop the depth layer
+    nc_data <- stars::st_apply(nc_data, c("i", "j", "time"), identity)[1]
+
+  #if the user wants the wind variable, this has four sub components
+  } else if (stringr::str_detect(Variable, "Wind")){
+
+    #update the wind variable
+    Variable <- c(
+      Variable[-which(stringr::str_detect(Variable, "Wind"))], 
+      c("wind_dir", "wind_mag", "wind_u", "wind_v"))
+
+    #extract the four sub components
+    nc_data <- purrr::map(Variable, \(x) {
+      stars::read_ncdf(
+        input_file,
+        var = x,
+        downsample = Downsample,
+        ncsub = cbind(
+          start = c(first_row, first_col, StartDateLayerIndex), 
+          count = c(num_of_rows, num_of_cols, DayCount)
+        )
+      )
+    }) 
+  
+  #otherwise, the user would be requesting true colour, which has three sub components
+  } else if (stringr::str_detect(Variable, "True Colour")){
 
     #create a list of the three colour channels to extract
     colour_channels <- list("R_645", "R_555", "R_470")
 
     #extract each colour channel
     nc_data <- purrr::map(colour_channels, \(x) {
-
       stars::read_ncdf(
         input_file, 
         var = x,
@@ -182,26 +198,27 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
 
     #join files into a single stars object
     nc_data <- do.call(c, nc_data)
-
-  #otherwise finish processing the data like normal
-  } else {
-
-    #overwrite erroneous high values (note that a value of even 50 would be very very high)
-    nc_data[(nc_data > 2000)] <- NA
-
-    #drop dimensions with only 1 value (i.e. the depth dimension) as it doesn't contribute to the data and only makes things harder
-    nc_data <- nc_data[drop = TRUE]
-
-    #extract units from the input
-    data_unit <- ncmeta::nc_atts(input_file, Variable) |> 
-      dplyr::filter(name == "units")
-
-    #keep just the units
-    data_unit <- data_unit$value[[1]]
-
-    #put units into the data, they are not carried over well in stars objects so we will hide them in the attribute name
-    names(nc_data) <- paste0(Variable, " (", data_unit, ")")
   }
+
+  #data can now either be in a list of nc objects, or a single nc object, if a single object, we just need to wrap it
+  #in a list so it can pass through the next purrr map
+  if (!inherits(nc_data, "list")){nc_data <- list(nc_data)}
+  
+  #then apply the final data cleaning steps, these aren't necessary for the True colour dataset
+  if (any(Variable != "True Colour")){
+    nc_data <- purrr::map2(nc_data, Variable, \(x, y) {
+
+      x[x > 2000] <- NA #overwrite erroneous high values (note that a value of even 50 would be very very high)
+      x_units <- ncmeta::nc_atts(input_file, y) |> #extract units from the input
+        dplyr::filter(name == "units")
+      x_units <- x_units$value[[1]] #keep just the units
+      names(x) <- paste0(y, " (", x_units, ")") #put units into the data, they are not carried over well in stars objects so we will hide them in the attribute name
+      return(x)
+    })
+  }
+
+  #if the list output has length one, it can be converted back to a stars object
+  if (length(nc_data) == 1){nc_data <- nc_data[[1]]}
 
   #return the final dataset
   nc_data

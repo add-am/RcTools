@@ -13,7 +13,7 @@ ereefs_extract(Region, StartDate, EndDate, Variable, Downsample = 0)
 
 \item{EndDate}{POSIX time. Supplied as a string in the format YYYY-MM-DD that defines the last day to extract data from}
 
-\item{Variable}{Character Vector. One or several variables to extract from eReefs, currently accessible: "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "Secchi", "pH", "Wind"}
+\item{Variable}{Character Vector. The variable to extract from eReefs, currently accessible: "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "Secchi", "pH", "Wind", "True Colour"}
 
 \item{Downsample}{Integer. A singular value that defines the level of downsampling to apply to the data (reduces data size and processing time, also reduces resolution)}
 }

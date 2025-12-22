@@ -4,13 +4,13 @@
 \alias{ereefs_reproject}
 \title{Convert the eReefs object from curvilinear to a regular grid}
 \usage{
-ereefs_reproject(x)
+ereefs_reproject(nc)
 }
 \arguments{
-\item{x}{A NetCDF (stars) object, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A NetCDF (stars) object or list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
 }
 \value{
-A NetCDF (stars) object with the same values as x, but in a regular grid format
+A NetCDF (stars) object or list of NetCDF (stars) objects, with the same values as x, but in a regular grid format
 }
 \description{
 Convert the eReefs object from curvilinear to a regular grid
