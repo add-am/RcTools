@@ -4,10 +4,18 @@
 \alias{ereefs_map}
 \title{Mapping eReefs Data}
 \usage{
-ereefs_map(nc)
+ereefs_map(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL)
 }
 \arguments{
 \item{nc}{A netCDF (stars) object, usually produced by the \link{ereefs_extract} and \link{ereefs_reproject} functions}
+
+\item{MapType}{Character String. Defines the type of map produced. One of "Concentration", "True Colour", or "Vector Field" (AKA wind)}
+
+\item{Aggregation}{Character String. Defines the level of aggregation to apply. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"}
+
+\item{LegendTitle}{Character String. The title of the legend. Defaults to the name of the netCDF's attribute}
+
+\item{nrow}{Numeric String. The number of rows to be used when facetting maps. Defaults to NULL and uses underlying default value}
 }
 \value{
 A tmap object
@@ -17,6 +25,10 @@ Mapping eReefs Data
 }
 \examples{
 \dontrun{
-m <- ereefs_map(nc)
+m <- ereefs_map(
+  nc = nc,
+  MapType = "Concentration",
+  Aggregation = "Month"
+)
 }
 }

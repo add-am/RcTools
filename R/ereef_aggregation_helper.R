@@ -1,11 +1,14 @@
 #' A function to help with various forms of netCDF aggregation
 #'
 #' @param nc A netCDF object
-#' @param agg The type of aggregation to complete, defaults to monthly. Options are "Month", "Season", "Financial", "Annual"
+#' @param agg The type of aggregation to complete, defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
 #' 
 #' @returns A netCDF object
 #'
 #' @examples
+#' \dontrun{
+#' x <- ereefs_aggregation_helper(nc, "Month")
+#' }
 ereefs_aggregation_helper <- function(nc, agg){
 
   #data can be provided as a list of nc objects (wind) or a single object. If a single object, we just need to wrap it
@@ -39,8 +42,8 @@ ereefs_aggregation_helper <- function(nc, agg){
     #depending on what aggregation is requested, change how the layer name column is created
     if (agg == "Month") {nc_dates <- tidyr::unite(nc_dates, LayerName, "Year", "Month", sep = "_")
     } else if (agg == "Season") {nc_dates <- tidyr::unite(nc_dates, LayerName, "SeasonYear", "Season", sep = "_")
-    } else if (agg == "Financial") {nc_dates <- tidyr::mutate(nc_dates, LayerName = Year)
-    } else if (agg == "Annual") {nc_dates <- tidyr::mutate(nc_dates, LayerName = Fyear)}
+    } else if (agg == "Financial") {nc_dates <- dplyr::mutate(nc_dates, LayerName = Year)
+    } else if (agg == "Annual") {nc_dates <- dplyr::mutate(nc_dates, LayerName = Fyear)}
     
     #based on the aggregation, determine the associated row (and thus layer) numbers to select
     dates <- nc_dates  |> 
@@ -67,7 +70,7 @@ ereefs_aggregation_helper <- function(nc, agg){
         aggregated_layer <- stars::st_redimension(
           aggregated_layer,
           new_dims = c(295, 276, 1),
-          along = setNames(list(LayerName), "time"),
+          along = stats::setNames(list(LayerName), "time"),
           name = "time"
         )
 
@@ -102,7 +105,7 @@ ereefs_aggregation_helper <- function(nc, agg){
       aggregated_item <- stars::st_redimension(
         aggregated_item,
         new_dims = stars::st_dimensions(aggregated_item),
-        along = setNames(list(names(aggregated_item)), "time")
+        along = stats::setNames(list(names(aggregated_item)), "time")
       )
 
       #replace the name of the aggregated attribute

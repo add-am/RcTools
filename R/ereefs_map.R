@@ -2,6 +2,7 @@
 #'
 #' @param nc A netCDF (stars) object, usually produced by the [ereefs_extract] and [ereefs_reproject] functions
 #' @param MapType Character String. Defines the type of map produced. One of "Concentration", "True Colour", or "Vector Field" (AKA wind)
+#' @param Aggregation Character String. Defines the level of aggregation to apply. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
 #' @param LegendTitle Character String. The title of the legend. Defaults to the name of the netCDF's attribute
 #' @param nrow Numeric String. The number of rows to be used when facetting maps. Defaults to NULL and uses underlying default value
 #'
@@ -10,11 +11,13 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' m <- ereefs_map(nc)
+#' m <- ereefs_map(
+#'   nc = nc,
+#'   MapType = "Concentration",
+#'   Aggregation = "Month"
+#' )
 #' }
 ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL){
-
-  Aggregation <- "Season"
 
   #conduct safety checks
   if (any(missing(nc), missing(MapType), missing(Aggregation))){stop("You must supply at least the 'nc', 'MapType', and 'Aggregation' parameters.")}
@@ -37,13 +40,13 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
     or 'Vector Field' to the 'MapType' parameter.")}
 
   #obtain a qld state outline from the AIMS dataset
-  qld <- get(data("gbr_feat", package = "gisaimsr")) |> 
-    dplyr::filter(FEAT_NAME %in% c("Mainland", "Island")) |> 
+  qld <- get(utils::data("gbr_feat", package = "gisaimsr", envir = environment())) |> 
+    dplyr::filter(FEAT_NAME %in% c("Mainland", "Island", envir = environment())) |> 
     sf::st_transform("EPSG:9473")
 
   #obtain a reefs outline from the AIMS dataset
-  reefs <- get(data("gbr_feat", package = "gisaimsr")) |> 
-    filter(FEAT_NAME == "Reef") |> 
+  reefs <- get(utils::data("gbr_feat", package = "gisaimsr")) |> 
+    dplyr::filter(FEAT_NAME == "Reef") |> 
     sf::st_transform("EPSG:9473")
 
   #aggregate the data
@@ -122,24 +125,24 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
     u_v_nc <- u_v_nc[order(names(u_v_nc))]    
 
     #vector fields need to be provided in tabular form, convert the two netcdfs to sf objects
-    u_data <- st_as_sf(u_v_nc[[1]], as_points = T, merge = F)
-    v_data <- st_as_sf(u_v_nc[[2]], as_points = T, merge = F)
+    u_data <- sf::st_as_sf(u_v_nc[[1]], as_points = T, merge = F)
+    v_data <- sf::st_as_sf(u_v_nc[[2]], as_points = T, merge = F)
 
     #convert the geometry into lat and lon columns, u and v share the same coordinates so this only needs to be done once
     u_data <- u_data |> 
       dplyr::mutate(
-        lat = st_coordinates(geometry)[, "X"],
-        lon = st_coordinates(geometry)[, "Y"]
+        lat = sf::st_coordinates(geometry)[, "X"],
+        lon = sf::st_coordinates(geometry)[, "Y"]
       ) |> 
-      st_drop_geometry()
+      sf::st_drop_geometry()
 
     #drop data for v as well
     v_data <- v_data |> 
       dplyr::mutate(
-        lat = st_coordinates(geometry)[, "X"],
-        lon = st_coordinates(geometry)[, "Y"]
+        lat = sf::st_coordinates(geometry)[, "X"],
+        lon = sf::st_coordinates(geometry)[, "Y"]
       ) |> 
-      st_drop_geometry()
+      sf::st_drop_geometry()
 
     #data is then pivoted longer such that all observations share one column
     if (ncol(u_data) > 3){
@@ -197,10 +200,10 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
         colours = ereefs_get_palette("Wind"),
         limits = c(min(u_v_data$speed), max(u_v_data$speed)),
         breaks = seq(min(u_v_data$speed), max(u_v_data$speed), length.out = 3)) +
-      ggplot2::facet_wrap(as.formula(paste("~", Aggregation)))
+      ggplot2::facet_wrap(stats::as.formula(paste("~", Aggregation)))
 
     #if the user had a specific number of rows for facetting  
-    if (!is.null(nrow)){m <- m + ggplot2::facet_wrap(as.formula(paste("~", Aggregation)), nrow = nrow)}
+    if (!is.null(nrow)){m <- m + ggplot2::facet_wrap(stats::as.formula(paste("~", Aggregation)), nrow = nrow)}
     
   }
   

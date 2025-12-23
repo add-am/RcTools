@@ -28,7 +28,11 @@ Imports:
     tmap,
     climaemet,
     busdater,
-    grid
+    grid,
+    RColorBrewer,
+    metR,
+    oce,
+    rcartocolor
 Remotes:
     open-AIMS/ereefs
 Depends: 
