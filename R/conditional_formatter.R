@@ -13,12 +13,14 @@
 #' @examples
 #' \dontrun{
 #' conditional_formatter(
-#' data, workbook, target_columns, 
-#' target_rows, scheme, include_letter, file_name)
+#'   data, workbook, target_columns, target_rows, 
+#'   scheme, include_letter, file_name
+#' )
 #' }
 conditional_formatter <- function(
-  data, workbook, target_columns, 
-  target_rows, scheme, include_letter, file_name){
+  data, workbook, target_columns, target_rows, 
+  scheme, include_letter, file_name
+){
 
   #convert target_columns and target_rows into excel format
   dimensions <- paste0(

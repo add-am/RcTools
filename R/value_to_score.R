@@ -22,7 +22,7 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' 
 #' x <- data.frame(
 #'  Basin = c("Black", "Ross", "Haughton", "Suttor"),
 #'  Indicator = c("DIN", "DIN", "Low_DO", "Low_DO"),
@@ -44,7 +44,6 @@
 #'     twentieth = Twentieth
 #'   )
 #'  
-#' }
 value_to_score <- function(
   df, 
   value, 

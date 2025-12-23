@@ -6,9 +6,13 @@
 #' @returns A netCDF object
 #'
 #' @examples
-#' \dontrun{
+#' 
+#' nc <- system.file("turbidity22.nc", package = "RcTools")
+#' nc <- stars::read_mdim(nc)
+#' 
 #' x <- ereefs_aggregation_helper(nc, "Month")
-#' }
+#' 
+#' 
 ereefs_aggregation_helper <- function(nc, agg){
 
   #data can be provided as a list of nc objects (wind) or a single object. If a single object, we just need to wrap it

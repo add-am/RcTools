@@ -5,10 +5,9 @@
 #' @returns A vector of hex code colour values of length 9
 #'
 #' @examples
-#' \dontrun{
+#' 
 #' ereefs_get_palette("Turbidity")
-#' }
-
+#' 
 ereefs_get_palette <- function(Variable){
 
   #check variables by comparing to allowed variables (at the moment)

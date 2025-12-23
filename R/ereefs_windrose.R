@@ -9,10 +9,12 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' 
+#' nc <- system.file("turbidity22.nc", package = "RcTools")
+#' nc <- stars::read_mdim(nc)
+#' 
 #' wr_plot <- ereefs_windrose(nc)
-#' }
-
+#' 
 ereefs_windrose <- function(nc, SubSample = 500, Heading = "Approximated Wind Speed", LegendTitle = "Speed (km/h)"){
 
   #check required argument

@@ -9,7 +9,7 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' 
 #' x <- data.frame(
 #'  Basin = c("Black", "Ross", "Haughton", "Suttor"),
 #'  Indicator = c("DIN", "DIN", "Low_DO", "Low_DO"),
@@ -23,8 +23,6 @@
 #'     weighting = Weight
 #'   )
 #'  
-#' }
-
 weight_score <- function(df, score, weighting){
   
   #check required arguments

@@ -8,7 +8,7 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' 
 #' x <- data.frame(
 #'  Basin = c("Black", "Ross", "Haughton", "Suttor"),
 #'  ScoreA = c(51, 76, 27, 98),
@@ -17,7 +17,6 @@
 #' )
 #' x <- score_to_grade(x, c(ScoreA, ScoreB, ScoreC))
 #'   
-#' }
 score_to_grade <- function(df, score_cols){
 
   df |> 

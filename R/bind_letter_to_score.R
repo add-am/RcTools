@@ -7,19 +7,21 @@
 #'
 #' @returns A dataframe with letters attached to scores
 #'
-#' @importFrom rlang sym
 #' @examples
-#' \dontrun{
+#' 
 #' df <- data.frame(
 #'  "Areas" = c("A", "B", "C", "D", "E", "F"),
 #'  "Score1" = c(0, 20, 40, 60, 80, 100),
 #'  "Score1" = c(0, 20, 40, 60, 80, 100),
 #'  "Other" = c("Z", "Y", "X", "W", "V", "U")
 #' )
-#' column_indicies <- 2:3
-#' row_indicies <- 1:4
-#' bind_letter_to_score(df, column_indicies, row_indicies)
-#' }
+#' 
+#' bind_letter_to_score(
+#'  df = df, 
+#'  columns = 2:3,
+#'  rows = 2:3
+#' )
+#' 
 bind_letter_to_score <- function(df, columns, rows) {
 
   #create a new column that contains the original column index (for rebuilding)
@@ -64,7 +66,7 @@ bind_letter_to_score <- function(df, columns, rows) {
     #unite the columns
     df_slice <- df_slice |> 
       tidyr::unite(
-        !!sym(target_column), 
+        !!rlang::sym(target_column), 
         c(target_column, grade_column_name), 
         sep = " ", 
         remove = TRUE

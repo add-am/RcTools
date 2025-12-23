@@ -10,13 +10,16 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' 
+#' nc <- system.file("turbidity22.nc", package = "RcTools")
+#' nc <- stars::read_mdim(nc)
+#' 
 #' m <- ereefs_map(
 #'   nc = nc,
 #'   MapType = "Concentration",
 #'   Aggregation = "Month"
 #' )
-#' }
+#' 
 ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL){
 
   #conduct safety checks

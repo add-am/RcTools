@@ -10,14 +10,17 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' 
+#' nc <- system.file("turbidity22.nc", package = "RcTools")
+#' nc <- stars::read_mdim(nc)
+#' 
 #' x_plot <- ereefs_dotplot(
 #'   nc = nc,
 #'   YAxisName = "Turbidity (NTU)", 
 #'   Heading = "Dry Tropics", 
 #'   LogTransform = TRUE
 #' )
-#' }
+#' 
 
 ereefs_dotplot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, LogTransform = FALSE){
 

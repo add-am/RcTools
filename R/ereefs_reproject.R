@@ -6,9 +6,12 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
-#' x_regular <- ereefs_reproject(x_curvilinear)
-#' }
+#' 
+#' nc_curvilinear <- system.file("turbidity22.RData", package = "RcTools")
+#' nc_curvilinear <- readRDS(nc_curvilinear)
+#' 
+#' nc_reg <- ereefs_reproject(nc_curvilinear)
+#' 
 ereefs_reproject <- function(nc){
 
   #if the variable supplied is not a list, convert it to a list to allow it through the map function
