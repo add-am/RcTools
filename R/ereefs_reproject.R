@@ -37,6 +37,9 @@ ereefs_reproject <- function(nc){
 
   })
 
+  #if the list output has length one, it can be converted back to a stars object
+  if (length(nc) == 1){nc <- nc[[1]]}
+
   #return the final object
   return(nc)
 }
