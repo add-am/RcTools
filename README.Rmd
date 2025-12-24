@@ -64,33 +64,92 @@ Functions under each theme are explained below. Alternatively, individual functi
 
 #### ereefs_extract
 
+The `ereefs_extract` function takes a geometry input, date, and variable, and returns a netCDF data object within those bounds.
+
 ```{r}
 #| eval: FALSE
+
+#first a geometry object is loaded in using the sf package
+sf_obj <- system.file("extdata/boundary.gpkg", package = "RcTools")
+sf_obj <- sf::st_read(sf_obj)
+
+#then the extract function can be run
+nc <- ereefs_extract(
+  Region = sf_obj, #define the region to look at with the sf object
+  StartDate = "2022-03-01",
+  EndDate = "2022-03-03",
+  Variable = "Turbidity",
+  Downsample = 0 #downsample reduces the size of the data by taking every nth cell
+)
 
 ```
 
 #### ereefs_reproject
 
+The `ereefs_reproject` function takes a curvilinear netCDF object and returns a regular grid netCDF object. The curvilinear netCDF object is generally produced by the `ereefs_extract` function.
+
 ```{r}
 #| eval: FALSE
+
+#reproject the data
+nc <- ereefs_reproject(nc)
 
 ```
 
 #### ereefs_dotplot
 
+The `ereefs_dotplot` function takes a regular grid netCDF object and returns a dotplot summarising daily values, the overall mean, and a rolling average.
+
 ```{r}
 #| eval: FALSE
+
+#plot data
+p <- ereefs_plot(
+  nc = nc,
+  Heading = "Dry Tropics",
+  YAxisName = "Chlorophyll a (mg/m3)",
+  LogTransform = TRUE
+)
+
+```
+
+The product of this function looks like this:
+
+```{r}
+#| eval: FALSE
+
+p
 
 ```
 
 #### ereefs_windrose
 
+The `ereefs_windplot` function takes a list regular grid netCDF objects (specifically the four objects produced when requesting wind from the `ereefs_extract` function) and returns a windrose plot summarising wind strength and direction.
+
 ```{r}
 #| eval: FALSE
+
+wr_p <- ereefs_windrose(
+  nc = nc_2, 
+  SubSample = 500, 
+  Heading = "Approximated Wind Speed", 
+  LegendTitle = "Speed (km/h)"
+)
+
+```
+
+The product of this function looks like this:
+
+```{r}
+#| eval: FALSE
+
+wr_p
 
 ```
 
 #### ereefs_map
+
+TBD
 
 ```{r}
 #| eval: FALSE

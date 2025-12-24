@@ -1,6 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+``` r
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
 # RcTools
 
 <!-- badges: start -->
@@ -9,10 +18,14 @@
 
 The goal of RcTools is to provide a collection of tools (functions) to
 be utilised by the Northern Three Report Cards’ technical staff. These
-tools bridge the gap between R analysis and technical report writing,
-and primarily focus on end of anaylsis pipelines such as converting
-values to scores, score to grades, and dataframes into xlsx files that
-are pre-formatted ready to be inserted into the technical report.
+tools have been written to to bridge the gap between:
+
+1.  Online data resources and desktop analysis, and
+2.  Finish analysis products and N3 technical reports.
+
+I.e., the tools focus on tasks such as downloading data, converting
+values to scores, converting scores to grades, and producing stylised
+visual products such as plots, maps, and formatted xlsx files.
 
 ## Installation
 
@@ -37,15 +50,31 @@ library(RcTools)
 
 ## Usage
 
-This package currently offers 3 key functions; `value_to_score()`,
-`score_to_grade()`, and `save_n3_table()`. Each of these functions are
-designed to work in sequence, starting from calculating report card
-scores, and finishing with saving an .xslx table. A summary of each
-function and an example use case is provided below. Alternatively,
-function documentation can be accessed with the command
-`?value_to_score` etc.
+This package currently contains 9 functions and is still expanding.
+Functions can be grouped under two themes:
 
-### value_to_score
+1.  eReefs related functions
+2.  Data table related functions
+
+Functions under each theme are explained below. Alternatively,
+individual function documentation can be accessed with the command
+`?fnc_name`.
+
+### eReefs Functions
+
+#### ereefs_extract
+
+#### ereefs_reproject
+
+#### ereefs_dotplot
+
+#### ereefs_windrose
+
+#### ereefs_map
+
+### Data Table Functions
+
+#### value_to_score
 
 The `value_to_score()` function is designed to calculate a variety of
 report card scores used by the Northern Three Report Cards. The function
@@ -149,7 +178,7 @@ table above would look like this:
 | -3            | 20.48              |
 | -5            | 20.06              |
 
-### score_to_grade
+#### score_to_grade
 
 The `score_to_grade()` function has been designed to directly follow the
 `value_to_score()` function. It takes a dataframe (with scores) and
@@ -194,7 +223,7 @@ The final output would look like this:
 | -3            | 20.48              | E                  |
 | -5            | 20.06              | E                  |
 
-### save_n3_table
+#### save_n3_table
 
 The `save_n3_table()` function is designed to take a finalised dataframe
 from within R (such as the one above) and save it as an excel file with
@@ -240,7 +269,7 @@ Which looks like this:
 
 ![](man/figures/README-save_n3_table-example_2.png)
 
-#### extensions
+##### extensions
 
 The `save_n3_table()` offers several other extensions for styling
 choices, these are as follows:
