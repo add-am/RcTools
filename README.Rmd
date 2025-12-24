@@ -4,13 +4,16 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r}
+#| eval: FALSE
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
 ```
 
 # RcTools
@@ -18,7 +21,12 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of RcTools is to provide a collection of tools (functions) to be utilised by the Northern Three Report Cards' technical staff. These tools bridge the gap between R analysis and technical report writing, and primarily focus on end of anaylsis pipelines such as converting values to scores, score to grades, and dataframes into xlsx files that are pre-formatted ready to be inserted into the technical report.
+The goal of RcTools is to provide a collection of tools (functions) to be utilised by the Northern Three Report Cards' technical staff. These tools have been written to to bridge the gap between: 
+
+ 1. Online data resources and desktop analysis, and
+ 2. Finish analysis products and N3 technical reports.
+
+ I.e., the tools focus on tasks such as downloading data, converting values to scores, converting scores to grades, and producing stylised visual products such as plots, maps, and formatted xlsx files.
 
 ## Installation
 
@@ -36,7 +44,7 @@ pak::pak("add-am/RcTools")
 
 Finally, load the package just like you would any other R package:
 
-```{R}
+```{r}
 #| eval: FALSE
 
 library(RcTools)
@@ -45,9 +53,53 @@ library(RcTools)
 
 ## Usage
 
-This package currently offers 3 key functions; `value_to_score()`, `score_to_grade()`, and `save_n3_table()`. Each of these functions are designed to work in sequence, starting from calculating report card scores, and finishing with saving an .xslx table. A summary of each function and an example use case is provided below. Alternatively, function documentation can be accessed with the command `?value_to_score` etc.
+This package currently contains 9 functions and is still expanding. Functions can be grouped under two themes:
 
-### value_to_score
+ 1. eReefs related functions
+ 2. Data table related functions
+
+Functions under each theme are explained below. Alternatively, individual function documentation can be accessed with the command `?fnc_name`.
+
+### eReefs Functions
+
+#### ereefs_extract
+
+```{r}
+#| eval: FALSE
+
+```
+
+#### ereefs_reproject
+
+```{r}
+#| eval: FALSE
+
+```
+
+#### ereefs_dotplot
+
+```{r}
+#| eval: FALSE
+
+```
+
+#### ereefs_windrose
+
+```{r}
+#| eval: FALSE
+
+```
+
+#### ereefs_map
+
+```{r}
+#| eval: FALSE
+
+```
+
+### Data Table Functions
+
+#### value_to_score
 
 The `value_to_score()` function is designed to calculate a variety of report card scores used by the Northern Three Report Cards. The function takes a dataframe and appends an additional column to the dataframe with the calculated scores.
 
@@ -63,7 +115,7 @@ Depending on the index/indicator a different amount of inputs are requried. Belo
 
 First you would need to have a table of data:
 
-```{r v2s example 1}
+```{r}
 #| eval: FALSE
 
 #load the package
@@ -88,7 +140,7 @@ df <- df |>
 
 Then you can call the function just like any other tidyverse function. Importantly, this function has been written to be "pipe-friendly" i.e. you can use the function by itself, or in a pipe. That is to say that `value_to_score(df, ...)` is the same as `df |> value_to_score(...)`:
 
-```{r v2s example 2}
+```{r}
 #| eval: FALSE
 
 #run the scoring function
@@ -110,7 +162,7 @@ Note that the arguments that are **not** provided in quotes are flexible (i.e. t
 
 Another example of the same function used to score riparian vegetation this time is as follows. Note that for this scoring method a lot less information is required. Helpers will notify you when required information is missing.
 
-```{r v2s example 3}
+```{r}
 #| eval: FALSE
 
 #create an example dataframe
@@ -138,7 +190,7 @@ In anycase, the output of the function is the original table, now with an additi
 | -3            | 20.48              |
 | -5            | 20.06              |
 
-### score_to_grade
+#### score_to_grade
 
 The `score_to_grade()` function has been designed to directly follow the `value_to_score()` function. It takes a dataframe (with scores) and appends an additional column to the dataframe with the calculated grades.
 
@@ -154,7 +206,7 @@ Broadly speaking, the majority of grades follow this range, should any other ran
 
 Below is a basic example of how to use the `score_to_grade()` function. If for some reason you have multiple columns that contain scores, multiple columns can also be provided:
 
-```{r s2g example}
+```{r}
 #| eval: FALSE
 
 #create an example dataframe (duplicate of above table)
@@ -179,13 +231,13 @@ The final output would look like this:
 | -3            | 20.48              | E                  |
 | -5            | 20.06              | E                  |
 
-### save_n3_table
+#### save_n3_table
 
 The `save_n3_table()` function is designed to take a finalised dataframe from within R (such as the one above) and save it as an excel file with formatting in the specific style used by the Northern Three Report Cards. Below is a basic example of how to use the `save_n3_table()` function to format a data frame for the Northern Three Report Card. We will use the table that we just created above for this example.
 
 In the first instance, we apply styling only to the score column:
 
-```{r sn3 example 1}
+```{r}
 #| eval: FALSE
 
 #run the "save as n3 table" function
@@ -205,7 +257,7 @@ Which looks like this:
 
 It is also possible to apply styling to the grade column as well. However, a side effect of this is the score column inherits the grades as well (as formatting is now done by character not value):
 
-```{r sn3 example 2}
+```{r}
 #| eval: FALSE
 
 #run the "save as n3 table" function
@@ -224,7 +276,7 @@ Which looks like this:
 
 ![](man/figures/README-save_n3_table-example_2.png)
 
-#### extensions
+##### extensions
 
 The `save_n3_table()` offers several other extensions for styling choices, these are as follows:
 
