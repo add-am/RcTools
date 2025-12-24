@@ -19,7 +19,7 @@ The original dataframe with new grade columns added. Names are inherited from th
 Function that converts scores to grades
 }
 \examples{
-\dontrun{
+
 x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
  ScoreA = c(51, 76, 27, 98),
@@ -28,5 +28,4 @@ x <- data.frame(
 )
 x <- score_to_grade(x, c(ScoreA, ScoreB, ScoreC))
   
-}
 }

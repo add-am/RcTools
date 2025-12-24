@@ -20,6 +20,7 @@
 #' 
 #' @returns The original dataframe with new score columns added. Names are inherited from the targeted columns.
 #'
+#' @importFrom rlang :=
 #' @export
 #' @examples
 #' 
@@ -35,6 +36,7 @@
 #' 
 #' x <- x |> 
 #'   value_to_score(
+#'     value = Value,
 #'     value_type = "Water Quality",
 #'     water_type = "Freshwater",
 #'     indicator = Indicator,

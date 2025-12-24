@@ -20,15 +20,19 @@ A dataframe with letters attached to scores
 Helper to Extract A Letter Grade From Scores
 }
 \examples{
-\dontrun{
+\dontrun{ #dont run because function is not exported
 df <- data.frame(
  "Areas" = c("A", "B", "C", "D", "E", "F"),
  "Score1" = c(0, 20, 40, 60, 80, 100),
- "Score1" = c(0, 20, 40, 60, 80, 100),
+ "Score2" = c(0, 20, 40, 60, 80, 100),
  "Other" = c("Z", "Y", "X", "W", "V", "U")
 )
-column_indicies <- 2:3
-row_indicies <- 1:4
-bind_letter_to_score(df, column_indicies, row_indicies)
+
+bind_letter_to_score(
+ df = df, 
+ columns = 2:3,
+ rows = 2:3
+)
 }
+
 }

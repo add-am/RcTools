@@ -13,7 +13,7 @@
 #'
 #' @export
 #' @examples
-#' 
+#' \dontrun{ #dont run because the function saves an file externally 
 #' x <- data.frame(
 #'  Basin = c("Black", "Ross", "Haughton", "Suttor"),
 #'  DIN = c(51, 76, 27, 98),
@@ -27,6 +27,7 @@
 #'  scheme = "Report Card",
 #'  include_letter = FALSE
 #' )
+#' }
 #' 
 save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, include_letter = FALSE){
 

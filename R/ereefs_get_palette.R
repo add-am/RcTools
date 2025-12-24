@@ -5,8 +5,9 @@
 #' @returns A vector of hex code colour values of length 9
 #'
 #' @examples
-#' 
+#' \dontrun{ #dont run because function is not exported
 #' ereefs_get_palette("Turbidity")
+#' }
 #' 
 ereefs_get_palette <- function(Variable){
 

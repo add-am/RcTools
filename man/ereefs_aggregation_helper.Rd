@@ -18,7 +18,11 @@ A netCDF object
 A function to help with various forms of netCDF aggregation
 }
 \examples{
-\dontrun{
+\dontrun{ #dont run because function is not exported
+nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+nc <- stars::read_mdim(nc)
+
 x <- ereefs_aggregation_helper(nc, "Month")
 }
+
 }

@@ -30,12 +30,15 @@ A ggplot object
 Plotting eReefs Data
 }
 \examples{
-\dontrun{
+
+nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+nc <- stars::read_mdim(nc)
+
 x_plot <- ereefs_dotplot(
   nc = nc,
   YAxisName = "Turbidity (NTU)", 
   Heading = "Dry Tropics", 
   LogTransform = TRUE
 )
-}
+
 }

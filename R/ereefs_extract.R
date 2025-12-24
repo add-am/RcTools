@@ -10,8 +10,8 @@
 #'
 #' @export
 #' @examples
-#' 
-#' sf_obj <- system.file("boundary.gpkg", package = "RcTools")
+#' \dontrun{ #dont run because function takes a while to execute
+#' sf_obj <- system.file("extdata/boundary.gpkg", package = "RcTools")
 #' sf_obj <- sf::st_read(sf_obj)
 #' 
 #' nc <- ereefs_extract(
@@ -21,7 +21,8 @@
 #'   Variable = "Turbidity",
 #'   Downsample = 0
 #' )
-#'  
+#' }
+#' 
 ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0){
 
   #check required argument (all of them)

@@ -16,7 +16,8 @@ A vector of hex code colour values of length 9
 Return Colour Palettes Associated With Specific Variables
 }
 \examples{
-\dontrun{
+\dontrun{ #dont run because function is not exported
 ereefs_get_palette("Turbidity")
 }
+
 }

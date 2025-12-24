@@ -34,7 +34,11 @@ Imports:
     oce,
     rcartocolor
 Remotes:
-    open-AIMS/ereefs
+    open-AIMS/ereefs,
+    open-AIMS/gisaimsr
+Suggests:
+    gisaimsr,
+    FNN
 Depends: 
     R (>= 3.5)
 LazyData: true

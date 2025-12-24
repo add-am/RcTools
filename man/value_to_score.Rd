@@ -50,7 +50,7 @@ The original dataframe with new score columns added. Names are inherited from th
 Function that converts values to score
 }
 \examples{
-\dontrun{
+
 x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
  Indicator = c("DIN", "DIN", "Low_DO", "Low_DO"),
@@ -63,6 +63,7 @@ x <- data.frame(
 
 x <- x |> 
   value_to_score(
+    value = Value,
     value_type = "Water Quality",
     water_type = "Freshwater",
     indicator = Indicator,
@@ -72,5 +73,4 @@ x <- x |>
     twentieth = Twentieth
   )
  
-}
 }

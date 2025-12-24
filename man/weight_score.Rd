@@ -21,7 +21,7 @@ The original dataframe with new weighted scores added. Names are inherited from 
 Function that weights scores based on predetermined weighting values
 }
 \examples{
-\dontrun{
+
 x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
  Indicator = c("DIN", "DIN", "Low_DO", "Low_DO"),
@@ -35,5 +35,4 @@ x <- x |>
     weighting = Weight
   )
  
-}
 }

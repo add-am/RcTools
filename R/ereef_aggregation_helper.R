@@ -6,12 +6,12 @@
 #' @returns A netCDF object
 #'
 #' @examples
-#' 
-#' nc <- system.file("turbidity22.nc", package = "RcTools")
+#' \dontrun{ #dont run because function is not exported
+#' nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
 #' nc <- stars::read_mdim(nc)
 #' 
 #' x <- ereefs_aggregation_helper(nc, "Month")
-#' 
+#' }
 #' 
 ereefs_aggregation_helper <- function(nc, agg){
 
@@ -113,7 +113,7 @@ ereefs_aggregation_helper <- function(nc, agg){
       )
 
       #replace the name of the aggregated attribute
-      names(x) <- attribute_names
+      names(aggregated_item) <- attribute_names
     }
 
     #return the aggregated item

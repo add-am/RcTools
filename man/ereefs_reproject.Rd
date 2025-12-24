@@ -16,7 +16,10 @@ A NetCDF (stars) object or list of NetCDF (stars) objects, with the same values 
 Convert the eReefs object from curvilinear to a regular grid
 }
 \examples{
-\dontrun{
-x_regular <- ereefs_reproject(x_curvilinear)
-}
+
+nc_curvilinear <- system.file("extdata/turbidity22.RData", package = "RcTools")
+nc_curvilinear <- readRDS(nc_curvilinear)
+
+nc_reg <- ereefs_reproject(nc_curvilinear)
+
 }

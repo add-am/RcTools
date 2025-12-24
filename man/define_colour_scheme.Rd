@@ -18,8 +18,9 @@ The supplied workbook object, now with the colour scheme embedded
 Helper to Select Various Colour Schemes
 }
 \examples{
-\dontrun{
+\dontrun{ #dont run because function is not exported
 wb <- openxlsx2::wb_workbook()
-define_colour_scheme(workbook = wb, scheme = "Report Card")}
+define_colour_scheme(workbook = wb, scheme = "Report Card")
+}
 
 }

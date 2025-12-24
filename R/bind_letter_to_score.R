@@ -1,4 +1,3 @@
-#create function that determines letter and binds it to the value
 #' Helper to Extract A Letter Grade From Scores
 #'
 #' @param df A dataframe/table/spreadsheet
@@ -8,11 +7,11 @@
 #' @returns A dataframe with letters attached to scores
 #'
 #' @examples
-#' 
+#' \dontrun{ #dont run because function is not exported
 #' df <- data.frame(
 #'  "Areas" = c("A", "B", "C", "D", "E", "F"),
 #'  "Score1" = c(0, 20, 40, 60, 80, 100),
-#'  "Score1" = c(0, 20, 40, 60, 80, 100),
+#'  "Score2" = c(0, 20, 40, 60, 80, 100),
 #'  "Other" = c("Z", "Y", "X", "W", "V", "U")
 #' )
 #' 
@@ -21,6 +20,7 @@
 #'  columns = 2:3,
 #'  rows = 2:3
 #' )
+#' }
 #' 
 bind_letter_to_score <- function(df, columns, rows) {
 

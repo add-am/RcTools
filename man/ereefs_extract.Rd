@@ -24,12 +24,17 @@ A NetCDF (stars) object or list of NetCDF (stars) objects
 Extracting eReefs Data
 }
 \examples{
-\dontrun{
-nc_output <- ereefs_extract(
-  Region = an_sf_object,
+\dontrun{ #dont run because function takes a while to execute
+sf_obj <- system.file("extdata/boundary.gpkg", package = "RcTools")
+sf_obj <- sf::st_read(sf_obj)
+
+nc <- ereefs_extract(
+  Region = sf_obj,
   StartDate = "2022-03-01",
   EndDate = "2022-03-03",
   Variable = "Turbidity",
-  Downsample = 0)
+  Downsample = 0
+)
 }
+
 }

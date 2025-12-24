@@ -35,7 +35,7 @@ A .xlsx output
 Conditional Formatting with .xlsx Output
 }
 \examples{
-\dontrun{
+\dontrun{ #dont run because the function saves an file externally 
 x <- data.frame(
  Basin = c("Black", "Ross", "Haughton", "Suttor"),
  DIN = c(51, 76, 27, 98),
@@ -50,4 +50,5 @@ save_n3_table(
  include_letter = FALSE
 )
 }
+
 }

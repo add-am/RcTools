@@ -7,7 +7,7 @@
 #' @export
 #' @examples
 #' 
-#' nc_curvilinear <- system.file("turbidity22.RData", package = "RcTools")
+#' nc_curvilinear <- system.file("extdata/turbidity22.RData", package = "RcTools")
 #' nc_curvilinear <- readRDS(nc_curvilinear)
 #' 
 #' nc_reg <- ereefs_reproject(nc_curvilinear)

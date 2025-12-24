@@ -27,7 +27,11 @@ A ggplot2 object (a windrose plot)
 Create a Windrose Plot from eReefs Data
 }
 \examples{
-\dontrun{
+
+nc_names <- paste0("extdata/", c("wind_dir", "wind_mag", "wind_u", "wind_v"), ".nc")
+nc <- purrr::map(nc_names, \(x) system.file(x, package = "RcTools"))
+nc <- purrr::map(nc, stars::read_mdim)
+
 wr_plot <- ereefs_windrose(nc)
-}
+
 }

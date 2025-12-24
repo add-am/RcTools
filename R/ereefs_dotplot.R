@@ -11,7 +11,7 @@
 #' @export
 #' @examples
 #' 
-#' nc <- system.file("turbidity22.nc", package = "RcTools")
+#' nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
 #' nc <- stars::read_mdim(nc)
 #' 
 #' x_plot <- ereefs_dotplot(

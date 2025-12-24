@@ -24,11 +24,14 @@ A tmap object
 Mapping eReefs Data
 }
 \examples{
-\dontrun{
+
+nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+nc <- stars::read_mdim(nc)
+
 m <- ereefs_map(
   nc = nc,
   MapType = "Concentration",
   Aggregation = "Month"
 )
-}
+
 }
