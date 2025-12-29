@@ -58,19 +58,114 @@ Functions can be grouped under two themes:
 
 Functions under each theme are explained below. Alternatively,
 individual function documentation can be accessed with the command
-`?fnc_name`.
+`?function_name`.
 
 ### eReefs Functions
 
 #### ereefs_extract
 
+The `ereefs_extract` function takes a geometry input, date, and
+variable, and returns a netCDF data object within those bounds.
+
+``` r
+#first a geometry object is loaded in using the sf package
+sf_obj <- system.file("extdata/boundary.gpkg", package = "RcTools")
+sf_obj <- sf::st_read(sf_obj)
+
+#then the extract function can be run
+nc <- ereefs_extract(
+  Region = sf_obj, #define the region to look at with the sf object
+  StartDate = "2022-03-01",
+  EndDate = "2022-03-03",
+  Variable = "Turbidity",
+  Downsample = 0 #downsample reduces the size of the data by taking every nth cell
+)
+```
+
 #### ereefs_reproject
+
+The `ereefs_reproject` function takes a curvilinear netCDF object and
+returns a regular grid netCDF object. The curvilinear netCDF object is
+generally produced by the `ereefs_extract` function. Note, this function
+tends to fail when the curvilinear netCDF object has a complex border,
+such as at the edge of the Mackay Whitsunday Isaac region.
+
+``` r
+#reproject the data
+nc <- ereefs_reproject(nc)
+```
 
 #### ereefs_dotplot
 
+The `ereefs_dotplot` function takes a regular grid netCDF object and
+returns a dotplot summarising daily values, the overall mean, and a
+rolling average.
+
+``` r
+#plot data
+p <- ereefs_plot(
+  nc = nc,
+  Heading = "Dry Tropics",
+  YAxisName = "Chlorophyll a (mg/m3)",
+  LogTransform = TRUE
+)
+```
+
+The product of this function looks like this:
+
+``` r
+p
+```
+
 #### ereefs_windrose
 
+The `ereefs_windplot` function takes a list regular grid netCDF objects
+(specifically the four objects produced when requesting wind from the
+`ereefs_extract` function) and returns a windrose plot summarising wind
+strength and direction.
+
+``` r
+wr_p <- ereefs_windrose(
+  nc = nc_2, 
+  SubSample = 500, 
+  Heading = "Approximated Wind Speed", 
+  LegendTitle = "Speed (km/h)"
+)
+```
+
+The product of this function looks like this:
+
+``` r
+wr_p
+```
+
 #### ereefs_map
+
+The `ereefs_map` function takes either a singular regular grid netCDF
+object, or a list regular grid netCDF objects and returns one of three
+different map types. Map A) is a concentration map for data such as
+turbidity, map B) is a true colour map that shows the “true” colour of
+the water, and map C) is a vector field map that provides a spatial
+representation of wind strength and direction.
+
+Note that the visuals of true colour maps suffer from temporal
+aggregation (instead short animations should be used).
+
+``` r
+m <- ereefs_map(
+  nc = nc,
+  MapType = "Concentration",
+  Aggregation = "Month",
+  LegendTitle = "Turbidity (NTU)",
+  nrow = 2 #the number of rows to use if/when maps are facetted
+)
+```
+
+The product of this function looks like this:
+
+``` r
+m
+```
 
 ### Data Table Functions
 

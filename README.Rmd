@@ -58,7 +58,7 @@ This package currently contains 9 functions and is still expanding. Functions ca
  1. eReefs related functions
  2. Data table related functions
 
-Functions under each theme are explained below. Alternatively, individual function documentation can be accessed with the command `?fnc_name`.
+Functions under each theme are explained below. Alternatively, individual function documentation can be accessed with the command `?function_name`.
 
 ### eReefs Functions
 
@@ -86,7 +86,7 @@ nc <- ereefs_extract(
 
 #### ereefs_reproject
 
-The `ereefs_reproject` function takes a curvilinear netCDF object and returns a regular grid netCDF object. The curvilinear netCDF object is generally produced by the `ereefs_extract` function.
+The `ereefs_reproject` function takes a curvilinear netCDF object and returns a regular grid netCDF object. The curvilinear netCDF object is generally produced by the `ereefs_extract` function. Note, this function tends to fail when the curvilinear netCDF object has a complex border, such as at the edge of the Mackay Whitsunday Isaac region.
 
 ```{r}
 #| eval: FALSE
@@ -149,10 +149,29 @@ wr_p
 
 #### ereefs_map
 
-TBD
+The `ereefs_map` function takes either a singular regular grid netCDF object, or a list regular grid netCDF objects and returns one of three different map types. Map A) is a concentration map for data such as turbidity, map B) is a true colour map that shows the "true" colour of the water, and map C) is a vector field map that provides a spatial representation of wind strength and direction.
+
+Note that the visuals of true colour maps suffer from temporal aggregation (instead short animations should be used).
 
 ```{r}
 #| eval: FALSE
+
+m <- ereefs_map(
+  nc = nc,
+  MapType = "Concentration",
+  Aggregation = "Month",
+  LegendTitle = "Turbidity (NTU)",
+  nrow = 2 #the number of rows to use if/when maps are facetted
+)
+
+```
+
+The product of this function looks like this:
+
+```{r}
+#| eval: FALSE
+
+m
 
 ```
 
