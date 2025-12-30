@@ -1,15 +1,4 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-``` r
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
 # RcTools
 
 <!-- badges: start -->
@@ -27,7 +16,7 @@ I.e., the tools focus on tasks such as downloading data, converting
 values to scores, converting scores to grades, and producing stylised
 visual products such as plots, maps, and formatted xlsx files.
 
-## Installation
+# Installation
 
 To install this package you will first need to download the [RTools
 package](https://cran.r-project.org/bin/windows/Rtools/rtools45/rtools.html)
@@ -48,7 +37,7 @@ Finally, load the package just like you would any other R package:
 library(RcTools)
 ```
 
-## Usage
+# Usage
 
 This package currently contains 9 functions and is still expanding.
 Functions can be grouped under two themes:
@@ -60,9 +49,9 @@ Functions under each theme are explained below. Alternatively,
 individual function documentation can be accessed with the command
 `?function_name`.
 
-### eReefs Functions
+## eReefs Functions
 
-#### ereefs_extract
+### ereefs_extract
 
 The `ereefs_extract` function takes a geometry input, date, and
 variable, and returns a netCDF data object within those bounds.
@@ -82,7 +71,7 @@ nc <- ereefs_extract(
 )
 ```
 
-#### ereefs_reproject
+### ereefs_reproject
 
 The `ereefs_reproject` function takes a curvilinear netCDF object and
 returns a regular grid netCDF object. The curvilinear netCDF object is
@@ -95,7 +84,7 @@ such as at the edge of the Mackay Whitsunday Isaac region.
 nc <- ereefs_reproject(nc)
 ```
 
-#### ereefs_dotplot
+### ereefs_dotplot
 
 The `ereefs_dotplot` function takes a regular grid netCDF object and
 returns a dotplot summarising daily values, the overall mean, and a
@@ -117,7 +106,7 @@ The product of this function looks like this:
 p
 ```
 
-#### ereefs_windrose
+### ereefs_windrose
 
 The `ereefs_windplot` function takes a list regular grid netCDF objects
 (specifically the four objects produced when requesting wind from the
@@ -139,7 +128,7 @@ The product of this function looks like this:
 wr_p
 ```
 
-#### ereefs_map
+### ereefs_map
 
 The `ereefs_map` function takes either a singular regular grid netCDF
 object, or a list regular grid netCDF objects and returns one of three
@@ -167,9 +156,9 @@ The product of this function looks like this:
 m
 ```
 
-### Data Table Functions
+## Data Table Functions
 
-#### value_to_score
+### value_to_score
 
 The `value_to_score()` function is designed to calculate a variety of
 report card scores used by the Northern Three Report Cards. The function
@@ -273,7 +262,7 @@ table above would look like this:
 | -3            | 20.48              |
 | -5            | 20.06              |
 
-#### score_to_grade
+### score_to_grade
 
 The `score_to_grade()` function has been designed to directly follow the
 `value_to_score()` function. It takes a dataframe (with scores) and
@@ -318,7 +307,7 @@ The final output would look like this:
 | -3            | 20.48              | E                  |
 | -5            | 20.06              | E                  |
 
-#### save_n3_table
+### save_n3_table
 
 The `save_n3_table()` function is designed to take a finalised dataframe
 from within R (such as the one above) and save it as an excel file with
@@ -364,7 +353,7 @@ Which looks like this:
 
 ![](man/figures/README-save_n3_table-example_2.png)
 
-##### extensions
+#### extensions
 
 The `save_n3_table()` offers several other extensions for styling
 choices, these are as follows:

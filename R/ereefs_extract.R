@@ -148,10 +148,8 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   #if the user wants the wind variable, this has four sub components
   } else if (stringr::str_detect(Variable, "Wind")){
 
-    #update the wind variable
-    Variable <- c(
-      Variable[-which(stringr::str_detect(Variable, "Wind"))], 
-      c("wind_dir", "wind_mag", "wind_u", "wind_v"))
+    #create a list of the four variables to extract
+    Variable <- list("wind_dir", "wind_mag", "wind_u", "wind_v")
 
     #extract the four sub components
     nc_data <- purrr::map(Variable, \(x) {
@@ -164,7 +162,10 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
           count = c(num_of_rows, num_of_cols, DayCount)
         )
       )
-    }) 
+    })
+    
+    #join files into a single stars object
+    nc_data <- do.call(c, nc_data)
   
   #otherwise, the user would be requesting true colour, which has three sub components
   } else if (stringr::str_detect(Variable, "True Colour")){
@@ -204,26 +205,21 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
     #join files into a single stars object
     nc_data <- do.call(c, nc_data)
   }
-
-  #data can now either be in a list of nc objects, or a single nc object, if a single object, we just need to wrap it
-  #in a list so it can pass through the next purrr map
-  if (!inherits(nc_data, "list")){nc_data <- list(nc_data)}
   
-  #then apply the final data cleaning steps, these aren't necessary for the True colour dataset
+  #apply the final data cleaning steps, these aren't necessary for the True colour dataset
   if (any(Variable != "True Colour")){
-    nc_data <- purrr::map2(nc_data, Variable, \(x, y) {
 
-      x[x > 2000] <- NA #overwrite erroneous high values (note that a value of even 50 would be very very high)
-      x_units <- ncmeta::nc_atts(input_file, y) |> #extract units from the input
+    #remove values that should be read as null
+    nc_data[nc_data > 2000] <- NA
+
+    #build name(s) and reassign
+    names(nc_data) <- purrr::map_chr(Variable, \(x) {
+      x_units <- ncmeta::nc_atts(input_file, x) |> 
         dplyr::filter(name == "units")
-      x_units <- x_units$value[[1]] #keep just the units
-      names(x) <- paste0(y, " (", x_units, ")") #put units into the data, they are not carried over well in stars objects so we will hide them in the attribute name
-      return(x)
+      x_units <- x_units$value[[1]]
+      paste0(x, " (", x_units, ")")
     })
   }
-
-  #if the list output has length one, it can be converted back to a stars object
-  if (length(nc_data) == 1){nc_data <- nc_data[[1]]}
 
   #return the final dataset
   nc_data

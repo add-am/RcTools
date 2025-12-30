@@ -2,20 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r}
-#| eval: FALSE
-
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-
-```
-
 # RcTools
 
 <!-- badges: start -->
@@ -28,7 +14,7 @@ The goal of RcTools is to provide a collection of tools (functions) to be utilis
 
  I.e., the tools focus on tasks such as downloading data, converting values to scores, converting scores to grades, and producing stylised visual products such as plots, maps, and formatted xlsx files.
 
-## Installation
+# Installation
 
 To install this package you will first need to download the [RTools package](https://cran.r-project.org/bin/windows/Rtools/rtools45/rtools.html) and install it on your computer (accept the defaults everywhere during the installation process).
 
@@ -51,7 +37,7 @@ library(RcTools)
 
 ```
 
-## Usage
+# Usage
 
 This package currently contains 9 functions and is still expanding. Functions can be grouped under two themes:
 
@@ -60,9 +46,9 @@ This package currently contains 9 functions and is still expanding. Functions ca
 
 Functions under each theme are explained below. Alternatively, individual function documentation can be accessed with the command `?function_name`.
 
-### eReefs Functions
+## eReefs Functions
 
-#### ereefs_extract
+### ereefs_extract
 
 The `ereefs_extract` function takes a geometry input, date, and variable, and returns a netCDF data object within those bounds.
 
@@ -84,7 +70,7 @@ nc <- ereefs_extract(
 
 ```
 
-#### ereefs_reproject
+### ereefs_reproject
 
 The `ereefs_reproject` function takes a curvilinear netCDF object and returns a regular grid netCDF object. The curvilinear netCDF object is generally produced by the `ereefs_extract` function. Note, this function tends to fail when the curvilinear netCDF object has a complex border, such as at the edge of the Mackay Whitsunday Isaac region.
 
@@ -96,7 +82,7 @@ nc <- ereefs_reproject(nc)
 
 ```
 
-#### ereefs_dotplot
+### ereefs_dotplot
 
 The `ereefs_dotplot` function takes a regular grid netCDF object and returns a dotplot summarising daily values, the overall mean, and a rolling average.
 
@@ -122,7 +108,7 @@ p
 
 ```
 
-#### ereefs_windrose
+### ereefs_windrose
 
 The `ereefs_windplot` function takes a list regular grid netCDF objects (specifically the four objects produced when requesting wind from the `ereefs_extract` function) and returns a windrose plot summarising wind strength and direction.
 
@@ -147,7 +133,7 @@ wr_p
 
 ```
 
-#### ereefs_map
+### ereefs_map
 
 The `ereefs_map` function takes either a singular regular grid netCDF object, or a list regular grid netCDF objects and returns one of three different map types. Map A) is a concentration map for data such as turbidity, map B) is a true colour map that shows the "true" colour of the water, and map C) is a vector field map that provides a spatial representation of wind strength and direction.
 
@@ -175,9 +161,9 @@ m
 
 ```
 
-### Data Table Functions
+## Data Table Functions
 
-#### value_to_score
+### value_to_score
 
 The `value_to_score()` function is designed to calculate a variety of report card scores used by the Northern Three Report Cards. The function takes a dataframe and appends an additional column to the dataframe with the calculated scores.
 
@@ -268,7 +254,7 @@ In anycase, the output of the function is the original table, now with an additi
 | -3            | 20.48              |
 | -5            | 20.06              |
 
-#### score_to_grade
+### score_to_grade
 
 The `score_to_grade()` function has been designed to directly follow the `value_to_score()` function. It takes a dataframe (with scores) and appends an additional column to the dataframe with the calculated grades.
 
@@ -309,7 +295,7 @@ The final output would look like this:
 | -3            | 20.48              | E                  |
 | -5            | 20.06              | E                  |
 
-#### save_n3_table
+### save_n3_table
 
 The `save_n3_table()` function is designed to take a finalised dataframe from within R (such as the one above) and save it as an excel file with formatting in the specific style used by the Northern Three Report Cards. Below is a basic example of how to use the `save_n3_table()` function to format a data frame for the Northern Three Report Card. We will use the table that we just created above for this example.
 
@@ -354,7 +340,7 @@ Which looks like this:
 
 ![](man/figures/README-save_n3_table-example_2.png)
 
-##### extensions
+#### extensions
 
 The `save_n3_table()` offers several other extensions for styling choices, these are as follows:
 
