@@ -53,7 +53,7 @@ ereefs_dotplot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL
     #combine the list into a single object
     nc_combine <- do.call(c, nc)
 
-    #use the same logical vector to pull date values associated with each of the datasets
+    #pull date values associated with each of the datasets
     data_dates <- do.call(c, purrr::map(nc, \(x) stars::st_get_dimension_values(x, "time")))
 
     #update the date values in the compressed dataset

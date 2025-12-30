@@ -118,18 +118,9 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
 
   } else if (MapType == "Vector Field"){
 
-    #update list names
-    names(nc) <- purrr::map(nc, names)
-
-    #determine which items in the list the u and v netCDF's are and extract those
-    u_v_nc <- nc[stringr::str_detect(names(nc), "wind_u|wind_v")]
-
-    #order the data alphabetically for consistency
-    u_v_nc <- u_v_nc[order(names(u_v_nc))]    
-
     #vector fields need to be provided in tabular form, convert the two netcdfs to sf objects
-    u_data <- sf::st_as_sf(u_v_nc[[1]], as_points = T, merge = F)
-    v_data <- sf::st_as_sf(u_v_nc[[2]], as_points = T, merge = F)
+    u_data <- sf::st_as_sf(nc["wind_u (Nm-2)",,,], as_points = T, merge = F)
+    v_data <- sf::st_as_sf(nc["wind_v (Nm-2)",,,], as_points = T, merge = F)
 
     #convert the geometry into lat and lon columns, u and v share the same coordinates so this only needs to be done once
     u_data <- u_data |> 
@@ -194,7 +185,7 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
       ) +
       metR::geom_arrow(
         ggplot2::aes(dx = u * 10, dy = v * 10), #multiply just to make tails longer
-        arrow = grid::arrow(15, grid::unit(0.8, "lines"), ends = "last", type = "closed"),
+        arrow = grid::arrow(angle = 15, length = grid::unit(0.8, "lines"), ends = "last", type = "closed"),
         skip = 6,
         direction = "ccw"
       ) +
@@ -209,6 +200,5 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
     if (!is.null(nrow)){m <- m + ggplot2::facet_wrap(stats::as.formula(paste("~", Aggregation)), nrow = nrow)}
     
   }
-  
   
 }
