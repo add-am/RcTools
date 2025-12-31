@@ -6,7 +6,7 @@
 #' @param Variable Character Vector. The variable to extract from eReefs, currently accessible: "Turbidity", "Chlorophyll a", "DIN", "NH4", "NO3", "Secchi", "pH", "Wind", "True Colour"
 #' @param Downsample Integer. A singular value that defines the level of downsampling to apply to the data (reduces data size and processing time, also reduces resolution)
 #'
-#' @returns A NetCDF (stars) object or list of NetCDF (stars) objects
+#' @returns A single NetCDF (stars) object of specified dimensions and attributes
 #'
 #' @export
 #' @examples
@@ -90,7 +90,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   nc <- ereefs::safe_nc_open(input_file)
   
   #get a vector of all times
-  ds <- as.Date(ereefs::safe_ncvar_get(nc, "time"), origin = as.Date("1990-01-01"))
+  ds <- as.Date(floor(ereefs::safe_ncvar_get(nc, "time")), origin = as.Date("1990-01-01"))
 
   #close the nc file
   ncdf4::nc_close(nc)
@@ -112,7 +112,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   #get the index for the closest days
   StartDateLayerIndex <- which.min(abs(StartDate - ds))
   EndDateLayerIndex <- which.min(abs(EndDate - ds))
-  DayCount <- pmax(EndDateLayerIndex - StartDateLayerIndex, 1)
+  DayCount <- pmax((EndDateLayerIndex - StartDateLayerIndex)+1, 1)
 
   #if the user wants secchi, this doesn't have a depth layer
   if (stringr::str_detect(Variable, "Secchi")){
@@ -199,7 +199,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
       vals <- scalefun(vals)*255 #scale values up to rgb channels (0 to 255)
       vals[vals > 255] <- 255 #cap vals
       x[[1]] <- vals #put values back into the netCDF
-      x[drop = TRUE] #drop the time values
+      return(x)
     })
 
     #join files into a single stars object

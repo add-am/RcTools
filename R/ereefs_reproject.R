@@ -1,8 +1,8 @@
 #' Convert the eReefs object from curvilinear to a regular grid
 #'
-#' @param nc A NetCDF (stars) object, generally produced by the [ereefs_extract()] function
+#' @param nc A single NetCDF (stars) object, generally produced by the [ereefs_extract()] function
 #'
-#' @returns A NetCDF (stars) object, with the same values as x, but in a regular grid format
+#' @returns A single NetCDF (stars) object, with the same values as x, but in a regular grid format
 #'
 #' @export
 #' @examples

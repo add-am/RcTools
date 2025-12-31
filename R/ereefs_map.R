@@ -1,6 +1,6 @@
 #' Mapping eReefs Data
 #'
-#' @param nc A netCDF (stars) object, usually produced by the [ereefs_extract] and [ereefs_reproject] functions
+#' @param nc A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the [ereefs_extract()] function
 #' @param MapType Character String. Defines the type of map produced. One of "Concentration", "True Colour", or "Vector Field" (AKA wind)
 #' @param Aggregation Character String. Defines the level of aggregation to apply. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
 #' @param LegendTitle Character String. The title of the legend. Defaults to the name of the netCDF's attribute
@@ -30,19 +30,13 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
   if (!is.null(LegendTitle) & !is.character(LegendTitle)){stop("You must supply a character string to the 'LegendTitle' parameter")}
   if (!is.null(nrow) & !is.numeric(nrow)){stop("You must supply a numeric string to the 'nrow' parameter")}
 
-  #check argument types
-  if (!inherits(nc, "stars")){
-    if (inherits(nc, "list")){
-      if (any(!purrr::map_lgl(nc, \(nc_object) inherits(nc_object, "stars")))){
-        stop("You must supply either a single netCDF (stars) object, or a list of netCDF (stars) objects")
-      }
-    } else {
-      stop("You must supply either a single netCDF (stars) object, or a list of netCDF (stars) objects")
-    }
-  }
+  #check if single object or list, and convert
+  nc <- ereefs_list_safety_check_and_convert(nc)
 
-  if (!MapType %in% c("Concentration", "True Colour", "Vector Field")){stop("You must supply one of 'Concentration', 'True Colour',
-    or 'Vector Field' to the 'MapType' parameter.")}
+  #check the map type arguments' value
+  if (!MapType %in% c("Concentration", "True Colour", "Vector Field")){
+    stop("You must supply one of 'Concentration', 'True Colour', or 'Vector Field' to the 'MapType' parameter.")
+  }
 
   #obtain a qld state outline from the AIMS dataset
   qld <- get(utils::data("gbr_feat", package = "gisaimsr", envir = environment())) |> 
@@ -158,8 +152,8 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
       
     } else {
 
-      u_data <- dplyr::rename(u_data, "u" = 1)
-      v_data <- dplyr::rename(v_data, "v" = 1)
+      u_data <- tidyr::pivot_longer(u_data, 1, names_to = Aggregation, values_to = "u")
+      v_data <- tidyr::pivot_longer(v_data, 1, names_to = Aggregation, values_to = "v")
 
     }
     

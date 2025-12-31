@@ -1,6 +1,6 @@
 #' Create a Windrose Plot from eReefs Data
 #'
-#' @param nc A NetCDF (stars) object containing wind data, generally produced by the [ereefs_extract()] function
+#' @param nc A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the [ereefs_extract()] function
 #' @param SubSample Numeric String. The number of values per day to plot in the wind rose. Defaults to 500 values per day.
 #' @param Aggregation Character String. What type of grouping to apply to the data. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
 #' @param Heading Character String. The heading of the plot. Defaults to "Approximated Wind Speed".
@@ -22,8 +22,8 @@ ereefs_windrose <- function(nc, SubSample = 500, Aggregation = "Month", Heading 
   #check required argument
   if (missing(nc)){stop("You must supply at least the 'nc' parameter.")}
 
-  #it is expected that the data is provided as a netcdf object
-  if (!inherits(nc, "stars")){stop("Please supply a stars netCDF object to the function.")}
+  #check if single object or list, and convert
+  nc <- ereefs_list_safety_check_and_convert(nc)
   
   #continue to check argument types
   if (!is.numeric(SubSample)){stop("You must supply a numeric argument to the 'SubSample' parameter")}
@@ -39,9 +39,9 @@ ereefs_windrose <- function(nc, SubSample = 500, Aggregation = "Month", Heading 
 
   #take a subset of the data by iterating over each column in the sf object
   sub_sampled_data <- purrr::map_dfc(full_data, \(x) {sample(x, SubSample)})
-  
+
   #mutate and edit data
-  sub_sampled_data <- sub_sampled_data |> 
+  wind_data <- sub_sampled_data |> 
     dplyr::mutate(across(everything(), as.character)) |> #formatting
     tidyr::pivot_longer(
       cols = everything(), 
@@ -67,28 +67,20 @@ ereefs_windrose <- function(nc, SubSample = 500, Aggregation = "Month", Heading 
         stringr::str_detect(Variable, "wind_v") ~ "wind_v_component",
         T ~ "wind_u_component"
       )
-    )
+    ) |>
+    dplyr::group_by(DateTime, Variable) |> 
+    dplyr::mutate(RowId = dplyr::row_number()) |> 
+    dplyr::ungroup() |> 
+    tidyr::pivot_wider(names_from = Variable, values_from = Values) |> 
+    dplyr::mutate(wind_speed = sqrt(wind_magnitude/(1.225*1.3e-3))*3.6) #convert sheer stress (on the water) to approximate wind speed
     
     #depending on what aggregation is requested, change how the dataframe grouping column is built
-    if (Aggregation == "Month") {
-      sub_sampled_data <- tidyr::unite(sub_sampled_data, GroupingCol, "Year", "Month", sep = "_")
-    } else if (Aggregation == "Season") {
-      sub_sampled_data <- tidyr::unite(sub_sampled_data, GroupingCol, "SeasonYear", "Season", sep = "_")
-    } else if (Aggregation == "Financial") {
-      sub_sampled_data <- dplyr::mutate(sub_sampled_data, GroupingCol = Year)
-    } else if (Aggregation == "Annual") {
-      sub_sampled_data <- dplyr::mutate(sub_sampled_data, GroupingCol = Fyear)
-    }
+    if (Aggregation == "Month") {wind_data <- tidyr::unite(wind_data, GroupingCol, "Year", "Month", sep = "_")}
+    else if (Aggregation == "Season") {wind_data <- tidyr::unite(wind_data, GroupingCol, "SeasonYear", "Season", sep = "_")}
+    else if (Aggregation == "Financial") {wind_data <- dplyr::mutate(wind_data, GroupingCol = Year)}
+    else if (Aggregation == "Annual") {wind_data <- dplyr::mutate(wind_data, GroupingCol = Fyear)}
 
-  #further transform the data into the grouping requested
-  wind_data <- sub_sampled_data |> 
-    dplyr::group_by(Variable, GroupingCol) |> 
-    dplyr::summarise(Values = mean(Values)) |> #obtain mean values per grouping
-    dplyr::ungroup() |> 
-    tidyr::pivot_wider(names_from = Variable, values_from = Values) |>  
-    dplyr::mutate(wind_speed = sqrt(wind_magnitude/(1.225*1.3e-3))*3.6) #convert sheer stress (on the water) to approximate wind speed
-
-  #create the windrose
+  #create the windrose, use the grouping column to define facets
   windrose <- 
     climaemet::ggwindrose(
       speed = wind_data$wind_speed,

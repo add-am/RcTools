@@ -1,12 +1,13 @@
 #' Plotting eReefs Data
 #'
-#' @param nc A NetCDF (stars) object or a list of NetCDF objects, generally produced by the [ereefs_extract()] function
+#' @param nc A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the [ereefs_extract()] function
 #' @param SubSample Numeric String. The number of values per day to plot in the dot plot. Defaults to 500 values per day.
 #' @param Heading Character String. The heading of the plot. Defaults to NULL.
 #' @param YAxisName Character String. The yaxis label text for the plot. Defaults to NULL and returns "value" in the plot.
 #' @param LogTransform Boolean. Should the data be presented with a log transformation - useful for some variables such as Turbidity or Chlorophyll
+#' @param AttributeName Character String. The name of the attribute to be used if several exist. Defaults to NULL
 #'
-#' @returns A ggplot object
+#' @returns A single ggplot object that can be further transformed/edited/saved
 #'
 #' @export
 #' @examples
@@ -22,47 +23,38 @@
 #' )
 #' 
 
-ereefs_dotplot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, LogTransform = FALSE){
+ereefs_dotplot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL, LogTransform = FALSE, AttributeName = NULL){
 
   #check required argument
   if (missing(nc)){stop("You must supply at least the 'nc' parameter.")}
 
-  #check argument types
-  if (!inherits(nc, "stars")){
-    if (inherits(nc, "list")){
-      if (any(!purrr::map_lgl(nc, \(nc_object) inherits(nc_object, "stars")))){
-        stop("You must supply either a single netCDF (stars) object, or a list of netCDF (stars) objects")
-      }
-    } else {
-      stop("You must supply either a single netCDF (stars) object, or a list of netCDF (stars) objects")
-    }
-  }
+  #check if single object or list, and convert
+  nc <- ereefs_list_safety_check_and_convert(nc)
   
   #continue to check argument types
   if (!is.numeric(SubSample)){stop("You must supply a numeric argument to the 'SubSample' parameter")}
   if (SubSample > 2000){warning("Using a SubSample value greater than 2000 will incur a significant processing cost and reduce function speed.")}
-
-  #continue to check argument types
   if (!is.null(YAxisName) & !is.character(YAxisName)){stop("You must supply a character argument to the 'YAxisName' parameter")}
   if (!is.null(Heading) & !is.character(Heading)){stop("You must supply a character argument to the 'Heading' parameter")}
   if (!is.logical(LogTransform)){stop("You must supply a logical (boolean) argument to the 'LogTransform' parameter")}
+  if (!is.null(AttributeName) & !is.character(AttributeName)){stop("You must supply a character argument to the 'AttributeName' parameter")}
 
-  #if several netcdfs are provided in a list
-  if (inherits(nc, "list")){
+  #if an attribute name was provided, check if it exists, if so, extract it
+  if (!is.null(AttributeName)) {
+    if (!any(stringr::str_detect(names(nc), stringr::fixed(AttributeName)))){
+      stop("The character provided to the AttributeName parameter must exist within the attributes of the NetCDF object.")
+    }
+    nc <- nc[AttributeName,,,]
+  }
 
-    #combine the list into a single object
-    nc_combine <- do.call(c, nc)
+  library(stringi) 
+  names_clean <- stringi::stri_trans_general(names(nc), "Latin-ASCII") 
+  attr_clean <- stringi::stri_trans_general(AttributeName, "Latin-ASCII")
 
-    #pull date values associated with each of the datasets
-    data_dates <- do.call(c, purrr::map(nc, \(x) stars::st_get_dimension_values(x, "time")))
-
-    #update the date values in the compressed dataset
-    stars::st_dimensions(nc_combine)$time$values <- data_dates
-
-    #update name
-    nc <- nc_combine
-    
-  } 
+  #check if the netCDF has one attribute or several, if several the user needs to go back and specify
+  if (length(names(nc)) > 1){
+    stop("The dotplot function should only be applied to netCF objects with a single attribute, if multiple attributes exist in the file supply the name via the 'AttributeName' parameter.")
+  }
 
   #convert the netcdf into a sf object (required by ggplot) and drop geometry
   full_data <- sf::st_drop_geometry(
