@@ -7,6 +7,8 @@
 #' @param nrow Numeric String. The number of rows to be used when facetting maps. Defaults to NULL and uses underlying default value
 #'
 #' @returns A tmap object
+#' 
+#' @import grid
 #'
 #' @export
 #' @examples
@@ -200,5 +202,7 @@ ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL
     if (!is.null(nrow)){m <- m + ggplot2::facet_wrap(stats::as.formula(paste("~", Aggregation)), nrow = nrow)}
     
   }
+
+  return(m)
   
 }

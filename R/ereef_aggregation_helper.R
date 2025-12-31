@@ -15,18 +15,20 @@
 #' 
 ereefs_aggregation_helper <- function(nc, agg){
 
+  attribute_names <- names(nc)
+
   #data can be provided as a list of nc objects (wind) or a single object. If a single object, we just need to wrap it
   #in a list so it can pass through the next purrr map
-  if (!inherits(nc, "list")){nc <- list(nc)}
+  #if (!inherits(nc, "list")){nc <- list(nc)}
 
   #map over each element in the list of objects, in most instances this is only one (but four for wind)
-  aggregated_data <- purrr::map(nc, \(x){
+  #aggregated_data <- purrr::map(nc, \(x){
 
     #pull the name(s) out of the object before it undergoes aggregation
-    attribute_names <- names(x)
+    #attribute_names <- names(x)
 
     #extract dates into a dataframe
-    nc_dates <- data.frame(DateTime = stars::st_get_dimension_values(x, "time"))
+    nc_dates <- data.frame(DateTime = stars::st_get_dimension_values(nc, "time"))
 
     #expand the dates dataframe to have several variations of the dates
     nc_dates <- nc_dates |> 
@@ -62,7 +64,7 @@ ereefs_aggregation_helper <- function(nc, agg){
     sliced_nc <- purrr::pmap(dates, \(LayerName, MinIndex, MaxIndex){
 
       #slice the data
-      sliced_layers <- x[,,,MinIndex:MaxIndex]
+      sliced_layers <- nc[,,,MinIndex:MaxIndex]
 
       #apply the mean function to the slice
       aggregated_layer <- stars::st_apply(sliced_layers, 1:2, FUN = mean, keep = TRUE)
@@ -73,13 +75,13 @@ ereefs_aggregation_helper <- function(nc, agg){
         #manually add the time dimension back in
         aggregated_layer <- stars::st_redimension(
           aggregated_layer,
-          new_dims = c(295, 276, 1),
+          new_dims = c(dim(aggregated_layer), 1),
           along = stats::setNames(list(LayerName), "time"),
           name = "time"
         )
 
         #it requires this two step process first to build the dimension then to properly add the value
-        stars::st_dimensions(aggregated_layer)$X3$values <- LayerName   
+        stars::st_dimensions(aggregated_layer)$X1$values <- LayerName   
         
         #expand the layer name re naming the attributes afterwards
         LayerName <- attribute_names
@@ -95,7 +97,7 @@ ereefs_aggregation_helper <- function(nc, agg){
     if (length(names(sliced_nc[[1]])) > 1){
     
       #bind the data back together
-      aggregated_item <- do.call(c, c(sliced_nc, along = "X3"))
+      aggregated_item <- do.call(c, c(sliced_nc, along = "X1"))
 
       #fix the dimension names
       aggregated_item <- stars::st_set_dimensions(aggregated_item, names = c("x", "y", "time"))
@@ -117,27 +119,30 @@ ereefs_aggregation_helper <- function(nc, agg){
     }
 
     #return the aggregated item
-    return(aggregated_item)
+   # return(aggregated_item)
 
-  })
+  #})
+
+  #update the names of the attributes
+  names(aggregated_item) <- attribute_names
 
   #if the list output has length one, it can be converted back to a individual stars object
-  if (length(aggregated_data) == 1){
+  #if (length(aggregated_data) == 1){
 
-    aggregated_data <- aggregated_data[[1]]
+  #  aggregated_data <- aggregated_data[[1]]
 
   #if the list output has several items it is wind, and the names need to be extracted
-  } else {
+  #} else {
 
-    aggregated_data <- purrr::map2(aggregated_data, nc, \(x, y) {
+  #  aggregated_data <- purrr::map2(aggregated_data, nc, \(x, y) {
 
-      names(x) <- names(y)
+  #    names(x) <- names(y)
 
-      return(x)
-    })
-  }
+  #    return(x)
+  #  })
+  #}
 
   #return the final product
-  return(aggregated_data)
+  return(aggregated_item)
 
 }
