@@ -4,10 +4,10 @@
 \alias{ereefs_map}
 \title{Mapping eReefs Data}
 \usage{
-ereefs_map(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL)
+ereefs_map(nc, MapType, Aggregation = "Month", LegendTitle = NULL, nrow = NULL)
 }
 \arguments{
-\item{nc}{A netCDF (stars) object, usually produced by the \link{ereefs_extract} and \link{ereefs_reproject} functions}
+\item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
 
 \item{MapType}{Character String. Defines the type of map produced. One of "Concentration", "True Colour", or "Vector Field" (AKA wind)}
 
@@ -25,13 +25,13 @@ Mapping eReefs Data
 }
 \examples{
 
-nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+nc <- system.file("extdata/turb_reg.nc", package = "RcTools")
 nc <- stars::read_mdim(nc)
 
 m <- ereefs_map(
   nc = nc,
   MapType = "Concentration",
-  Aggregation = "Month"
+  Aggregation = "Annual"
 )
 
 }

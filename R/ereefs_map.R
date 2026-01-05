@@ -13,19 +13,19 @@
 #' @export
 #' @examples
 #' 
-#' nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+#' nc <- system.file("extdata/turb_reg.nc", package = "RcTools")
 #' nc <- stars::read_mdim(nc)
 #' 
 #' m <- ereefs_map(
 #'   nc = nc,
 #'   MapType = "Concentration",
-#'   Aggregation = "Month"
+#'   Aggregation = "Annual"
 #' )
 #' 
-ereefs_map <- function(nc, MapType, Aggregation, LegendTitle = NULL, nrow = NULL){
+ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, nrow = NULL){
 
   #conduct safety checks
-  if (any(missing(nc), missing(MapType), missing(Aggregation))){stop("You must supply at least the 'nc', 'MapType', and 'Aggregation' parameters.")}
+  if (any(missing(nc), missing(MapType))){stop("You must supply at least the 'nc' and 'Aggregation' parameters.")}
   if (!is.character(MapType)){stop("You must supply a character string to the 'MapType' parameter")}
   if (!is.null(LegendTitle) & !is.character(LegendTitle)){stop("You must supply a character string to the 'LegendTitle' parameter")}
   if (!is.null(nrow) & !is.numeric(nrow)){stop("You must supply a numeric string to the 'nrow' parameter")}

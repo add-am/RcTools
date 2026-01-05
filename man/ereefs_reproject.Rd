@@ -7,19 +7,19 @@
 ereefs_reproject(nc)
 }
 \arguments{
-\item{nc}{A NetCDF (stars) object or list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A single NetCDF (stars) object, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
 }
 \value{
-A NetCDF (stars) object or list of NetCDF (stars) objects, with the same values as x, but in a regular grid format
+A single NetCDF (stars) object, with the same values as x, but in a regular grid format
 }
 \description{
 Convert the eReefs object from curvilinear to a regular grid
 }
 \examples{
 
-nc_curvilinear <- system.file("extdata/turbidity22.RData", package = "RcTools")
-nc_curvilinear <- readRDS(nc_curvilinear)
+load(system.file("extdata/turb_curvi.RData", package = "RcTools"))
 
-nc_reg <- ereefs_reproject(nc_curvilinear)
+
+nc_reg <- ereefs_reproject(turb_curvi)
 
 }

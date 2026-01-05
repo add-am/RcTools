@@ -7,14 +7,17 @@
 ereefs_windrose(
   nc,
   SubSample = 500,
+  Aggregation = "Month",
   Heading = "Approximated Wind Speed",
   LegendTitle = "Speed (km/h)"
 )
 }
 \arguments{
-\item{nc}{A list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
 
 \item{SubSample}{Numeric String. The number of values per day to plot in the wind rose. Defaults to 500 values per day.}
+
+\item{Aggregation}{Character String. What type of grouping to apply to the data. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"}
 
 \item{Heading}{Character String. The heading of the plot. Defaults to "Approximated Wind Speed".}
 

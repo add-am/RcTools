@@ -18,7 +18,7 @@ ereefs_extract(Region, StartDate, EndDate, Variable, Downsample = 0)
 \item{Downsample}{Integer. A singular value that defines the level of downsampling to apply to the data (reduces data size and processing time, also reduces resolution)}
 }
 \value{
-A NetCDF (stars) object or list of NetCDF (stars) objects
+A single NetCDF (stars) object of specified dimensions and attributes
 }
 \description{
 Extracting eReefs Data

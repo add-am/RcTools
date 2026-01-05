@@ -12,7 +12,7 @@
 #' @export
 #' @examples
 #' 
-#' nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+#' nc <- system.file("extdata/turb_reg.nc", package = "RcTools")
 #' nc <- stars::read_mdim(nc)
 #' 
 #' x_plot <- ereefs_dotplot(
@@ -46,10 +46,6 @@ ereefs_dotplot <- function(nc, SubSample = 500, Heading = NULL, YAxisName = NULL
     }
     nc <- nc[AttributeName,,,]
   }
-
-  library(stringi) 
-  names_clean <- stringi::stri_trans_general(names(nc), "Latin-ASCII") 
-  attr_clean <- stringi::stri_trans_general(AttributeName, "Latin-ASCII")
 
   #check if the netCDF has one attribute or several, if several the user needs to go back and specify
   if (length(names(nc)) > 1){

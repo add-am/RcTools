@@ -5,6 +5,10 @@
 #' @returns A single NetCDF (stars) object combined on the time dimension
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
+#' ereefs_list_safety_check_and_convert("Turbidity")
+#' }
+#' 
 ereefs_list_safety_check_and_convert <- function(nc){
 
   #check if supplied object is not a single netCDF object or a list
@@ -19,20 +23,6 @@ ereefs_list_safety_check_and_convert <- function(nc){
     if (any(!purrr::map_lgl(nc, \(nc_object) inherits(nc_object, "stars")))){
       stop("You must supply either a single netCDF (stars) object, or a list of netCDF (stars) objects.")
     }
-
-    result <- tryCatch(
-
-      #try this, if it works, end
-      {do.call(c, nc)},
-
-      #if it fails, do this
-      error = function(e) { 
-
-        #send a message
-        stop("Merge failed: At least one object contained only 1 date - each object must have at least 2 dates to work (sorry).") 
-
-      }
-    )
 
     #if so, combine objects
     nc_combine <- do.call(c, nc)

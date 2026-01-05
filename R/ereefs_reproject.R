@@ -7,10 +7,10 @@
 #' @export
 #' @examples
 #' 
-#' nc_curvilinear <- system.file("extdata/turbidity22.RData", package = "RcTools")
-#' nc_curvilinear <- readRDS(nc_curvilinear)
+#' load(system.file("extdata/turb_curvi.RData", package = "RcTools"))
 #' 
-#' nc_reg <- ereefs_reproject(nc_curvilinear)
+#' 
+#' nc_reg <- ereefs_reproject(turb_curvi)
 #' 
 ereefs_reproject <- function(nc){
     

@@ -9,11 +9,12 @@ ereefs_dotplot(
   SubSample = 500,
   Heading = NULL,
   YAxisName = NULL,
-  LogTransform = FALSE
+  LogTransform = FALSE,
+  AttributeName = NULL
 )
 }
 \arguments{
-\item{nc}{A NetCDF (stars) object or a list of NetCDF objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
 
 \item{SubSample}{Numeric String. The number of values per day to plot in the dot plot. Defaults to 500 values per day.}
 
@@ -22,16 +23,18 @@ ereefs_dotplot(
 \item{YAxisName}{Character String. The yaxis label text for the plot. Defaults to NULL and returns "value" in the plot.}
 
 \item{LogTransform}{Boolean. Should the data be presented with a log transformation - useful for some variables such as Turbidity or Chlorophyll}
+
+\item{AttributeName}{Character String. The name of the attribute to be used if several exist. Defaults to NULL}
 }
 \value{
-A ggplot object
+A single ggplot object that can be further transformed/edited/saved
 }
 \description{
 Plotting eReefs Data
 }
 \examples{
 
-nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+nc <- system.file("extdata/turb_reg.nc", package = "RcTools")
 nc <- stars::read_mdim(nc)
 
 x_plot <- ereefs_dotplot(

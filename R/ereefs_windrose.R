@@ -42,9 +42,9 @@ ereefs_windrose <- function(nc, SubSample = 500, Aggregation = "Month", Heading 
 
   #mutate and edit data
   wind_data <- sub_sampled_data |> 
-    dplyr::mutate(across(everything(), as.character)) |> #formatting
+    dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) |> #formatting
     tidyr::pivot_longer(
-      cols = everything(), 
+      cols = dplyr::everything(), 
       names_to = c("Variable", "DateTime"), 
       names_sep = "\\.", 
       values_to = "Values"
@@ -77,8 +77,8 @@ ereefs_windrose <- function(nc, SubSample = 500, Aggregation = "Month", Heading 
     #depending on what aggregation is requested, change how the dataframe grouping column is built
     if (Aggregation == "Month") {wind_data <- tidyr::unite(wind_data, GroupingCol, "Year", "Month", sep = "_")}
     else if (Aggregation == "Season") {wind_data <- tidyr::unite(wind_data, GroupingCol, "SeasonYear", "Season", sep = "_")}
-    else if (Aggregation == "Financial") {wind_data <- dplyr::mutate(wind_data, GroupingCol = Year)}
-    else if (Aggregation == "Annual") {wind_data <- dplyr::mutate(wind_data, GroupingCol = Fyear)}
+    else if (Aggregation == "Financial") {wind_data <- dplyr::mutate(wind_data, GroupingCol = as.character(Year))}
+    else if (Aggregation == "Annual") {wind_data <- dplyr::mutate(wind_data, GroupingCol = as.character(Fyear))}
 
   #create the windrose, use the grouping column to define facets
   windrose <- 
