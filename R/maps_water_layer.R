@@ -20,6 +20,22 @@
 #enviro = c("Freshwater", "Estuarine")
 #sub_basin_or_sub_zone = NA
 
+#' Create a Tmap Water Layer
+#'
+#' @param supplied_sf
+#' @param fast
+#' @param stream_order
+#' @param water_lines
+#' @param water_polygons
+#' @param region
+#' @param enviro
+#' @param basin_or_zone
+#' @param sub_basin_or_sub_zone
+#'
+#' @returns
+#'
+#' @export
+#' @examples
 maps_water_layer <- function(supplied_sf, fast = F, stream_order = NA, water_lines = T, water_polygons = T,
                              region = NA, enviro = NA, basin_or_zone = NA, sub_basin_or_sub_zone = NA){
   
@@ -37,12 +53,12 @@ maps_water_layer <- function(supplied_sf, fast = F, stream_order = NA, water_lin
   lapply(package_vec, require, character.only = T)
   
   #turn off spherical geometry
-  sf_use_s2(F)
+  sf::sf_use_s2(F)
   
   #load the n3_watercourse dataset/check if it was already loaded
   if (!exists("n3_watercourse")) {
     
-    n3_watercourse <-  st_read(here("data/01. core/n3_prep_watercourse-builder/n3_watercourse.gpkg"))
+    n3_watercourse <-  sf::st_read(here("data/01. core/n3_prep_watercourse-builder/n3_watercourse.gpkg"))
     
     #put it into the global environment, so if this function gets used in a loop it doesn't reload the dataset each loop
     assign("n3_watercourse", n3_watercourse, envir = globalenv())
@@ -143,25 +159,25 @@ maps_water_layer <- function(supplied_sf, fast = F, stream_order = NA, water_lin
   } else {#otherwise do the safe method that cuts (spatially) the dataset
   
     #cut the full watercourse dataset down to the focus area as defined by the supplied sf object
-    focus_water <- st_intersection(n3_watercourse, st_union(supplied_sf))
+    focus_water <- sf::st_intersection(n3_watercourse, sf::st_union(supplied_sf))
   }
   
   #split the water dataset into a lines dataset and filter by stream order
-  if (any(str_detect(unique(st_geometry_type(focus_water)), "LINE"))){
+  if (any(stringr::str_detect(unique(sf::st_geometry_type(focus_water)), "LINE"))){
     
     focus_water_lines <- focus_water |> 
-      st_collection_extract("LINESTRING") |> 
-      filter(if (all(!is.na(internal_stream_order) & length(internal_stream_order) == 1)) 
+      sf::st_collection_extract("LINESTRING") |> 
+      dplyr::filter(if (all(!is.na(internal_stream_order) & length(internal_stream_order) == 1)) 
         {StreamOrder >= internal_stream_order}
              else if (all(!is.na(internal_stream_order) & length(internal_stream_order) == 2)) 
                {StreamOrder %in% internal_stream_order[1]:internal_stream_order[2]}
         else {StreamOrder %in% StreamOrder})
   }
   
-  if (any(str_detect(unique(st_geometry_type(focus_water)), "POLY"))){
+  if (any(stringr::str_detect(unique(sf::st_geometry_type(focus_water)), "POLY"))){
   
     #and a polygon dataset
-    focus_water_areas <- st_collection_extract(focus_water, "POLYGON")
+    focus_water_areas <- sf::st_collection_extract(focus_water, "POLYGON")
   }
   
   #check if lines exists and notify the user
@@ -190,20 +206,20 @@ maps_water_layer <- function(supplied_sf, fast = F, stream_order = NA, water_lin
   #otherwise construct the map as per the users request  
   } else if (water_lines & water_polygons){#if the user wants both and both exists, create a map with both
     
-    water_map <- tm_shape(focus_water_lines) +
-      tm_lines(col = "dodgerblue", lwd = 0.5) +
-      tm_shape(focus_water_areas) +
-      tm_polygons(fill = "aliceblue", col = "dodgerblue", lwd = 0.5)
+    water_map <- tmap::tm_shape(focus_water_lines) +
+      tmap::tm_lines(col = "dodgerblue", lwd = 0.5) +
+      tmap::tm_shape(focus_water_areas) +
+      tmap::tm_polygons(fill = "aliceblue", col = "dodgerblue", lwd = 0.5)
     
   } else if (water_lines){#if only lines exist, create a map with only lines
       
-      water_map <- tm_shape(focus_water_lines) +
-        tm_lines(col = "dodgerblue", lwd = 0.5)
+      water_map <- tmap::tm_shape(focus_water_lines) +
+        tmap::tm_lines(col = "dodgerblue", lwd = 0.5)
 
   } else if (water_polygons){#if only areas exists, create a map with only polygons
     
-    water_map <- tm_shape(focus_water_areas) +
-      tm_polygons(fill = "aliceblue", col = "dodgerblue", lwd = 0.5)
+    water_map <- tmap::tm_shape(focus_water_areas) +
+      tmap::tm_polygons(fill = "aliceblue", col = "dodgerblue", lwd = 0.5)
     
   }
   
