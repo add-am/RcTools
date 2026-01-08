@@ -50,8 +50,11 @@ maps_water_layer <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, Water
     stop(glue::glue("The following basin argument(s) are invalid: '{faulty_basin}'. Try one of: {allowed_basins_collapsed}"))
   }
 
+  #if O'connell is one of the requested basins it requires additional formatting due to its additional single quote
+  Basin[stringr::str_detect(Basin, "O'Connell")] <- "O''Connell"
+
   #build the basin filter request (takes the format of an SQL argument)
-  requested_basins <- paste("'", Basin,"'", collapse = ", ", sep = "")
+  requested_basins <- paste("'", Basin,"'", collapse = ", ", sep = "")  
   basin_query <- glue::glue("DRAINAGE_BASIN IN ({requested_basins})")
 
   #if stream order has be supplied, build this query as well
