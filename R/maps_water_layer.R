@@ -108,12 +108,29 @@ maps_water_layer <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, Water
   #bind all data together (makes the map easier to handle)
   all_water_data <- dplyr::bind_rows(requested_features)
 
-  #build water layer
-  water_layer <- 
-    tmap::tm_shape(all_water_data) + #all lines
-    tmap::tm_lines(col = "dodgerblue", lwd = 0.5) +
-    tmap::tm_shape(all_water_data) + #all areas
-    tmap::tm_polygons(fill = "aliceblue", col = "dodgerblue", lwd = 0.5)
+  #get a list of geometry types in the data
+  geom_types <- unique(sf::st_geometry_type(all_water_data))
+
+  #start with an empty tmap object 
+  water_layer <- tmap::tm_shape(all_water_data)
+
+  #if the data has lines :
+  if (any(c("MULTILINESTRING", "LINESTRING") %in% geom_types)){
+
+    #build lines layer
+    water_layer <- water_layer +
+      tmap::tm_lines(col = "dodgerblue", lwd = 0.5)
+
+  } 
+
+  #if the data has areas
+  if (any(c("POLYGON", "MULTIPOLYGON") %in% geom_types)){
+    
+    #build area layer
+    water_layer <- water_layer +
+      tmap::tm_polygons(fill = "aliceblue", col = "dodgerblue", lwd = 0.5)
+  
+  }
   
   #return the water layer object
   return(water_layer)
