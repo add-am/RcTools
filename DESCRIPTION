@@ -32,7 +32,8 @@ Imports:
     RColorBrewer,
     metR,
     oce,
-    rcartocolor
+    rcartocolor,
+    arcgis
 Remotes:
     open-AIMS/ereefs,
     open-AIMS/gisaimsr

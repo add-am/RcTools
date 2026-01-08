@@ -1,9 +1,3 @@
-#inputs: 
-#supplied_sf_1 = REQUIRED. The main sf object that will define the area of interest
-#supplied_sf_2 = OPTIONAL. If you want a second box in the map you can use this
-#backdrop = REQUIRED. The "backdrop" aka wider region that provides context to where the main sf object is
-#aspect = REQUIRED. The aspect ratio of the inset map (Height and Width). Note this should match that of the aspect used over in the main map
-
 #' Create a Tmap Inset (corner) Map
 #'
 #' @param supplied_sf_1 Sf object. An sf object that defines the main area of interest.
