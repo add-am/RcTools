@@ -31,9 +31,8 @@ Create a Windrose Plot from eReefs Data
 }
 \examples{
 
-nc_names <- paste0("extdata/", c("wind_dir", "wind_mag", "wind_u", "wind_v"), ".nc")
-nc <- purrr::map(nc_names, \(x) system.file(x, package = "RcTools"))
-nc <- purrr::map(nc, stars::read_mdim)
+nc <- system.file("extdata/wind_reg.nc", package = "RcTools")
+nc <- stars::read_mdim(nc)
 
 wr_plot <- ereefs_windrose(nc)
 

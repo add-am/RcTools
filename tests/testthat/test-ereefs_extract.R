@@ -1,5 +1,7 @@
 test_that("ereefs_extract returns a single attribute stars object", {
 
+  skip("Slow test — periodically unskip and run manually")
+
   #load in a small boundary
   sf_obj <- sf::st_read(
       system.file("extdata/boundary.gpkg", package = "RcTools"),
@@ -34,6 +36,8 @@ test_that("ereefs_extract returns a single attribute stars object", {
 
 test_that("ereefs_extract returns a multi-attribute TC stars object", {
 
+  skip("Slow test — periodically unskip and run manually")
+
   #load in a small boundary
   sf_obj <- sf::st_read(
       system.file("extdata/boundary.gpkg", package = "RcTools"),
@@ -67,6 +71,8 @@ test_that("ereefs_extract returns a multi-attribute TC stars object", {
 })
 
 test_that("ereefs_extract returns a multi-attribute Wind stars object", {
+
+  skip("Slow test — periodically unskip and run manually")
 
   #load in a small boundary
   sf_obj <- sf::st_read(

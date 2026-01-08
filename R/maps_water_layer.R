@@ -11,6 +11,9 @@
 #'
 #' @export
 #' @examples
+#' 
+#' ross_and_black <- maps_water_layer(Basin = c("Black", "Ross"))
+#' 
 maps_water_layer <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, WaterLakes = FALSE, StreamOrder = NULL){
 
   #check the required argument
@@ -20,7 +23,7 @@ maps_water_layer <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, Water
   if (!is.logical(WaterLines)){stop("You must supply a boolean (T/F) argument to the 'WaterLines' parameter.")}
   if (!is.logical(WaterAreas)){stop("You must supply a boolean (T/F) argument to the 'WaterAreas' parameter.")}
   if (!is.logical(WaterLakes)){stop("You must supply a boolean (T/F) argument to the 'WaterLakes' parameter.")}
-  if (!is.numeric(StreamOrder)){stop("You must supply a numeric argument to the 'StreamOrder' parameter.")}
+  if (!is.null(StreamOrder) & !is.numeric(StreamOrder)){stop("You must supply a numeric argument to the 'StreamOrder' parameter.")}
   if (length(StreamOrder) > 2){stop("You must supply either one or two numeric arguments to the 'StreamOrder' parameter.")}
 
   #construct a list of allowed basins to request
@@ -75,17 +78,17 @@ maps_water_layer <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, Water
     layer_url <- glue::glue("https://spatial-gis.information.qld.gov.au/arcgis/rest/services/InlandWaters/WaterCoursesAndBodies/MapServer{x}")
   
     #build the final filter query, based on the layer requested (if 33 it has a stream order argument)
-    if (x == "/33"){
+    if (x == "/33" & !is.null(StreamOrder)){
       final_query = glue::glue("{basin_query} AND {stream_query}")
     } else {
       final_query = basin_query
     }
 
     #open the layer
-    layer <- arc_open(layer_url)
+    layer <- arcgislayers::arc_open(layer_url)
   
     #filter the layer based on user selection
-    water_data <- arc_select(
+    water_data <- arcgislayers::arc_select(
       layer,
       where = final_query
   )

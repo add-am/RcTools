@@ -10,6 +10,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
     dplyr,
+    glue,
     openxlsx2,
     rlang,
     stringr,
@@ -33,7 +34,7 @@ Imports:
     metR,
     oce,
     rcartocolor,
-    arcgis
+    arcgislayers
 Remotes:
     open-AIMS/ereefs,
     open-AIMS/gisaimsr
@@ -42,6 +43,6 @@ Suggests:
     FNN,
     testthat (>= 3.0.0)
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1)
 LazyData: true
 Config/testthat/edition: 3
