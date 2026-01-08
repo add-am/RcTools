@@ -38,6 +38,9 @@ maps_water_layer <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, Water
     "Shoalwater", "Styx", "Torres Strait Islands"
   )
 
+  #if mulgrave or russell are provided, rename to mulgrave-russell
+  Basin[stringr::str_detect(Basin, "Mulgrave|Russell")] <- "Mulgrave-Russell"  
+
   #check if the requested basin is in the allowed list
   if (!all(Basin %in% allowed_basins)){
 
