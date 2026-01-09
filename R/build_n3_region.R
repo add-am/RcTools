@@ -250,7 +250,9 @@ n3_marine <- split_regions |>
 
   library(dplyr) 
   library(stringr) 
-  library(sf) 
+  library(sf)
+
+  sf::st_write(n3_marine, "test.gpkg")
   
 
   #add a point geom for each of the polygons 
@@ -261,13 +263,11 @@ n3_marine <- n3_marine |> mutate(Zone = SubZone)
 
 #assign region based on where each polygon is located
 n3_marine <- n3_marine |> 
+  dplyr::mutate(Zone = case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") ~ "Northern")) |> 
   dplyr::mutate(
     Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet") ~ "Northern", 
-      TRUE ~ Zone)) |> 
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,1] > 145.91915 & sf::st_coordinates(geom2)[,2] < -16.8642 ~ "Central", 
+      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.91915 & sf::st_coordinates(geom2)[,2] < -16.8642 ~ "Central", 
+      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.86671 & sf::st_coordinates(geom2)[,2] < -16.93366 ~ "Central",
       TRUE ~ Zone)) |> 
   dplyr::mutate(
     Zone = case_when(
