@@ -156,8 +156,8 @@ build_n3_region <- function(){
 
   # 1. Convert each border into a LINESTRING in EPSG:7855 
   border_lines <- lapply(borders, function(df) { 
-    st_linestring(as.matrix(df)) |> st_sfc(crs = 4326) |> 
-      st_transform("EPSG:7855") }) 
+    sf::st_linestring(as.matrix(df)) |> sf::st_sfc(crs = 4326) |> 
+      sf::st_transform("EPSG:7855") }) 
   
   # 2. Combine all LINESTRING geometries into one sfc object 
   all_borders <- do.call(c, border_lines)
@@ -166,8 +166,8 @@ build_n3_region <- function(){
   marine_area <- water_bodies_final#st_union(water_bodies_final) 
   
   split_regions <- lwgeom::st_split(marine_area, all_borders) |> 
-    st_collection_extract("POLYGON") |> 
-    st_sf()
+    sf::st_collection_extract("POLYGON") |> 
+    sf::st_sf()
 
   #add a point geom for each of the polygons 
 split_regions <- split_regions |> 
@@ -177,7 +177,7 @@ split_regions <- split_regions |>
 #assign region based on where each polygon is located. This is a trial and error process to eliminate errors
 n3_marine <- split_regions |> 
   sf::st_transform("EPSG:4326") |> 
-  dplyr::mutate(Region = case_when(
+  dplyr::mutate(Region = dplyr::case_when(
     stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < -15.8457 & sf::st_coordinates(geom2)[,2] > -18.8980 ~ "Wet Tropics",
     stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < -18.8980 & sf::st_coordinates(geom2)[,2] > -19.3037 & sf::st_coordinates(geom2)[,1] < 147.0235 ~ "Dry Tropics",
     stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < -19.1923 & sf::st_coordinates(geom2)[,2] > -19.8465 &
@@ -197,7 +197,7 @@ n3_marine <- split_regions |>
     stringr::str_detect(SubZone, "Off") & sf::st_coordinates(geom2)[,2] < -18.4789 & sf::st_coordinates(geom2)[,2] > -18.8889 ~ "Burdekin",
     stringr::str_detect(SubZone, "Off") & sf::st_coordinates(geom2)[,2] < -18.8889 & sf::st_coordinates(geom2)[,2] > -21.2486 ~ "Mackay Whitsunday Isaac")) |>
   dplyr::filter(!is.na(Region)) |> 
-  dplyr::mutate(SubZone = case_when(
+  dplyr::mutate(SubZone = dplyr::case_when(
     stringr::str_detect(SubZone, "Enc") ~ "Enclosed Coastal",
     stringr::str_detect(SubZone, "Ope") ~ "Open Coastal",
     TRUE ~ SubZone)) |> 
@@ -211,7 +211,7 @@ n3_marine <- split_regions |>
     
   #create lines between each region
   borders2 <- list(
-    halifax_cleveland <- data.frame("lon" = c(146.675117968, 146.91653), "lat" = c(-19.189224827, -18.63154)),
+    halifax_cleveland <- data.frame("lon" = c(146.675117968, 146.91653), "lat" = c(-19.190224827, -18.63154)),
     north_whit <- data.frame("lon" = c(148.47151, 148.58685), "lat" = c(-20.07056, -19.91489)),
     whit_central <- data.frame("lon" = c(148.927459, 149.25506), "lat" = c(-20.534212, -20.58335)),
     central_south <- data.frame("lon" = c(149.483468, 149.8913), "lat" = c(-21.533408, -21.2565)),
@@ -226,8 +226,8 @@ n3_marine <- split_regions |>
 
   # 1. Convert each border into a LINESTRING in EPSG:7855 
   border_lines <- lapply(borders2, function(df) { 
-    st_linestring(as.matrix(df)) |> st_sfc(crs = 4326) |> 
-      st_transform("EPSG:7855") }) 
+    sf::st_linestring(as.matrix(df)) |> sf::st_sfc(crs = 4326) |> 
+      sf::st_transform("EPSG:7855") }) 
   
   # 2. Combine all LINESTRING geometries into one sfc object 
   all_borders <- do.call(c, border_lines)
@@ -236,8 +236,8 @@ n3_marine <- split_regions |>
   marine_area <- n3_marine#st_union(water_bodies_final) 
   
   split_regions <- lwgeom::st_split(marine_area, all_borders) |> 
-    st_collection_extract("POLYGON") |> 
-    st_sf()
+    sf::st_collection_extract("POLYGON") |> 
+    sf::st_sf()
 
   n3_marine <- split_regions
 
@@ -245,87 +245,59 @@ n3_marine <- split_regions |>
   # CHECK POINT 4: COMPLETE
   #---------------
   tmap::tm_shape(n3_marine) + tmap::tm_polygons(fill = "Region", fill_alpha = 1) 
-  backup <- n3_marine
   #---------------
 
-  library(dplyr) 
-  library(stringr) 
-  library(sf)
+  #create a point geom for each of the polygons 
+  n3_marine$geom2 <- st_centroid(st_geometry(n3_marine))
 
-  sf::st_write(n3_marine, "test.gpkg")
+  #include preliminary zone information for those which don't have special names
+  n3_marine <- n3_marine |> dplyr::mutate(Zone = SubZone)
   
+  #assign zone information based on where each polygon is located: this is done in stages
 
-  #add a point geom for each of the polygons 
-n3_marine$geom2 <- st_centroid(st_geometry(n3_marine))
+  #do wet tropics first
+  wt_marine <- n3_marine |> 
+    dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") ~ "Northern", TRUE ~ Zone)) |> 
+    dplyr::mutate(Zone = dplyr::case_when(
+      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 384862.6 & sf::st_coordinates(geom2)[,2] < 8135153 ~ "Central", 
+      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 379320 & sf::st_coordinates(geom2)[,2] < 8127436 ~ "Central", TRUE ~ Zone)) |> 
+    dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < 8048663 ~ "Southern", TRUE ~ Zone)) |> 
+    dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") &  stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < 7954262 ~ "Palm Group", TRUE ~ Zone)) 
+    
+  #then do dry tropics
+  dt_marine <- wt_marine |>
+    dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") ~ "Halifax Bay", TRUE ~ Zone)) |> 
+    dplyr::mutate(Zone = dplyr::case_when(
+      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") & sf::st_coordinates(geom2)[,1] > 466064.8 & 
+        sf::st_coordinates(geom2)[,2] < 7937544 ~ "Cleveland Bay", TRUE ~ Zone))
 
-#add preliminary zone information for those which don't have special names
-n3_marine <- n3_marine |> mutate(Zone = SubZone)
+  #next is burdekin
+  bd_marine <- dt_marine |>  
+    dplyr::mutate(Zone = dplyr::case_when(
+        stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Burd") & sf::st_coordinates(geom2)[,1] > 502288.7 & 
+          sf::st_coordinates(geom2)[,2] < 7877869~ "Burdekin",TRUE ~ Zone))
 
-#assign region based on where each polygon is located
-n3_marine <- n3_marine |> 
-  dplyr::mutate(Zone = case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") ~ "Northern")) |> 
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.91915 & sf::st_coordinates(geom2)[,2] < -16.8642 ~ "Central", 
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.86671 & sf::st_coordinates(geom2)[,2] < -16.93366 ~ "Central",
-      TRUE ~ Zone)) |> 
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,1] > 145.86671 & sf::st_coordinates(geom2)[,2] < -16.93366 ~ "Central", 
-      TRUE ~ Zone)) |> 
-  dplyr::mutate(
-    Zone = case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < -17.6486 ~ "Southern", 
-    TRUE ~ Zone)) |>
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") &  stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < -18.5021 ~ "Palm Group", 
-      TRUE ~ Zone)) |>
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") ~ "Halifax Bay", 
-      TRUE ~ Zone)) |> 
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") & sf::st_coordinates(geom2)[,1] > 146.68007 & sf::st_coordinates(geom2)[,2] < -18.6532 ~ "Cleveland Bay", 
-      TRUE ~ Zone)) |> 
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Burd") & sf::st_coordinates(geom2)[,1] > 147.0217007 & sf::st_coordinates(geom2)[,2] > -19.206464 & sf::st_coordinates(geom2)[,2] < -19.1924341 ~ "Burdekin",
-      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Burd") & sf::st_coordinates(geom2)[,1] > 147.024120 & sf::st_coordinates(geom2)[,2] < -19.208543 ~ "Burdekin", 
-      TRUE ~ Zone)) |> 
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc") & stringr::str_detect(Region, "Mackay") ~ "North",
-      stringr::str_detect(SubZone, "Open") & stringr::str_detect(Region, "Mackay") ~ "North",
-      TRUE ~ Zone)) |>
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 148.476995 & sf::st_coordinates(geom2)[,2] < -19.97939 ~ "Whitsunday", 
-      stringr::str_detect(SubZone, "Open") & sf::st_coordinates(geom2)[,1] > 148.476995 & sf::st_coordinates(geom2)[,2] < -19.97939 ~ "Whitsunday", 
-      TRUE ~ Zone)) |>
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 148.844991 & sf::st_coordinates(geom2)[,2] < -20.431976 ~ "Central",
-      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 148.889737 & sf::st_coordinates(geom2)[,2] < -20.495653 ~ "Central",
-      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < -20.52959 ~ "Central",
-      stringr::str_detect(SubZone, "Open") & sf::st_coordinates(geom2)[,2] < -20.52622 ~ "Central", 
-      TRUE ~ Zone)) |> 
-  dplyr::mutate(
-    Zone = case_when(
-      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 149.483495 & sf::st_coordinates(geom2)[,2] < -21.533348 ~ "South",
-      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 149.45443 & sf::st_coordinates(geom2)[,2] < -21.56729 ~ "South",
-      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < -21.583174 ~ "South",
-      stringr::str_detect(SubZone, "Open") & sf::st_coordinates(geom2)[,1] > 149.483495 & sf::st_coordinates(geom2)[,2] < -21.33330 ~ "South", 
-      TRUE ~ Zone))
-
-#remove old geom and add the Environment type
-n3_marine <- select(n3_marine, -geom2) |> mutate(Environment = "Marine")
-
+  #and finally mackay
+  all_marine <- bd_marine |> 
+    dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open") & stringr::str_detect(Region, "Mackay") ~ "North", TRUE ~ Zone)) |> 
+    dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open") & sf::st_coordinates(geom2)[,1] > 655274.4 & sf::st_coordinates(geom2)[,2] < 7788874 ~ "Whitsunday", TRUE ~ Zone)) |> 
+    dplyr::mutate(Zone = dplyr::case_when(
+      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 693987.2 & sf::st_coordinates(geom2)[,2] < 7738799 ~ "Central",
+      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 698673.9 & sf::st_coordinates(geom2)[,2] < 7733296 ~ "Central",
+      stringr::str_detect(SubZone, "Enc|Open") & sf::st_coordinates(geom2)[,2] < 7729880 ~ "Central", TRUE ~ Zone)) |> 
+    dplyr::mutate(Zone = dplyr::case_when(
+      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 759883.2 & sf::st_coordinates(geom2)[,2] < 7618823 ~ "South",
+      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 756098.2 & sf::st_coordinates(geom2)[,2] < 7615067 ~ "South",
+      stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < 7612584 ~ "South",
+      stringr::str_detect(SubZone, "Open") & sf::st_coordinates(geom2)[,1] > 759883.2 & sf::st_coordinates(geom2)[,2] < 7639843 ~ "South", TRUE ~ Zone))
+  
+  #remove old geom and add the Environment type
+  all_marine <- dplyr::select(all_marine, -geom2) |> dplyr::mutate(Environment = "Marine")
 
   #---------------
   # CHECK POINT 5: COMPLETE
   #---------------
-  tmap::tm_shape(n3_marine) + tmap::tm_polygons(fill = "Zone", fill_alpha = 1) 
+  tmap::tm_shape(all_marine) + tmap::tm_polygons(fill = "Zone", fill_alpha = 1) 
   #---------------
   
   
@@ -357,3 +329,44 @@ tmap::tm_shape(n3_marine) +
 
 
 }
+
+
+
+
+#do wet tropics first
+#wt_marine <- n3_marine |> 
+#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") ~ "Northern", TRUE ~ Zone)) |> 
+#  dplyr::mutate(Zone = dplyr::case_when(
+#    stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.91915 & sf::st_coordinates(geom2)[,2] < -16.8642 ~ "Central", 
+#    stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.86671 & sf::st_coordinates(geom2)[,2] < -16.93366 ~ "Central", TRUE ~ Zone)) |> 
+#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < -17.6486 ~ "Southern", TRUE ~ Zone)) |> 
+#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") &  stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < -18.5021 ~ "Palm Group", TRUE ~ Zone)) 
+  
+#then do dry tropics
+#dt_marine <- wt_marine |>
+#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") ~ "Halifax Bay", TRUE ~ Zone)) |> 
+#  dplyr::mutate(Zone = dplyr::case_when(
+#    stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") & sf::st_coordinates(geom2)[,1] > 146.68007 & 
+#      sf::st_coordinates(geom2)[,2] < -18.6532 ~ "Cleveland Bay", TRUE ~ Zone))
+
+#next is burdekin
+#bd_marine <- dt_marine |>  
+#  dplyr::mutate(Zone = dplyr::case_when(
+#      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Burd") & sf::st_coordinates(geom2)[,1] > 147.0217007 & 
+#        sf::st_coordinates(geom2)[,2] > -19.206464 & sf::st_coordinates(geom2)[,2] < -19.1924341 ~ "Burdekin",
+#      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Burd") & sf::st_coordinates(geom2)[,1] > 147.024120 & 
+#        sf::st_coordinates(geom2)[,2] < -19.208543 ~ "Burdekin", TRUE ~ Zone))
+
+#and finally mackay
+#all_marine <- bd_marine |> 
+#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open") & stringr::str_detect(Region, "Mackay") ~ "North", TRUE ~ Zone)) |> 
+#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open") & sf::st_coordinates(geom2)[,1] > 148.476995 & sf::st_coordinates(geom2)[,2] < -19.97939 ~ "Whitsunday", TRUE ~ Zone)) |> 
+#  dplyr::mutate(Zone = dplyr::case_when(
+#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 148.844991 & sf::st_coordinates(geom2)[,2] < -20.431976 ~ "Central",
+#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 148.889737 & sf::st_coordinates(geom2)[,2] < -20.495653 ~ "Central",
+#    stringr::str_detect(SubZone, "Enc|Open") & sf::st_coordinates(geom2)[,2] < -20.52959 ~ "Central", TRUE ~ Zone)) |> 
+#  dplyr::mutate(Zone = dplyr::case_when(
+#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 149.483495 & sf::st_coordinates(geom2)[,2] < -21.533348 ~ "South",
+#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 149.45443 & sf::st_coordinates(geom2)[,2] < -21.56729 ~ "South",
+#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < -21.583174 ~ "South",
+#    stringr::str_detect(SubZone, "Open") & sf::st_coordinates(geom2)[,1] > 149.483495 & sf::st_coordinates(geom2)[,2] < -21.33330 ~ "South", TRUE ~ Zone))
