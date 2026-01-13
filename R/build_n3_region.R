@@ -1,6 +1,9 @@
 build_n3_region <- function(){
 
-
+  #---------------
+  # STAGE 1: LANDMASSES
+  #---------------
+ 
   #create basins and sub basins list for northern three regions
   basin_list <- c("'Don', 'Proserpine', 'O''Connell', 'Pioneer', 'Plane', 'Daintree', 'Mossman', 
     'Barron', 'Johnstone', 'Tully', 'Murray', 'Herbert', 'Ross', 'Black', 'Haughton', 'Burdekin'")
@@ -26,7 +29,6 @@ build_n3_region <- function(){
   basin_and_sub <- subs_extract |> 
     dplyr::rename("BasinName" = "SubName", "BasinNumber" = "SubNumber") |> 
     rbind(basins_extract) |> 
-    #dplyr::rename("BasinName" = "basin_name") |>
     sf::st_transform("EPSG:7855") |> 
     dplyr::mutate(Region = dplyr::case_when(
       BasinName %in% c("Ross", "Black") ~ "Dry Tropics",
@@ -82,13 +84,30 @@ build_n3_region <- function(){
   
   #keep only islands within the bounding box of the land basins
   basin_extent <- sf::st_bbox(basin_and_sub)
-  basin_extent[3] <- 155.0000
-  named_islands <- sf::st_crop(named_islands, basin_extent)  
+  basin_extent[3] <- 7897976
+  named_islands <- sf::st_crop(named_islands, basin_extent)
   
+  #---------------
+  # CHECK POINT 1: COMPLETE
+  #---------------
+  #tmap::tm_shape(basin_and_sub) + tmap::tm_polygons(fill = "BasinName", fill_alpha = 1) + 
+    #tmap::tm_shape(named_islands) + tmap::tm_polygons(fill = "BasinName", fill_alpha = 1) 
+  #---------------
+
+  #---------------
+  # STAGE 2: WATERBODIES
+  #---------------
+    
   #read the water bodies data set from the aims package
   water_bodies <- get(data("wbodies", package = "gisaimsr")) |> 
     name_cleaning() |> 
     sf::st_transform("EPSG:7855")
+
+  #do a preliminary hole fill and cut to fill unnamed islands
+  water_bodies <- water_bodies |> 
+    nngeo::st_remove_holes() |> 
+    sf::st_difference(sf::st_union(named_islands)) |> 
+    dplyr::rename(geom = geometry)
 
   #create a buffer around the water bodies then take only the buffer, union everything as no info is needed currently
   wb_buffer_dif <- water_bodies |> 
@@ -150,9 +169,15 @@ build_n3_region <- function(){
     dplyr::summarise(geom = sf::st_union(geom))
 
   #---------------
-  # CHECK POINT 1: COMPLETE
+  # CHECK POINT 2: COMPLETE
   #---------------
-  tmap::tm_shape(water_bodies_final) + tmap::tm_polygons(fill = "SubZone", fill_alpha = 1) 
+  tmap::tm_shape(water_bodies_final) + tmap::tm_polygons(fill = "SubZone", fill_alpha = 1) +
+    tmap::tm_shape(basin_and_sub) + tmap::tm_polygons(fill = "BasinName", fill_alpha = 1) + 
+    tmap::tm_shape(named_islands) + tmap::tm_polygons(fill = "BasinName", fill_alpha = 1) 
+  #---------------
+
+  #---------------
+  # STAGE 3: WATERBODY BOUNDARIES
   #---------------
 
   #create marine boundary lines between each region
@@ -209,13 +234,7 @@ build_n3_region <- function(){
       TRUE ~ SubZone)) |> 
     dplyr::select(-geom2) |> 
     sf::st_make_valid()
-  
-  #---------------
-  # CHECK POINT 2: COMPLETE
-  #---------------
-  tmap::tm_shape(n3_marine) + tmap::tm_polygons(fill = "Region", fill_alpha = 1) 
-  #---------------
-    
+
   #create lines between each zone
   borders2 <- list(
     halifax_cleveland <- data.frame("lon" = c(465845.1, 491195.6), "lat" = c(7878093, 7939939)),
@@ -281,6 +300,10 @@ build_n3_region <- function(){
   #remove old geom and add the Environment type
   all_marine <- dplyr::select(all_marine, -geom2) |> 
     dplyr::mutate(Environment = "Marine")
+
+  tmap::tm_shape(all_marine) + tmap::tm_polygons(fill = "Zone", fill_alpha = 1) +
+    tmap::tm_shape(basin_and_sub) + tmap::tm_polygons(fill = "BasinName", fill_alpha = 1) + 
+    tmap::tm_shape(named_islands) + tmap::tm_polygons(fill = "BasinName", fill_alpha = 1) 
  
   #combine islands and land basins  
   n3_land <- rbind(basin_and_sub, named_islands) |> 
@@ -300,9 +323,13 @@ build_n3_region <- function(){
     name_cleaning()
 
   #---------------
-  # CHECK POINT 3: COMPLETE
+  # CHECK POINT 3: ERROR CREATING GAPS BETWEEN MARINE AND LAND 
   #---------------
-  tmap::tm_shape(all_marine) + tmap::tm_polygons(fill = "Zone", fill_alpha = 1) 
+  #tmap::tm_shape(n3_marine) + tmap::tm_polygons(fill = "Zone", fill_alpha = 1) 
+  #---------------
+
+  #---------------
+  # STAGE 4: SUB BASINS
   #---------------
 
   #load in epp datasets from file
@@ -362,7 +389,11 @@ build_n3_region <- function(){
   #---------------
   # CHECK POINT 4: COMPLETE
   #---------------
-  tmap::tm_shape(dt_sb_grouped) + tmap::tm_polygons(fill = "SubBasin", fill_alpha = 1) 
+  #tmap::tm_shape(dt_sb_grouped) + tmap::tm_polygons(fill = "SubBasin", fill_alpha = 1) 
+  #---------------
+
+  #---------------
+  # STAGE 5: SUB BASINS
   #---------------
 
   #get the difference between the dt_sub_basin area and the area for ross and black in the n3 files
@@ -398,13 +429,13 @@ build_n3_region <- function(){
   n3_basin_subtraction <- basin_and_sub |> 
     dplyr::filter(BasinName != "Black", BasinName != "Ross") |> 
     sf::st_union()
-    
+
   n3_water_bodies_subtraction <- sf::st_union(n3_marine)
 
   #subtract the surrounding polygons
   dt_sb_grouped <- dt_sb_grouped |> 
     sf::st_difference(n3_basin_subtraction) |> 
-    sf::st_difference(n3_water_bodies_subtraction)
+    sf::st_difference(n3_water_bodies_subtraction)  
 
   #do minor clean up
   dt_sb_grouped <- dt_sb_grouped |> 
@@ -433,11 +464,20 @@ build_n3_region <- function(){
   #---------------
   # CHECK POINT 5: COMPLETE
   #---------------
-  tmap::tm_shape(n3_land) + tmap::tm_polygons(fill = "SubBasin", fill_alpha = 1) 
+  #tmap::tm_shape(n3_land) + tmap::tm_polygons(fill = "SubBasin", fill_alpha = 1) 
+  #---------------
+
+  #---------------
+  # STAGE 6: BURDEKIN GEOGRAPHIC AREAS
   #---------------
 
   #load in epp dataset from file
   #epp_water_schedule <- sf::st_read("epp_water_schedule.gpkg") |> 
+  #  name_cleaning() |> 
+  #  sf::st_transform("EPSG:7855")
+
+  #load in epp datasets from file
+  #epp_water_env_value <- sf::st_read("epp_water_env_value.gpkg") |> 
   #  name_cleaning() |> 
   #  sf::st_transform("EPSG:7855")
 
@@ -476,14 +516,17 @@ build_n3_region <- function(){
   #load in the burdekin sub basins (above is how this file was originally made)
   load(system.file("extdata/bd_sub_basins.RData", package = "RcTools"))
 
-  #make each instance of watercourse completely unique
-  test <- bd_sub_basins |> 
+  #make each instance of watercourse completely unique and cut the data back by the DT area (around alligator creek) and marine area
+  bd_sub_basins <- bd_sub_basins |> 
     dplyr::group_by(WatercourseOrGeographicArea) |> 
     dplyr::mutate(Rows = dplyr::n()) |> 
     dplyr::ungroup() |> 
     dplyr::mutate(NewSubBasin = glue::glue("({SubBasin})")) |> 
     tidyr::unite(Combined, WatercourseOrGeographicArea, NewSubBasin, sep = " ", remove = FALSE) |> 
-    dplyr::mutate(WatercourseOrGeographicArea = dplyr::case_when(Rows != 1 ~ Combined, TRUE ~ WatercourseOrGeographicArea))
+    dplyr::mutate(WatercourseOrGeographicArea = dplyr::case_when(Rows != 1 ~ Combined, TRUE ~ WatercourseOrGeographicArea)) |> 
+    dplyr::select(Region, BasinName, SubBasin, WatercourseOrGeographicArea, geom) |> 
+    sf::st_difference(sf::st_union(dt_sb_grouped)) |> 
+    sf::st_difference(sf::st_union(n3_marine))
 
   #sub out the old Burdekin Basin and add in the extra geographic area column
   n3_land <- n3_land |> 
@@ -491,32 +534,26 @@ build_n3_region <- function(){
     dplyr::rename("WatercourseOrGeographicArea" = EnvValueZone) |> 
     dplyr::bind_rows(bd_sub_basins)
 
-
   #---------------
   # CHECK POINT 6: COMPLETE
   #---------------
-  tmap::tm_shape(n3_land) + tmap::tm_polygons(fill = "WatercourseOrGeographicArea", fill_alpha = 1) 
+  #tmap::tm_shape(n3_land) + tmap::tm_polygons(fill = "WatercourseOrGeographicArea", fill_alpha = 1) 
   #---------------
 
-  #select paluma
-  #paluma <- epp_water_env_value |> 
-  #  dplyr::filter(EnvValueZone == "Paluma Reservoir") |> 
-  #  dplyr::mutate(Region = "Dry Tropics", BasinName = "Black", SubBasin = "Paluma Lake", WatercourseOrGeographicArea = NA) |> 
-  #  dplyr::select(Region, BasinName, SubBasin, WatercourseOrGeographicArea, geom)
+  #---------------
+  # STAGE 7: PALUMA SPECIAL AREA
+  #---------------
 
-  #load in the paluma outline (above is how this file was originally made)
-  load(system.file("extdata/paluma.RData", package = "RcTools"))
 
-  #cut a hole in the main data
-  n3_land <- st_difference(n3_land, st_union(paluma))
-
-  #insert paluma lake
-  n3_land <- rbind(n3_land, paluma)
 
   #---------------
   # CHECK POINT 7: COMPLETE
   #---------------
-  tmap::tm_shape(n3_land) + tmap::tm_polygons(fill = "SubBasin", fill_alpha = 1) 
+  #tmap::tm_shape(n3_land) + tmap::tm_polygons(fill = "SubBasin", fill_alpha = 1) 
+  #---------------
+
+  #---------------
+  # STAGE 8: FRESH AND ESTUARINE BOUNDARIES
   #---------------
 
   #load the data in from file
@@ -527,150 +564,204 @@ build_n3_region <- function(){
   #get only the fresh and estuarine watertypes from the EPP data
   #water_types <- epp_water_types |> 
   #  dplyr::filter(!stringr::str_detect(WaterType, "coast|shelf")) |> 
-  #  dplyr::mutate(Env = dplyr::case_when(stringr::str_detect(WaterType, "estua") ~  "Estuarine", TRUE ~ "Freshwater")) |> 
-  #  dplyr::select(Env, geom)
+  #  dplyr::mutate(Environment = dplyr::case_when(stringr::str_detect(WaterType, "estua") ~  "Estuarine", TRUE ~ "Freshwater")) |> 
+  #  dplyr::select(Environment, geom)
 
   #crop the water types to an area only a bit larger than the n3 region and reduce file size for saving
-  #n3_water_types <- sf::st_crop(water_types, sf::st_union(n3_land)) |> 
-  #  dplyr::group_by(Env) |> 
+  #n3_water_types <- sf::st_intersection(water_types, sf::st_union(n3_land)) |> 
+  #  sf::st_collection_extract("POLYGON") |> 
+  #  dplyr::group_by(Environment) |> 
   #  dplyr::summarise(geom = st_union(geom)) |> 
   #  sf::st_simplify() |> 
-  #  nngeo::st_remove_holes() |> 
+  #  nngeo::st_remove_holes(max_area = 300) |> 
   #  sf::st_make_valid()
 
   #load in the water type boundaries (above is how this file was originally made)
   load(system.file("extdata/n3_water_types.RData", package = "RcTools"))
-
-
-    
+  
+  #rename the geometry column
+  n3_water_types <- dplyr::rename(n3_water_types, geom = geometry)
+   
   #get the difference between the water types area and the area for the n3 land
-  diff <- n3_land |> sf::st_difference(sf::st_union(water_types)) |> sf::st_cast("POLYGON")
+  diff <- n3_land |> sf::st_difference(sf::st_union(n3_water_types)) |> sf::st_cast("POLYGON")
 
-  tmap::tm_shape(diff) + tmap::tm_polygons(fill = "Env", fill_alpha = 1) 
-
-  #add a point geom for each of the polygons 
+  #create a point geom for each of the polygons 
   diff$geom2 <- sf::st_centroid(sf::st_geometry(diff))
 
   #for each of the centroids figure out which of the water types is closest
-  diff$NearestWaterType <- sf::st_nearest_feature(diff, water_types)
+  diff$NearestWaterType <- sf::st_nearest_feature(diff, n3_water_types)
 
   #get the index for each water type and the name of each water type
-  replace_with <- water_types$Env
-  replace_from <- 1:length(water_types$Env)
+  replace_with <- n3_water_types$Environment
+  replace_from <- 1:length(n3_water_types$Environment)
 
   #match each case and replace with the sub basin
-  diff$Env <- replace_with[match(diff$NearestWaterType, replace_from)]
+  diff$Environment <- replace_with[match(diff$NearestWaterType, replace_from)]
 
   #join the difference back on to the main water type set and union everything up
-  n3_water_types <- diff |> dplyr::select(Env, geom) |> rbind(water_types)
+  n3_water_types <- diff |> dplyr::select(Environment, geom) |> 
+    rbind(n3_water_types) |> 
+    dplyr::group_by(Environment) |> 
+    dplyr::summarise(geom = sf::st_union(geom))
 
-  #cut the extent back using n3_polygons
-  n3_land_subtraction <- n3_land |> sf::st_union()
-
-  #subtract the surrounding polygons
-  n3_water_types <- n3_water_types |> sf::st_intersection(n3_land_subtraction) |> 
+  #cut the extent back using n3_land
+  n3_water_types <- n3_water_types |> 
+    sf::st_intersection(sf::st_union(n3_land)) |> 
     sf::st_collection_extract("POLYGON")
 
   #intersect each water type over the main dataset
-  n3_fresh <- sf::st_intersection(n3_land, sf::st_union(filter(n3_water_types, Env == "Freshwater"))) |> 
-    sf::st_collection_extract("POLYGON") |> dplyr::mutate(Environment = "Freshwater")
-  n3_estuarine <- st_intersection(n3_land, sf::st_union(filter(n3_water_types, Env == "Estuarine"))) |> 
-    sf::st_collection_extract("POLYGON") |> dplyr::mutate(Environment = "Estuarine")
+  n3_fresh <- n3_land |> 
+    sf::st_intersection(sf::st_union(dplyr::filter(n3_water_types, Environment == "Freshwater"))) |> 
+    sf::st_collection_extract("POLYGON") |> 
+    dplyr::mutate(Environment = "Freshwater")
+  n3_estuarine <- n3_land |> 
+    sf::st_intersection(sf::st_union(dplyr::filter(n3_water_types, Environment == "Estuarine"))) |> 
+    sf::st_collection_extract("POLYGON") |> 
+    dplyr::mutate(Environment = "Estuarine")
 
   #join everything together
   n3_land <- rbind(n3_fresh, n3_estuarine) |> sf::st_make_valid()
 
-  #update column names for better clarity
+  #---------------
+  # CHECK POINT 8: COMPLETE
+  #---------------
+  #tmap::tm_shape(n3_land) + tmap::tm_polygons(fill = "WatercourseOrGeographicArea", fill_alpha = 1) 
+  #---------------
+
+  #---------------
+  # STAGE 9: SPECIAL AREAS
+  #---------------
+
+  #load the data in from file
+  #epp_water_manage <- sf::st_read("epp_water_manage.gpkg") |> 
+  #  name_cleaning() |> 
+  #  sf::st_transform("EPSG:7855")
+
+  #select the two special areas (magnetic island water and port boundary)
+  #special_areas <- epp_water_manage |> 
+  #  dplyr::filter(
+  #    MiId %in% c("SD2244", "SD2243", "MD2241", "MD2242") & EnvValueZone == "Halifax & Cleveland Bay" |
+  #      MiId != "SD2244" & MiId != "SD2243" & EnvValueZone == "Halifax & Cleveland Bay"
+  #  ) |> 
+  #  dplyr::mutate(MiId = dplyr::case_when(!MiId %in% c("SD2244", "SD2243", "MD2241", "MD2242") ~ "General", TRUE ~ MiId)) |> 
+  #  dplyr::group_by(MiId) |> 
+  #  dplyr::mutate(geom = st_union(geom))
+
+  #epp_water_manage <- sf::st_read("epp_water_manage.gpkg") |> 
+  #  name_cleaning() |> 
+  #  sf::st_transform("EPSG:7855")
+
+  #select paluma
+  #paluma <- epp_water_env_value |> 
+  #  dplyr::filter(EnvValueZone == "Paluma Reservoir") |> 
+  #  dplyr::mutate(Region = "Dry Tropics", BasinName = "Black", SubBasin = "Paluma Lake", WatercourseOrGeographicArea = NA) |> 
+  #  dplyr::select(Region, BasinName, SubBasin, WatercourseOrGeographicArea, geom)
+
+  #load in the data (above is how this file was originally made)
+  load(system.file("extdata/special_areas.RData", package = "RcTools"))
+  load(system.file("extdata/paluma.RData", package = "RcTools"))
+
+  #buffer the magnetic island waters to fill gaps between the water and the land
+  mi_buffer <- special_areas |> 
+    dplyr::filter(MiId %in% c("SD2244", "SD2243")) |> 
+      sf::st_buffer(dist = 200) |> 
+      dplyr::select()
+  
+  #cut the buffer back by the land component
+  mi_buffer <- mi_buffer |> 
+    sf::st_difference(sf::st_union(n3_land)) 
+  
+  #then fetch the surrounding waters
+  surrounding <- special_areas |> 
+    dplyr::filter(MiId == "General") |> 
+    dplyr::select()
+
+  #then cut by the surrounding waters component to make the magnetic waters perfectly fit 
+  mi_buffer <- mi_buffer |> 
+    sf::st_difference(surrounding)
+
+  #give the magnetic island its required columns
+  mi_buffer <- mi_buffer |>  
+    dplyr::mutate(
+      Region = "Dry Tropics", Environment = "Marine", Zone = "Cleveland Bay", SubZone = "Magnetic Island"
+    )
+
+  #cut a hole in the marine layer with the Maggie island waters
+  n3_marine <- sf::st_difference(n3_marine, sf::st_union(mi_buffer))
+
+  #put the waters in the cut out marine layer
+  n3_marine <- rbind(n3_marine, mi_buffer)
+    
+  #get the port zone and buffer to fill the gap between the port zone and land
+  pz_buffer <- special_areas |> 
+    dplyr::filter(MiId == "MD2241") |> 
+    sf::st_buffer(dist = 200) |> 
+    dplyr::select()    
+
+  #cut the buffer back by the land component, 
+  pz_buffer <- pz_buffer |> 
+    sf::st_difference(sf::st_union(n3_land)) 
+
+  #then fetch the surrounding waters
+  surrounding <- special_areas |> 
+    dplyr::filter(MiId == "MD2242") |> 
+    dplyr::select()
+
+  #then cut by the surrounding waters component to make the magnetic waters perfectly fit 
+  pz_buffer <- pz_buffer |> 
+    sf::st_difference(surrounding)
+
+  #give the port zone its enclosed and open delegation and add the geographic area
+  pz_buffer <- pz_buffer |> 
+    sf::st_intersection(n3_marine) |> 
+    dplyr::mutate(
+      WatercourseOrGeographicArea = dplyr::case_when(
+        SubZone == "Open Coastal" ~ "OC.Inside Port Zone",
+        TRUE ~ "EC.Inside Port Zone"))
+
+  #cut a hole in the marine layer with the port zone and add the geographic area
+  n3_marine <- n3_marine |> 
+    sf::st_difference(sf::st_union(pz_buffer)) |> 
+    dplyr::mutate(
+      WatercourseOrGeographicArea = dplyr::case_when(
+        SubZone == "Enclosed Coastal" & Region == "Dry Tropics" & Zone == "Cleveland Bay" ~ "EC.Outside Port Zone",
+        SubZone == "Open Coastal" & Region == "Dry Tropics" & Zone == "Cleveland Bay" ~ "OC.Outside Port Zone",
+        TRUE ~ SubZone))
+
+  #put the port zone in the cut out marine layer
+  n3_marine <- rbind(n3_marine, pz_buffer)  
+
+  #cut a hole in the main data
+  n3_land <- st_difference(n3_land, st_union(paluma))
+
+  #insert paluma lake
+  n3_land <- rbind(n3_land, paluma)
+
+  #---------------
+  # CHECK POINT 9: COMPLETE
+  #---------------
+  #tmap::tm_shape(n3_marine) + tmap::tm_polygons(fill = "WatercourseOrGeographicArea", fill_alpha = 1) 
+  #---------------
+  
+  #---------------
+  # STAGE 10: FINAL BIND
+  #---------------
+
+  #update the column names for clarity
+  n3_marine <- n3_marine |> 
+    dplyr::rename(BasinOrZone = Zone, SubBasinOrSubZone = SubZone) 
   n3_land <- n3_land |> 
-    dplyr::rename(BasinOrZone = Basin, SubBasinOrSubZone = SubBasin) |> 
-    nngeo::st_remove_holes() |> 
-    sf::st_make_valid() |> 
-    dplyr::rename(geom = "geometry") #weirdly this code chunk makes the geom column named geometry?
+    dplyr::rename(BasinOrZone = BasinName, SubBasinOrSubZone = SubBasin) 
 
+  #combine the n3 land and marine datasets together, reorder and union all polygons that belong to the same group
+  n3_land_marine <- rbind(n3_marine, n3_land) |> 
+    dplyr::group_by(Region, Environment, BasinOrZone, SubBasinOrSubZone, WatercourseOrGeographicArea) |> 
+    dplyr::summarise(geom = sf::st_union(geom)) |> 
+    sf::st_make_valid()
 
-
-
-
-
-
-  
-  epp_water_manage <- sf::st_read("epp_water_manage.gpkg") |> 
-    name_cleaning() |> 
-    sf::st_transform("EPSG:7855")
-
-
-
-
-
-
-
-    
-  #tmap_mode("view")
-  tmap::tm_shape(n3_marine) +
-    tmap::tm_polygons(fill = "SubZone")
-  
-
-
-  tmap::tm_shape(split_regions) + tmap::tm_polygons(fill = "red", fill_alpha = 1) 
-
-
-  
-  #tmap::tmap_mode("view")
-  
-  tmap::tm_shape(water_bodies_final) + tmap::tm_polygons(fill = "red", fill_alpha = 0.5) +
-    tmap::tm_shape(water_bodies) + tmap::tm_polygons(fill = "green", fill_alpha = 0.5) +
-    tmap::tm_shape(basin_and_sub) + tmap::tm_polygons(fill = "blue", fill_alpha = 0.5) +
-    tmap::tm_shape(named_islands) + tmap::tm_polygons(fill = "orange", fill_alpha = 0.5) +
-    tmap::tm_shape(area_shared) + tmap::tm_polygons(fill = "purple", fill_alpha = 0.5)
-
-  
-    
-
-
-
-
-
-
-
+  #---------------
+  # CHECK POINT 10: COMPLETE
+  #---------------
+  #tmap::tm_shape(n3_land_marine) + tmap::tm_polygons(fill = "SubBasinOrSubZone", fill_alpha = 1) 
+  #---------------
 }
-
-
-
-
-#do wet tropics first
-#wt_marine <- n3_marine |> 
-#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") ~ "Northern", TRUE ~ Zone)) |> 
-#  dplyr::mutate(Zone = dplyr::case_when(
-#    stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.91915 & sf::st_coordinates(geom2)[,2] < -16.8642 ~ "Central", 
-#    stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet Tropics") & sf::st_coordinates(geom2)[,1] > 145.86671 & sf::st_coordinates(geom2)[,2] < -16.93366 ~ "Central", TRUE ~ Zone)) |> 
-#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < -17.6486 ~ "Southern", TRUE ~ Zone)) |> 
-#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") &  stringr::str_detect(Region, "Wet") & sf::st_coordinates(geom2)[,2] < -18.5021 ~ "Palm Group", TRUE ~ Zone)) 
-  
-#then do dry tropics
-#dt_marine <- wt_marine |>
-#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") ~ "Halifax Bay", TRUE ~ Zone)) |> 
-#  dplyr::mutate(Zone = dplyr::case_when(
-#    stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Dry") & sf::st_coordinates(geom2)[,1] > 146.68007 & 
-#      sf::st_coordinates(geom2)[,2] < -18.6532 ~ "Cleveland Bay", TRUE ~ Zone))
-
-#next is burdekin
-#bd_marine <- dt_marine |>  
-#  dplyr::mutate(Zone = dplyr::case_when(
-#      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Burd") & sf::st_coordinates(geom2)[,1] > 147.0217007 & 
-#        sf::st_coordinates(geom2)[,2] > -19.206464 & sf::st_coordinates(geom2)[,2] < -19.1924341 ~ "Burdekin",
-#      stringr::str_detect(SubZone, "Enc|Open|Mid") & stringr::str_detect(Region, "Burd") & sf::st_coordinates(geom2)[,1] > 147.024120 & 
-#        sf::st_coordinates(geom2)[,2] < -19.208543 ~ "Burdekin", TRUE ~ Zone))
-
-#and finally mackay
-#all_marine <- bd_marine |> 
-#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open") & stringr::str_detect(Region, "Mackay") ~ "North", TRUE ~ Zone)) |> 
-#  dplyr::mutate(Zone = dplyr::case_when(stringr::str_detect(SubZone, "Enc|Open") & sf::st_coordinates(geom2)[,1] > 148.476995 & sf::st_coordinates(geom2)[,2] < -19.97939 ~ "Whitsunday", TRUE ~ Zone)) |> 
-#  dplyr::mutate(Zone = dplyr::case_when(
-#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 148.844991 & sf::st_coordinates(geom2)[,2] < -20.431976 ~ "Central",
-#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] < 148.889737 & sf::st_coordinates(geom2)[,2] < -20.495653 ~ "Central",
-#    stringr::str_detect(SubZone, "Enc|Open") & sf::st_coordinates(geom2)[,2] < -20.52959 ~ "Central", TRUE ~ Zone)) |> 
-#  dplyr::mutate(Zone = dplyr::case_when(
-#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 149.483495 & sf::st_coordinates(geom2)[,2] < -21.533348 ~ "South",
-#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,1] > 149.45443 & sf::st_coordinates(geom2)[,2] < -21.56729 ~ "South",
-#    stringr::str_detect(SubZone, "Enc") & sf::st_coordinates(geom2)[,2] < -21.583174 ~ "South",
-#    stringr::str_detect(SubZone, "Open") & sf::st_coordinates(geom2)[,1] > 149.483495 & sf::st_coordinates(geom2)[,2] < -21.33330 ~ "South", TRUE ~ Zone))
