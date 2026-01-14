@@ -38,10 +38,8 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
     stop("You must supply one of 'Concentration', 'True Colour', or 'Vector Field' to the 'MapType' parameter.")
   }
 
-  #obtain a qld state outline from the AIMS dataset
-  qld <- get(utils::data("gbr_feat", package = "gisaimsr", envir = environment())) |> 
-    dplyr::filter(FEAT_NAME %in% c("Mainland", "Island", envir = environment())) |> 
-    sf::st_transform("EPSG:9473")
+  #load in the qld outline
+  load(system.file("extdata/qld.RData", package = "RcTools"))
 
   #obtain a reefs outline from the AIMS dataset
   reefs <- get(utils::data("gbr_feat", package = "gisaimsr")) |> 

@@ -34,7 +34,11 @@ Imports:
     metR,
     oce,
     rcartocolor,
-    arcgislayers
+    arcgislayers,
+    janitor,
+    lwgeom,
+    nngeo,
+    terra
 Remotes:
     open-AIMS/ereefs,
     open-AIMS/gisaimsr

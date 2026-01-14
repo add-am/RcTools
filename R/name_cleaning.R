@@ -9,6 +9,8 @@
 #'
 #' @export
 #' @examples
+#' df <- name_cleaning(df)
+#' 
 name_cleaning <- function(df){
   
   #check if the df is an sf object and if so, apply clean names to every column but the last column
