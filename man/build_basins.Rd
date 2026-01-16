@@ -13,6 +13,8 @@ An sf object
 Build Basins in the Northern Three region
 }
 \examples{
+\dontrun{ #dont run because function is not exported
 basin_output <- build_basins()
+}
 
 }

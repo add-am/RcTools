@@ -6,13 +6,15 @@
 #' @returns An sf object
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
 #' waterbodies <- build_waterbodies(basins, named_islands)
+#' }
 #' 
 build_waterbodies <- function(basins, named_islands) {  
     
   #read the water bodies data set from the aims package
   tmp <- new.env() 
-  data("wbodies", package = "gisaimsr", envir = tmp) 
+  utils::data("wbodies", package = "gisaimsr", envir = tmp) 
 
   water_bodies <- tmp$wbodies |> 
     name_cleaning() |> 

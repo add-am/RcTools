@@ -13,6 +13,6 @@ An sf object
 Build the Northern Three Region Dataset
 }
 \examples{
-#' n3_region <- build_n3_region()
+n3_region <- build_n3_region()
 
 }

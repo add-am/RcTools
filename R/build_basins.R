@@ -3,7 +3,9 @@
 #' @returns An sf object
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
 #' basin_output <- build_basins()
+#' }
 #' 
 build_basins <- function() {
 

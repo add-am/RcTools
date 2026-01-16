@@ -7,7 +7,7 @@
 build_named_islands(basins)
 }
 \arguments{
-\item{basin}{An sf object produced by the \code{\link[=build_basins]{build_basins()}} function}
+\item{basins}{An sf object produced by the \code{\link[=build_basins]{build_basins()}} function}
 }
 \value{
 An sf object
@@ -16,6 +16,8 @@ An sf object
 Build the Named Islands Within the Northern Three Region
 }
 \examples{
+\dontrun{ #dont run because function is not exported
 named_islands <- build_named_islands(basins)
+}
 
 }

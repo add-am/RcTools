@@ -20,6 +20,8 @@ An sf object
 Build the Sub Basins Within the Northern Three Region
 }
 \examples{
+\dontrun{ #dont run because function is not exported
 n3_land <- build_sub_basins(n3_land, basins, n3_marine)
+}
 
 }

@@ -18,6 +18,8 @@ An sf object
 Apply Special Transformations to the n3_marine Dataset
 }
 \examples{
+\dontrun{ #dont run because function is not exported
 n3_marine <- build_marine_sp(n3_marine, n3_land)
+}
 
 }

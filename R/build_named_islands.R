@@ -5,13 +5,15 @@
 #' @returns An sf object
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
 #' named_islands <- build_named_islands(basins)
+#' }
 #' 
 build_named_islands <- function(basins) {  
 
   #bring in all islands (that each have their own polygon), 
   tmp <- new.env() 
-  data("gbr_feat", package = "gisaimsr", envir = tmp) 
+  utils::data("gbr_feat", package = "gisaimsr", envir = tmp) 
 
   named_islands <- tmp$gbr_feat |> 
     name_cleaning() |> 

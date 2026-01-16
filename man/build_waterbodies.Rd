@@ -18,6 +18,8 @@ An sf object
 Build the Marine Based Water Types Within the Northern Three Region
 }
 \examples{
+\dontrun{ #dont run because function is not exported
 waterbodies <- build_waterbodies(basins, named_islands)
+}
 
 }

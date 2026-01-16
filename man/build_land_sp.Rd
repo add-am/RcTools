@@ -16,6 +16,8 @@ An sf object
 Apply Special Transformations to the n3_land Dataset
 }
 \examples{
+\dontrun{ #dont run because function is not exported
 n3_land <- build_land_sp(n3_land)
+}
 
 }

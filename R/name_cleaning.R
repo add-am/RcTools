@@ -9,6 +9,12 @@
 #'
 #' @export
 #' @examples
+#' 
+#' df <- data.frame(
+#'   "Column 1" = c(1,2,3),
+#'   "column-2" = c(1,2,3),
+#'   "COLUMN    3" = c(1,2,3)
+#' )
 #' df <- name_cleaning(df)
 #' 
 name_cleaning <- function(df){
@@ -40,8 +46,8 @@ name_cleaning <- function(df){
   
   #for every character type column, run a encoding check and fix, then remove weird new line characters
   df_new <- df_new  |> 
-    dplyr::mutate(across(where(is.character), ~ iconv(., from = 'UTF-8', to = 'ASCII//TRANSLIT'))) |> 
-    dplyr::mutate(across(where(is.character), ~ stringr::str_replace_all(., "\r\n", " ")))
+    dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ iconv(., from = 'UTF-8', to = 'ASCII//TRANSLIT'))) |> 
+    dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ stringr::str_replace_all(., "\r\n", " ")))
   
   return(df_new)
   

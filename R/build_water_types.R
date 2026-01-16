@@ -6,7 +6,9 @@
 #' @returns An sf object
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
 #' n3_land <- build_water_types(n3_land, n3_marine)
+#' }
 #' 
 build_water_types <- function(n3_land, n3_marine) {
 

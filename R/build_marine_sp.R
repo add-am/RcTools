@@ -6,7 +6,9 @@
 #' @returns An sf object
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
 #' n3_marine <- build_marine_sp(n3_marine, n3_land)
+#' }
 #' 
 build_marine_sp <- function(n3_marine, n3_land) {
 
@@ -30,7 +32,7 @@ build_marine_sp <- function(n3_marine, n3_land) {
 
   #buffer the magnetic island waters to fill gaps between the water and the land
   mi_buffer <- special_areas |> 
-    dplyr::filter(MiId %in% c("SD2244", "SD2243")) |> 
+    dplyr::filter(.data$MiId %in% c("SD2244", "SD2243")) |> 
       sf::st_buffer(dist = 200) |> 
       dplyr::select()
   
@@ -40,7 +42,7 @@ build_marine_sp <- function(n3_marine, n3_land) {
   
   #then fetch the surrounding waters
   surrounding <- special_areas |> 
-    dplyr::filter(MiId == "General") |> 
+    dplyr::filter(.data$MiId == "General") |> 
     dplyr::select()
 
   #then cut by the surrounding waters component to make the magnetic waters perfectly fit 
@@ -71,7 +73,7 @@ build_marine_sp <- function(n3_marine, n3_land) {
 
   #then fetch the surrounding waters
   surrounding <- special_areas |> 
-    dplyr::filter(MiId == "MD2242") |> 
+    dplyr::filter(.data$MiId == "MD2242") |> 
     dplyr::select()
 
   #then cut by the surrounding waters component to make the magnetic waters perfectly fit 

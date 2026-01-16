@@ -5,7 +5,9 @@
 #' @returns An sf object
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
 #' n3_marine <- build_waterbody_boundaries(waterbodies)
+#' }
 #' 
 build_waterbody_boundaries <- function(waterbodies) {
 

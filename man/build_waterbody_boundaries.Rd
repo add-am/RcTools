@@ -16,6 +16,8 @@ An sf object
 Build the Marine Zone Boundaries Within the Northern Three Region
 }
 \examples{
+\dontrun{ #dont run because function is not exported
 n3_marine <- build_waterbody_boundaries(waterbodies)
+}
 
 }

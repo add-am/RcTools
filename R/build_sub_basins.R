@@ -7,7 +7,9 @@
 #' @returns An sf object
 #'
 #' @examples
+#' \dontrun{ #dont run because function is not exported
 #' n3_land <- build_sub_basins(n3_land, basins, n3_marine)
+#' }
 #' 
 build_sub_basins <- function(n3_land, basins, n3_marine) {
 
@@ -67,12 +69,12 @@ build_sub_basins <- function(n3_land, basins, n3_marine) {
         TRUE ~ NA
       )) |> 
     dplyr::group_by(Region, BasinName, SubBasin, EnvValueZone) |> 
-    dplyr::summarise(geom = st_union(geom))
+    dplyr::summarise(geom = sf::st_union(geom))
   
   #get the difference between the dt_sub_basin area and the area for ross and black in the n3 files
   diff <- basins |> 
     dplyr::filter(BasinName %in% c("Ross", "Black")) |> 
-    sf::st_difference(st_union(dt_sb_grouped)) |> 
+    sf::st_difference(sf::st_union(dt_sb_grouped)) |> 
     sf::st_cast("POLYGON")
 
   #create a point geom for each of the polygons 
@@ -96,7 +98,7 @@ build_sub_basins <- function(n3_land, basins, n3_marine) {
     dplyr::select(Region, BasinName, SubBasin, EnvValueZone, geom) |> 
     rbind(dt_sb_grouped) |> 
     dplyr::group_by(Region, BasinName, SubBasin, EnvValueZone) |> 
-    dplyr::summarise(geom = st_union(geom))
+    dplyr::summarise(geom = sf::st_union(geom))
 
   #cut the extent back using the surrounding polygons from land and marine
   dt_sb_grouped <- dt_sb_grouped |> 

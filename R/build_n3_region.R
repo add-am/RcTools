@@ -4,38 +4,46 @@
 #'
 #' @export
 #' @examples
-#' #' n3_region <- build_n3_region()
+#' n3_region <- build_n3_region()
 #' 
 build_n3_region <- function(){
 
-  #build the basins dataset
+  message("Building Northern Three Basins...")
   basins <- build_basins()
+  Sys.sleep(0.5)
 
-  #build the islands dataset
+  message("Building Northern Three Islands...")
   named_islands <- build_named_islands(basins)
+  Sys.sleep(0.5)
 
-  #build the waterbodies dataset
+  message("Building Northern Three Marine Boundary...")
   waterbodies <- build_waterbodies(basins, named_islands)
+  Sys.sleep(0.5)
 
-  #create internal waterbody boundaries
+  message("Creating Internal Marine Boundaries...")
   n3_marine <- build_waterbody_boundaries(waterbodies)
+  Sys.sleep(0.5)
 
-  #combine the basins and islands objects
+  #combine basins and islands
   n3_land <- basins |> 
     dplyr::select(Region, BasinName) |> 
     rbind(named_islands)
 
-  #create sub basins within the n3_land dataset
+  message("Building Northern Three Sub Basins...")
   n3_land <- build_sub_basins(n3_land, basins, n3_marine)
+  Sys.sleep(0.5)
 
-  #create water types (fresh, estuarine) within the n3_land dataset
+  message("Assigning Freshwater and Estuarine Zonations...")
   n3_land <- build_water_types(n3_land, n3_marine)
+  Sys.sleep(0.5)
 
-  #create special locations in the n3_land dataset
+  message("Adding Special Land Features...")
   n3_land <- build_land_sp(n3_land)
+  Sys.sleep(0.5)
 
-  #create special locations in the n3_marine dataset
+  message("Adding Special Marine Features...")
   n3_marine <- build_marine_sp(n3_marine, n3_land)
+  Sys.sleep(0.5)
 
   #clean names
   n3_marine <- n3_marine |> 
@@ -48,11 +56,11 @@ build_n3_region <- function(){
   #combine the n3 land and marine datasets together, reorder and union all polygons that belong to the same group
   n3_land_marine <- rbind(n3_marine, n3_land) |> 
     dplyr::group_by(
-      .data$Region, 
-      .data$Environment, 
-      .data$BasinOrZone, 
-      .data$SubBasinOrSubZone, 
-      .data$WatercourseOrGeographicArea) |> 
+      Region, 
+      Environment, 
+      BasinOrZone, 
+      SubBasinOrSubZone, 
+      WatercourseOrGeographicArea) |> 
     dplyr::summarise(geom = sf::st_union(geom)) |> 
     sf::st_make_valid()
 
