@@ -42,5 +42,13 @@ build_basins <- function() {
       TRUE ~ "Wet Tropics"
     ))
   
+  #adjust some basin names
+  basin_and_sub <- basin_and_sub |> 
+    dplyr::mutate(BasinName = dplyr::case_when(
+      BasinName == "Mulgrave River" ~ "Mulgrave",
+      BasinName == "Russell River"  ~ "Russell",
+      TRUE ~ BasinName
+    ))
+  
   return(basin_and_sub)
 }
