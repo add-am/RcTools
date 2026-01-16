@@ -64,6 +64,14 @@ build_n3_region <- function(){
     dplyr::summarise(geom = sf::st_union(geom)) |> 
     sf::st_make_valid()
 
+  #adjust some basin names
+  n3_land_marine <- n3_land_marine |> 
+    dplyr::mutate(BasinOrZone = dplyr::case_when(
+      BasinOrZone == "Mulgrave River" ~ "Mulgrave",
+      BasinOrZone == "Russell River"  ~ "Russell",
+      TRUE ~ BasinOrZone
+    ))
+
   #return the final output
   return(n3_land_marine)
 
