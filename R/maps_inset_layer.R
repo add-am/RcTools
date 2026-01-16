@@ -57,7 +57,7 @@ maps_inset_layer <- function(supplied_sf_1, background, aspect, use_bbox_1 = TRU
   if (!use_bbox_2 & !is.null(supplied_sf_2)){sf_object_2 <- sf::st_union(supplied_sf_2)}
 
   #load in the qld outline
-  load(system.file("extdata/qld.RData", package = "RcTools"))
+  data("qld", package = "RcTools")
 
   #create the map that will be put into the viewport
   inset_map <-
