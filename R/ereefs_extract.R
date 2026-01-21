@@ -23,7 +23,7 @@
 #' )
 #' }
 #' 
-ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0){
+ereefs_extract <- function(Model = "catalog", Region, StartDate, EndDate, Variable, Downsample = 0){
 
   #check required argument (all of them)
   if (any(missing(Region), missing(StartDate), missing(EndDate), missing(Variable))){
@@ -31,8 +31,12 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   }
 
   #check argument types
+  if (!is.character(Model)){stop("You must supply a character argument to the 'Model' parameter")}
   if (!inherits(Region, "sf")){stop("You must supply an sf object to the 'Region' parameter")}
   if (!is.numeric(Downsample)){stop("You must supply a numeric argument to the 'Downsample' parameter")}
+
+  #check model
+  Model <- ereefs_input_selection(Model)
   
   #check dates (this will fail if not already a date object or not provided as the correct characters and gives an informative error message)
   StartDate <- as.Date(StartDate)
@@ -45,14 +49,14 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   }
  
   #define input link
-  input_file <- "https://dapds00.nci.org.au/thredds/dodsC/fx3/GBR1_H2p0_B3p2_Cfur_Dnrt.ncml"
+  #input_file <- "https://dapds00.nci.org.au/thredds/dodsC/fx3/GBR1_H2p0_B3p2_Cfur_Dnrt.ncml"
 
   #convert the sf object into a bounding box, then rearrange the order for how eReefs likes it
   Region <- sf::st_bbox(Region)
   Region <- c(Region[1], Region[3], Region[2], Region[4])
 
   #get all grids
-  grids <- ereefs::get_ereefs_grids(input_file)
+  grids <- ereefs::get_ereefs_grids(Model)
         
   #get x and y specifically
   x_grid <- grids[["x_grid"]]
@@ -87,7 +91,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
   num_of_cols <- utils::tail(true_cols, n = 1) - first_col
 
   #open the nc file
-  nc <- ereefs::safe_nc_open(input_file)
+  nc <- ereefs::safe_nc_open(Model)
   
   #get a vector of all times
   ds <- as.Date(floor(ereefs::safe_ncvar_get(nc, "time")), origin = as.Date("1990-01-01"))
@@ -119,7 +123,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
 
     #extract data using indices to define layer counts
     nc_data <- stars::read_ncdf(
-      input_file, 
+      Model, 
       var = Variable,
       downsample = Downsample,
       ncsub = cbind(
@@ -133,7 +137,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
 
     #extract data using indices to define layer counts plus include depth
     nc_data <- stars::read_ncdf(
-      input_file, 
+      Model, 
       var = Variable,
       downsample = Downsample,
       ncsub = cbind(
@@ -154,7 +158,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
     #extract the four sub components
     nc_data <- purrr::map(Variable, \(x) {
       stars::read_ncdf(
-        input_file,
+        Model,
         var = x,
         downsample = Downsample,
         ncsub = cbind(
@@ -176,7 +180,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
     #extract each colour channel
     nc_data <- purrr::map(colour_channels, \(x) {
       stars::read_ncdf(
-        input_file, 
+        Model, 
         var = x,
         downsample = Downsample,
         ncsub = cbind(
@@ -214,7 +218,7 @@ ereefs_extract <- function(Region, StartDate, EndDate, Variable, Downsample = 0)
 
     #build name(s) and reassign
     names(nc_data) <- purrr::map_chr(Variable, \(x) {
-      x_units <- ncmeta::nc_atts(input_file, x) |> 
+      x_units <- ncmeta::nc_atts(Model, x) |> 
         dplyr::filter(name == "units")
       x_units <- x_units$value[[1]]
       paste0(x, " (", x_units, ")")

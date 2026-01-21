@@ -3,6 +3,7 @@
 export(build_n3_region)
 export(ereefs_dotplot)
 export(ereefs_extract)
+export(ereefs_get_date_range)
 export(ereefs_map)
 export(ereefs_reproject)
 export(ereefs_windrose)

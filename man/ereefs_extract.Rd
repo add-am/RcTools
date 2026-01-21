@@ -4,7 +4,14 @@
 \alias{ereefs_extract}
 \title{Extracting eReefs Data}
 \usage{
-ereefs_extract(Region, StartDate, EndDate, Variable, Downsample = 0)
+ereefs_extract(
+  Model = "catalog",
+  Region,
+  StartDate,
+  EndDate,
+  Variable,
+  Downsample = 0
+)
 }
 \arguments{
 \item{Region}{SF Object. An sf object defining the area to extract data from}
