@@ -102,6 +102,15 @@ dhw_extract <- function(FullPath, CroppedPath, CropObj){
   #put the real time values back into the data
   stars::st_dimensions(full_dhw_file)$time$values <- time_dates   
 
+  #extract all dimensions
+  dims <- stars::st_dimensions(full_dhw_file) 
+
+  #update the reference system for time
+  dims$time$refsys <- "Date" 
+
+  #then update the original object
+  stars::st_dimensions(full_dhw_file) <- dims
+
   #return the object
   return(full_dhw_file)
 }
