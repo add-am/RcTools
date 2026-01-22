@@ -86,6 +86,15 @@ sst_extract <- function(FullPath, CroppedPath, CropObj){
   #map over the list of cropped file names
   full_sst_file <- stars::read_stars(cropped_file_names, along = "time")
 
+  #extract the vals that are stored as "time"
+  time_vals <- stars::st_get_dimension_values(full_sst_file, "time") 
+
+  #convert them into actual time values
+  time_dates <- as.Date(paste0(time_vals, "01"), format = "%Y%m%d")
+
+  #put the real time values back into the data
+  stars::st_dimensions(full_sst_file)$time$values <- time_dates   
+
   #return the object
   return(full_sst_file)
 }
