@@ -1,5 +1,6 @@
 #' Extracting eReefs Data
 #'
+#' @param Model Character String. Describes the url of the model to use. Defaults to "catalog" and provides the user with options
 #' @param Region SF Object. An sf object defining the area to extract data from
 #' @param StartDate POSIX time. Supplied as a string in the format YYYY-MM-DD that defines the first day to extract data from
 #' @param EndDate POSIX time. Supplied as a string in the format YYYY-MM-DD that defines the last day to extract data from
@@ -10,7 +11,7 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{ #dont run because function takes a while to execute
+#' \dontrun{ #dont run because function takes a while to execute and calls interactive component
 #' sf_obj <- system.file("extdata/boundary.gpkg", package = "RcTools")
 #' sf_obj <- sf::st_read(sf_obj)
 #' 
@@ -48,9 +49,6 @@ ereefs_extract <- function(Model = "catalog", Region, StartDate, EndDate, Variab
     stop("Invalid 'Variable': must be one of ", paste(var_choices, collapse = ", "))
   }
  
-  #define input link
-  #input_file <- "https://dapds00.nci.org.au/thredds/dodsC/fx3/GBR1_H2p0_B3p2_Cfur_Dnrt.ncml"
-
   #convert the sf object into a bounding box, then rearrange the order for how eReefs likes it
   Region <- sf::st_bbox(Region)
   Region <- c(Region[1], Region[3], Region[2], Region[4])

@@ -6,7 +6,9 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{ #dont run because function requires user interaction
 #' date_range <- ereefs_get_date_range()
+#' }
 #' 
 ereefs_get_date_range <- function(Model = "catalog"){
 

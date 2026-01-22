@@ -11,7 +11,7 @@ RoxygenNote: 7.3.3
 Imports: 
     dplyr, glue, openxlsx2, rlang, stringr, tidyr, ncdf4, sf, stars, utils, ereefs, ncmeta, ggplot2,
     lubridate, scales, purrr, stats, tmap, climaemet, busdater, grid, RColorBrewer, metR, oce, rcartocolor,
-    arcgislayers, janitor, lwgeom, nngeo, terra
+    arcgislayers, janitor, lwgeom, nngeo, terra, thredds
 Remotes:
     open-AIMS/ereefs,
     open-AIMS/gisaimsr

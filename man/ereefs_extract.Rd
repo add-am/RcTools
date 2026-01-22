@@ -14,6 +14,8 @@ ereefs_extract(
 )
 }
 \arguments{
+\item{Model}{Character String. Describes the url of the model to use. Defaults to "catalog" and provides the user with options}
+
 \item{Region}{SF Object. An sf object defining the area to extract data from}
 
 \item{StartDate}{POSIX time. Supplied as a string in the format YYYY-MM-DD that defines the first day to extract data from}
@@ -31,7 +33,7 @@ A single NetCDF (stars) object of specified dimensions and attributes
 Extracting eReefs Data
 }
 \examples{
-\dontrun{ #dont run because function takes a while to execute
+\dontrun{ #dont run because function takes a while to execute and calls interactive component
 sf_obj <- system.file("extdata/boundary.gpkg", package = "RcTools")
 sf_obj <- sf::st_read(sf_obj)
 

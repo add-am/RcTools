@@ -39,7 +39,8 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
   }
 
   #load in the qld outline
-  data("qld", package = "RcTools")
+  tmp <- new.env() 
+  utils::data("qld", package = "RcTools", envir = tmp)
 
   #obtain a reefs outline from the AIMS dataset
   reefs <- get(utils::data("gbr_feat", package = "gisaimsr")) |> 

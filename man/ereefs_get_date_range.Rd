@@ -16,6 +16,8 @@ Character string. Describes the min and max dates for the specific model
 Return the Model's Min and Max Dates
 }
 \examples{
+\dontrun{ #dont run because function requires user interaction
 date_range <- ereefs_get_date_range()
+}
 
 }

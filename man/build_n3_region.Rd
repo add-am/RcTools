@@ -13,6 +13,8 @@ An sf object
 Build the Northern Three Region Dataset
 }
 \examples{
+\dontrun{ #dont run because function takes a while
 n3_region <- build_n3_region()
+}
 
 }

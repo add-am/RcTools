@@ -4,7 +4,9 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{ #dont run because function takes a while
 #' n3_region <- build_n3_region()
+#' }
 #' 
 build_n3_region <- function(){
 
