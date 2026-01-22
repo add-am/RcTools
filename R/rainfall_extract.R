@@ -22,8 +22,8 @@ rainfall_extract <- function(Region, StartDate = NULL, EndDate = NULL){
   
   #continue to check argument types
   if (!inherits(Region, "sf")){stop("You must supply an sf object to the 'Region' parameter.")}
-  if (!is.null(StartDate) & !is.character(StartDate)){stop("You must supply a character string to the 'StartDate' parmeter or leave it blank.")}
-  if (!is.null(EndDate) & !is.character(EndDate)){stop("You must supply a character string to the 'EndDate' parmeter or leave it blank.")}
+  if (!is.null(StartDate) & !is.character(StartDate)){stop("You must supply a character string to the 'StartDate' parameter or leave it blank.")}
+  if (!is.null(EndDate) & !is.character(EndDate)){stop("You must supply a character string to the 'EndDate' parameter or leave it blank.")}
 
   #if dates supplied, confirm they can be converted
   if (!is.null(StartDate)){StartDate <- as.Date(StartDate)}

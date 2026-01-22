@@ -1,4 +1,4 @@
-#' Extract Sea Surface Temperature Data from NOAA's API
+#' Extract Degree Heating Week Data from NOAA's API
 #'
 #' @param FullPath Character String. A path arguement to the location where each full file should be saved and retrived.
 #' @param CroppedPath Character String. A path arguement to the location where each cropped file should be saved and retrived.
@@ -18,10 +18,10 @@
 #' 
 #' n3_region <- build_n3_region()
 #' 
-#' sst_extract(p1, p2, n3_region)
+#' dhw_extract(p1, p2, n3_region)
 #' }
 #' 
-sst_extract <- function(FullPath, CroppedPath, CropObj){
+dhw_extract <- function(FullPath, CroppedPath, CropObj){
 
   #check required arguments
   if (any(missing(FullPath), missing(CroppedPath), missing(CropObj))){
@@ -32,7 +32,7 @@ sst_extract <- function(FullPath, CroppedPath, CropObj){
   if (!is.character(FullPath)){stop("You must supply a character string to the 'FullPath' parameter.")}
   if (!is.character(CroppedPath)){stop("You must supply a character string to the 'CroppedPath' parameter.")}
   if (!inherits(CropObj, "sf")){stop("You must supply an sf object to the 'CropObj' parameter.")}
-  
+    
   #convert the provided sf object into a bbox
   target_bbox <- CropObj |> 
     sf::st_transform("EPSG:4326") |> 
@@ -42,26 +42,33 @@ sst_extract <- function(FullPath, CroppedPath, CropObj){
   #turn of spherical geometry  
   sf::sf_use_s2(FALSE)
 
-  #build the base url
-  base_url <- "https://www.star.nesdis.noaa.gov/pub/socd/mecb/crw/data/5km/v3.1_op/nc/v1.0/monthly/"
+  #build a base url
+  base_url <- "https://www.star.nesdis.noaa.gov/pub/socd/mecb/crw/data/5km/v3.1_op/nc/v1.0"
 
-  #define the most recent completed month (data is approximately 1 month delayed)
-  end_date <- lubridate::floor_date(as.Date(format(Sys.time(), "%Y-%m-%d")), unit = "month") %m-% months(1)
-
-  #build a vector of YYYYMM character strings from 1985 to "now"
-  date_vect <- format(seq(as.Date("1985-01-01"), end_date, by = "month"), "%Y%m")
-
-  #build an equal length vector of YYYY character strings
-  folder_vect <- stringr::str_sub(date_vect, end = -3)
+  #create a vector between 1986 and the current year
+  date_vect <- 1986:format(Sys.Date(), "%Y")
 
   #build an equal length vector of file name character strings to iterate on
-  raw_file_names <- glue::glue("{FullPath}/sst_{date_vect}.nc")
+  raw_file_names <- glue::glue("{FullPath}/dhw_{date_vect}.nc")
 
   #build a second vector of file names for the cropped version
-  cropped_file_names <- glue::glue("{CroppedPath}/cropped_sst_{date_vect}.nc")
+  cropped_file_names <- glue::glue("{CroppedPath}/cropped_dhw_{date_vect}.nc")
 
-  #build an equal length vector of url name character strings to iterate on
-  url_names <- glue::glue("{base_url}{folder_vect}/ct5km_sst-mean_v3.1_{date_vect}.nc")
+  #drop the current year (its url is built differently)
+  date_vect <- head(date_vect, -1)
+
+  #then create urls for each year between 1986 and the present year (minus 1)
+  url_names <- glue::glue("{base_url}/annual/ct5km_dhw-max_v3.1_{date_vect}.nc")
+
+  #extract the current year and the current month and day (minus 2 to account for a data upload delay)
+  cy <- format(Sys.Date(), "%Y")
+  md <- format(Sys.Date()-2, "%m%d")
+
+  #build the final url for the current year (needs ytd data instead) and bind it to a full vector of urls
+  url_names <- c(
+    url_names,
+    glue::glue("{base_url}/daily/year-to-date/ct5km_dhw-max-ytd_v3.1_{cy}{md}.nc")
+  )
 
   #map over each of the vectors, if the file does not exists locally, download it
   purrr::walk2(raw_file_names, url_names, \(x,y) {if(!file.exists(x)){utils::download.file(y, x, mode = "wb")}})
@@ -84,9 +91,8 @@ sst_extract <- function(FullPath, CroppedPath, CropObj){
   })
 
   #map over the list of cropped file names
-  full_sst_file <- stars::read_stars(cropped_file_names, along = "time")
+  full_dhw_file <- stars::read_stars(cropped_file_names, along = "time")
 
   #return the object
-  return(full_sst_file)
+  return(full_dhw_file)
 }
-
