@@ -53,7 +53,8 @@ rainfall_extract <- function(Region, StartDate = NULL, EndDate = NULL){
   #convert the provided sf object into a bbox
   target_bbox <- Region |> 
     sf::st_transform("EPSG:7844") |> 
-    sf::st_bbox()     
+    sf::st_buffer(0.1) |>
+    sf::st_bbox()   
 
   #find the index of the values that closest matche the bbox lon vals, then count how many vals are between then 
   lon_start <- which.min(abs(lon - target_bbox["xmin"]))

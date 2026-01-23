@@ -5,15 +5,16 @@
 #' 
 #' @returns A netCDF object
 #'
+#' @export
+#' 
 #' @examples
-#' \dontrun{ #dont run because function is not exported
+#' 
 #' nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
 #' nc <- stars::read_mdim(nc)
 #' 
-#' x <- ereefs_aggregation_helper(nc, "Month")
-#' }
-#' 
-ereefs_aggregation_helper <- function(nc, agg){
+#' x <- nc_aggregation_helper(nc, "Month")
+#'  
+nc_aggregation_helper <- function(nc, agg){
 
   #pull out the attribute name/names
   attribute_names <- names(nc)

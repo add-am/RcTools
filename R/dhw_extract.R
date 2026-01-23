@@ -35,7 +35,8 @@ dhw_extract <- function(FullPath, CroppedPath, CropObj){
     
   #convert the provided sf object into a bbox
   target_bbox <- CropObj |> 
-    sf::st_transform("EPSG:4326") |> 
+    sf::st_transform("EPSG:4326") |>
+    sf::st_buffer(0.1) |>
     sf::st_bbox() |> 
     sf::st_as_sfc()
 

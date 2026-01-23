@@ -48,7 +48,7 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
     sf::st_transform("EPSG:9473")
 
   #aggregate the data
-  nc <- ereefs_aggregation_helper(nc, agg = Aggregation)
+  nc <- nc_aggregation_helper(nc, agg = Aggregation)
 
   #if no legend title was provided, use the name of the attributes
   if (is.null(LegendTitle)) {LegendTitle <- names(nc)}

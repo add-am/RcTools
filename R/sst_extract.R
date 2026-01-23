@@ -33,9 +33,10 @@ sst_extract <- function(FullPath, CroppedPath, CropObj){
   if (!is.character(CroppedPath)){stop("You must supply a character string to the 'CroppedPath' parameter.")}
   if (!inherits(CropObj, "sf")){stop("You must supply an sf object to the 'CropObj' parameter.")}
   
-  #convert the provided sf object into a bbox
+  #buffer the provided object then convert into a bbox
   target_bbox <- CropObj |> 
     sf::st_transform("EPSG:4326") |> 
+    sf::st_buffer(0.1) |> 
     sf::st_bbox() |> 
     sf::st_as_sfc()
 
