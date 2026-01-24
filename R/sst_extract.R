@@ -36,10 +36,11 @@ sst_extract <- function(FullPath, CroppedPath, CropObj){
   #buffer the provided object then convert into a bbox
   target_bbox <- CropObj |> 
     sf::st_transform("EPSG:4326") |> 
-    sf::st_buffer(0.1) |> 
     sf::st_bbox() |> 
-    sf::st_as_sfc()
-
+    sf::st_as_sfc() |>
+    sf::st_as_sf() |>
+    sf::st_buffer(0.1)
+  
   #turn of spherical geometry  
   sf::sf_use_s2(FALSE)
 
