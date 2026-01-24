@@ -109,7 +109,7 @@ dhw_extract <- function(FullPath, CroppedPath, CropObj){
 
   #update the reference system for time
   dims$time$refsys <- "Date" 
- |> 
+
   #then update the original object
   stars::st_dimensions(full_dhw_file) <- dims
 
