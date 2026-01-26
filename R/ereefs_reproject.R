@@ -8,8 +8,7 @@
 #' @examples
 #' 
 #' load(system.file("extdata/turb_curvi.RData", package = "RcTools"))
-#' 
-#' 
+#'  
 #' nc_reg <- ereefs_reproject(turb_curvi)
 #' 
 ereefs_reproject <- function(nc){
