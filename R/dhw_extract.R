@@ -57,7 +57,7 @@ dhw_extract <- function(FullPath, CroppedPath, CropObj){
   cropped_file_names <- glue::glue("{CroppedPath}/cropped_dhw_{date_vect}.nc")
 
   #drop the current year (its url is built differently)
-  date_vect <- head(date_vect, -1)
+  date_vect <- utils::head(date_vect, -1)
 
   #then create urls for each year between 1986 and the present year (minus 1)
   url_names <- glue::glue("{base_url}/annual/ct5km_dhw-max_v3.1_{date_vect}.nc")

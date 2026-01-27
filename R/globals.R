@@ -6,5 +6,8 @@ utils::globalVariables(
     "speed", "GroupingCol", "paluma", "dt_sub_basins", "special_areas", "MiId", "Region",
     "BasinName", "Zone", "SubZone", "SubBasin", "Environment", "BasinOrZone", 
     "SubBasinOrSubZone", "WatercourseOrGeographicArea", "FeatName", "GbrName", "Objectid",
-    "geom2", "EnvValueZone", "Combined", "NewSubBasin", "MarineWate"
+    "geom2", "EnvValueZone", "Combined", "NewSubBasin", "MarineWate", "Result_Chlorophyll",
+    "Flags_Chlorophyll", "Units_Chlorophyll", "Result_Turbidity", "Flags_Turbidity", 
+    "Units_Turbidity", "Indicator", "Units", "Latitude", "Longitude", "Logger", "Attribution",
+    "Result", "Flags"
 ))

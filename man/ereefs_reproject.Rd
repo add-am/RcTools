@@ -18,8 +18,7 @@ Convert the eReefs object from curvilinear to a regular grid
 \examples{
 
 load(system.file("extdata/turb_curvi.RData", package = "RcTools"))
-
-
+ 
 nc_reg <- ereefs_reproject(turb_curvi)
 
 }

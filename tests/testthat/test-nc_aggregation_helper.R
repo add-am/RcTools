@@ -8,7 +8,7 @@ test_that("Aggregation returns a smaller stars object (single attribute)", {
   expected_layers <- c(12, 3, 2, 1)
 
   #do the aggregations
-  aggregated_data <- purrr::map(agg_options, \(x) ereefs_aggregation_helper(turb_reg, x))
+  aggregated_data <- purrr::map(agg_options, \(x) nc_aggregation_helper(turb_reg, x))
 
   #check layer counts
   purrr::walk2(aggregated_data, expected_layers, \(x,y) expect_equal(dim(x)[[3]], y))
@@ -36,7 +36,7 @@ test_that("Aggregation returns a smaller stars object (multi-attribute)", {
   att_names <- c("R_645", "R_555", "R_470")
 
   #do the aggregations
-  aggregated_data <- purrr::map(agg_options, \(x) ereefs_aggregation_helper(tc_reg, x))
+  aggregated_data <- purrr::map(agg_options, \(x) nc_aggregation_helper(tc_reg, x))
 
   #check layer counts
   purrr::walk2(aggregated_data, expected_layers, \(x,y) expect_equal(dim(x)[[3]], y))
