@@ -33,8 +33,8 @@ nc_high_res_crop <- function(nc, CropObj, DisaggFactor = 5){
     initial_crop, 
     stars::st_as_stars(
       sf::st_bbox(initial_crop),
-      dx = (1/DisaggFactor) * stars::st_dimensions(x)$x$delta, 
-      dy = (1/DisaggFactor) * stars::st_dimensions(x)$y$delta
+      dx = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$x$delta, 
+      dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta
     ), 
     method = "bilinear", 
     use_gdal = TRUE
