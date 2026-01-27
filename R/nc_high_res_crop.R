@@ -52,14 +52,17 @@ nc_high_res_crop <- function(nc, CropObj, DisaggFactor = 5){
         dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta)
     
     #then explicity rebuild time dimension
-    high_resolution <- target_nc |> 
+    target_nc <- target_nc |> 
       stars::st_redimension(
         new_dims = c(dim(target_nc), 1),
         along = list(stars::st_dimensions(initial_crop)$time$values)) |> 
       stars::st_set_dimensions(names = c("x", "y", "time"))
 
-      #and properly add the value back in
-      stars::st_dimensions(high_resolution)$time$values <- stars::st_dimensions(initial_crop)$time$values  
+    #and properly add the value back in
+    stars::st_dimensions(target_nc)$time$values <- stars::st_dimensions(initial_crop)$time$values  
+    
+    #then warp the data into the target objectobject
+    high_resolution <- stars::st_warp(initial_crop, target_nc, method = "bilinear", use_gdal = TRUE)
 
   }
 
