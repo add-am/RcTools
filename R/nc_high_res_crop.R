@@ -28,43 +28,37 @@ nc_high_res_crop <- function(nc, CropObj, DisaggFactor = 5){
   #crop the supplied raster with close proximity
   initial_crop <- sf::st_crop(nc, buffed_obj)
 
-  #if the provided data only has one layer, it requires a more explicity process
-  if (dim(nc)[[3]] > 1){
-
-    #do everything in one step
-    high_resolution <- stars::st_warp(
-      initial_crop, 
-      stars::st_as_stars(
-        sf::st_bbox(initial_crop),
-        dx = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$x$delta, 
-        dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta
-      ), 
-      method = "bilinear", 
-      use_gdal = TRUE
-    )
-  } else {
-
-    #build the new stars object to put the data into
-    target_nc <- initial_crop |> 
-      sf::st_bbox() |> 
-      stars::st_as_stars(
-        dx = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$x$delta, 
-        dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta)
+  #if the supplied data has only one time step, give it another (one timestep causes strange error)
+  if (dim(nc)[[3]] == 1){
     
-    #then explicity rebuild time dimension
-    target_nc <- target_nc |> 
-      stars::st_redimension(
-        new_dims = c(dim(target_nc), 1),
-        along = list(stars::st_dimensions(initial_crop)$time$values)) |> 
-      stars::st_set_dimensions(names = c("x", "y", "time"))
+    #duplicate data
+    initial_crop_2 <- initial_crop
 
-    #and properly add the value back in
-    stars::st_dimensions(target_nc)$time$values <- stars::st_dimensions(initial_crop)$time$values  
-    
-    #then warp the data into the target objectobject
-    high_resolution <- stars::st_warp(initial_crop, target_nc, method = "bilinear", use_gdal = TRUE)
+    #edit the timestep on the duplicate
+    stars::st_dimensions(initial_crop_2)$time$values <- stars::st_dimensions(initial_crop)$time$values+1
 
+    #merge the data to make a new version with two timesteps
+    initial_crop <- c(initial_crop, initial_crop_2, along = "time")
   }
+
+  #build a target layout
+  target_nc <- initial_crop |> 
+    sf::st_bbox() |> 
+    stars::st_as_stars(
+      dx = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$x$delta, 
+      dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta)
+
+  #then warp the data into the target objectobject
+  high_resolution <- stars::st_warp(initial_crop, target_nc, method = "bilinear", use_gdal = TRUE)
+
+  #and properly add the value back in
+  stars::st_dimensions(high_resolution)$band$values <- stars::st_dimensions(initial_crop)$time$values
+
+  #if data is supposed to have one timestep, make this true
+  if (dim(nc)[[3]] == 1){high_resolution <- high_resolution[,,,1]}
+
+  #update the last dimension to have the correct name
+  high_resolution <- stars::st_set_dimensions(high_resolution, "band", names = "time")
 
   #then mask again to get a precise border with much higher resolution
   final_raster <- sf::st_crop(high_resolution, CropObj)
