@@ -65,8 +65,9 @@ nc_aggregation_helper <- function(nc, agg){
     aggregated_layer <- stars::st_redimension(
       aggregated_layer,
       new_dims = c(dim(aggregated_layer), 1),
-      along = stats::setNames(list(LayerName), "time"),
-      name = "time"
+      along = #stats::setNames( (dont need this stuff i think?)
+        list(LayerName)#, "time"), (dont need this stuff i think?)
+      #name = "time" (dont need this stuff i think?)
     )
 
     #it requires this two step process first to build the dimension then to properly add the value

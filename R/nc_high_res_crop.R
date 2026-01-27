@@ -28,17 +28,40 @@ nc_high_res_crop <- function(nc, CropObj, DisaggFactor = 5){
   #crop the supplied raster with close proximity
   initial_crop <- sf::st_crop(nc, buffed_obj)
 
-  #increase the resolution of the initially cropped object
-  high_resolution <- stars::st_warp(
-    initial_crop, 
-    stars::st_as_stars(
-      sf::st_bbox(initial_crop),
-      dx = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$x$delta, 
-      dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta
-    ), 
-    method = "bilinear", 
-    use_gdal = TRUE
-  )
+  #if the provided data only has one layer, it requires a more explicity process
+  if (dim(nc)[[3]] > 1){
+
+    #do everything in one step
+    high_resolution <- stars::st_warp(
+      initial_crop, 
+      stars::st_as_stars(
+        sf::st_bbox(initial_crop),
+        dx = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$x$delta, 
+        dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta
+      ), 
+      method = "bilinear", 
+      use_gdal = TRUE
+    )
+  } else {
+
+    #build the new stars object to put the data into
+    target_nc <- initial_crop |> 
+      sf::st_bbox() |> 
+      stars::st_as_stars(
+        dx = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$x$delta, 
+        dy = (1/DisaggFactor) * stars::st_dimensions(initial_crop)$y$delta)
+    
+    #then explicity rebuild time dimension
+    high_resolution <- target_nc |> 
+      stars::st_redimension(
+        new_dims = c(dim(target_nc), 1),
+        along = list(stars::st_dimensions(initial_crop)$time$values)) |> 
+      stars::st_set_dimensions(names = c("x", "y", "time"))
+
+      #and properly add the value back in
+      stars::st_dimensions(high_resolution)$time$values <- stars::st_dimensions(initial_crop)$time$values  
+
+  }
 
   #then mask again to get a precise border with much higher resolution
   final_raster <- sf::st_crop(high_resolution, CropObj)
