@@ -52,7 +52,10 @@ extract_rainfall <- function(Region, StartDate = NULL, EndDate = NULL){
 
   #convert the provided sf object into a bbox
   target_bbox <- Region |> 
-    sf::st_transform("EPSG:7844") |> 
+    sf::st_bbox() |> 
+    sf::st_as_sfc() |> 
+    sf::st_as_sf() |> 
+    sf::st_transform("EPSG:4326") |> 
     sf::st_buffer(0.1) |>
     sf::st_bbox()   
 
@@ -73,8 +76,8 @@ extract_rainfall <- function(Region, StartDate = NULL, EndDate = NULL){
     count = c(lon_count, lat_count, time_count))
   )
 
-  #warp the data to a projected crs
-  target_data <- stars::st_warp(target_data, crs = "EPSG:7855")
+  #warp the data to a more localised crs
+  target_data <- stars::st_warp(target_data, crs = "EPSG:7844")
 
   return(target_data)
 
