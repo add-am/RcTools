@@ -19,7 +19,7 @@ A function to help with various forms of netCDF aggregation
 }
 \examples{
 
-nc <- system.file("extdata/turbidity22.nc", package = "RcTools")
+nc <- system.file("extdata/turb_reg.nc", package = "RcTools")
 nc <- stars::read_mdim(nc)
 
 x <- nc_aggregation_helper(nc, "Month")

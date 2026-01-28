@@ -7,7 +7,7 @@
 ereefs_reproject(nc)
 }
 \arguments{
-\item{nc}{A single NetCDF (stars) object, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A single NetCDF (stars) object, generally produced by the \code{\link[=extract_ereefs]{extract_ereefs()}} function}
 }
 \value{
 A single NetCDF (stars) object, with the same values as x, but in a regular grid format

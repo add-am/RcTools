@@ -14,7 +14,7 @@ ereefs_dotplot(
 )
 }
 \arguments{
-\item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=extract_ereefs]{extract_ereefs()}} function}
 
 \item{SubSample}{Numeric String. The number of values per day to plot in the dot plot. Defaults to 500 values per day.}
 

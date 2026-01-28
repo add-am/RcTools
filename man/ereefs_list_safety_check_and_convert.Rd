@@ -7,7 +7,7 @@
 ereefs_list_safety_check_and_convert(nc)
 }
 \arguments{
-\item{nc}{A list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A list of NetCDF (stars) objects, generally produced by the \code{\link[=extract_ereefs]{extract_ereefs()}} function}
 }
 \value{
 A single NetCDF (stars) object combined on the time dimension

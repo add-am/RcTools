@@ -11,14 +11,14 @@
 #' @examples
 #' 
 #' nc <- stars::read_mdim(system.file("extdata/turb_reg.nc", package = "RcTools"))
-#' area <- sf::st_read(system.file("exdata/example_box.gpkg", package = "RcTools"))
+#' area <- sf::st_read(system.file("extdata/example_box.gpkg", package = "RcTools"))
 #' 
 #' nc_high_res <- high_res_crop(nc, area, 5)
 #' 
 nc_high_res_crop <- function(nc, CropObj, DisaggFactor = 5){
 
   #determine the type of buffer to use (i.e meters or longlat)
-  buff_val <- if(sf::st_is_longlat(sf::st_crs(CropObj))){0.1} else {10000}
+  buff_val <- if(sf::st_is_longlat(sf::st_crs(CropObj))){0.1} else {15000}
 
   #create a buffered version of the supplied object
   buffed_obj <- CropObj |> 

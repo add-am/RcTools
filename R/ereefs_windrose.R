@@ -1,6 +1,6 @@
 #' Create a Windrose Plot from eReefs Data
 #'
-#' @param nc A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the [ereefs_extract()] function
+#' @param nc A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the [extract_ereefs()] function
 #' @param SubSample Numeric String. The number of values per day to plot in the wind rose. Defaults to 500 values per day.
 #' @param Aggregation Character String. What type of grouping to apply to the data. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
 #' @param Heading Character String. The heading of the plot. Defaults to "Approximated Wind Speed".

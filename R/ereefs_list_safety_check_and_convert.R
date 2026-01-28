@@ -1,6 +1,6 @@
 #' Check if object is Stars or list of Stars, Convert if List
 #'
-#' @param nc A list of NetCDF (stars) objects, generally produced by the [ereefs_extract()] function
+#' @param nc A list of NetCDF (stars) objects, generally produced by the [extract_ereefs()] function
 #'
 #' @returns A single NetCDF (stars) object combined on the time dimension
 #'

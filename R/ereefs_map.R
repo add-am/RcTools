@@ -1,6 +1,6 @@
 #' Mapping eReefs Data
 #'
-#' @param nc A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the [ereefs_extract()] function
+#' @param nc A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the [extract_ereefs()] function
 #' @param MapType Character String. Defines the type of map produced. One of "Concentration", "True Colour", or "Vector Field" (AKA wind)
 #' @param Aggregation Character String. Defines the level of aggregation to apply. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
 #' @param LegendTitle Character String. The title of the legend. Defaults to the name of the netCDF's attribute

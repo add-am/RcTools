@@ -7,7 +7,7 @@
 ereefs_map(nc, MapType, Aggregation = "Month", LegendTitle = NULL, nrow = NULL)
 }
 \arguments{
-\item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=ereefs_extract]{ereefs_extract()}} function}
+\item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=extract_ereefs]{extract_ereefs()}} function}
 
 \item{MapType}{Character String. Defines the type of map produced. One of "Concentration", "True Colour", or "Vector Field" (AKA wind)}
 

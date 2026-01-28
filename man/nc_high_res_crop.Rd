@@ -23,7 +23,7 @@ Crop A Raster and Increase its Resolution at the Same Time
 \examples{
 
 nc <- stars::read_mdim(system.file("extdata/turb_reg.nc", package = "RcTools"))
-area <- sf::st_read(system.file("exdata/example_box.gpkg", package = "RcTools"))
+area <- sf::st_read(system.file("extdata/example_box.gpkg", package = "RcTools"))
 
 nc_high_res <- high_res_crop(nc, area, 5)
 
