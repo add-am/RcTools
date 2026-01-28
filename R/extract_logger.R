@@ -18,12 +18,12 @@
 #' @export
 #' 
 #' @examples
-#' wq_data <- logger_extract(
+#' wq_data <- extract_logger(
 #' Years = 2025, 
 #' Loggers = "BUR2"
 #' )
 
-logger_extract <- function(
+extract_logger <- function(
   Years, Loggers, Indicators = c("chlorophyll", "turbidity"), FilterFlags = TRUE, FlagTags = c(1,2), Aggregate = FALSE, 
   AggregationType, SmallTables = FALSE, RowCount = 1500){
 
