@@ -15,7 +15,7 @@
 #' sf_obj <- system.file("extdata/boundary.gpkg", package = "RcTools")
 #' sf_obj <- sf::st_read(sf_obj)
 #' 
-#' nc <- ereefs_extract(
+#' nc <- extract_ereefs(
 #'   Region = sf_obj,
 #'   StartDate = "2022-03-01",
 #'   EndDate = "2022-03-03",
@@ -24,7 +24,7 @@
 #' )
 #' }
 #' 
-ereefs_extract <- function(Model = "catalog", Region, StartDate, EndDate, Variable, Downsample = 0){
+extract_ereefs <- function(Model = "catalog", Region, StartDate, EndDate, Variable, Downsample = 0){
 
   #check required argument (all of them)
   if (any(missing(Region), missing(StartDate), missing(EndDate), missing(Variable))){

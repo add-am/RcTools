@@ -12,10 +12,10 @@
 #' \dontrun{ #dont run because example takes a while
 #' n3_region <- build_n3_region()
 #' 
-#' rain_data <- rainfall_extract(n3_region, "2022-01-01", "2022-02-01")
+#' rain_data <- extract_rainfall(n3_region, "2022-01-01", "2022-02-01")
 #' }
 #' 
-rainfall_extract <- function(Region, StartDate = NULL, EndDate = NULL){
+extract_rainfall <- function(Region, StartDate = NULL, EndDate = NULL){
 
   #check required arguments
   if (missing(Region)){stop("You must supply at least the 'Region', parameter.")}

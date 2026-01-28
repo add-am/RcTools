@@ -18,10 +18,10 @@
 #' 
 #' n3_region <- build_n3_region()
 #' 
-#' sst_extract(p1, p2, n3_region)
+#' extract_sst(p1, p2, n3_region)
 #' }
 #' 
-sst_extract <- function(FullPath, CroppedPath, CropObj){
+extract_sst <- function(FullPath, CroppedPath, CropObj){
 
   #check required arguments
   if (any(missing(FullPath), missing(CroppedPath), missing(CropObj))){
