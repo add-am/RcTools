@@ -12,8 +12,9 @@
 #' 
 #' nc <- stars::read_mdim(system.file("extdata/turb_reg.nc", package = "RcTools"))
 #' area <- sf::st_read(system.file("extdata/example_box.gpkg", package = "RcTools"))
+#' st_crs(area) <- st_crs(nc)
 #' 
-#' nc_high_res <- high_res_crop(nc, area, 5)
+#' nc_high_res <- nc_high_res_crop(nc, area, 5)
 #' 
 nc_high_res_crop <- function(nc, CropObj, DisaggFactor = 5){
 

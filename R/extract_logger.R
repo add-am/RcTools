@@ -188,35 +188,39 @@ extract_logger <- function(
   })
 
   if (SmallTables){#if the user wants to return small tables (rather than full series) slice up all the tables
+
+    df_names <- with(target_matrix, paste0(Loggers, "_", Years))
+
+    list_of_dfs <- row_splitter(retrieve_data, NameVec = df_names)
     
     #map over the list of datasets (plus the number of total datasets)
-    list_of_dfs <- purrr::map2(retrieve_data, seq_along(retrieve_data), function(df, count){
+    #list_of_dfs <- purrr::map2(retrieve_data, seq_along(retrieve_data), function(df, count){
 
       #build a vector of min and max row indicies
-      min_indicies <- seq(1, nrow(df), RowCount)
-      max_indicies <- pmin(min_indicies + (RowCount-1), nrow(df))
+    #  min_indicies <- seq(1, nrow(df), RowCount)
+    #  max_indicies <- pmin(min_indicies + (RowCount-1), nrow(df))
       
       #and a vector of table names
-      table_names <- paste0(
-        target_matrix[count, 2], "_", 
-        target_matrix[count, 1], "_rows_", 
-        min_indicies, "_to_", max_indicies
-      )
+    #  table_names <- paste0(
+    #    target_matrix[count, 2], "_", 
+    #    target_matrix[count, 1], "_rows_", 
+    #    min_indicies, "_to_", max_indicies
+    #  )
 
       #slice up the dataframe into small chunks and return it as a list
-      small_tables <- purrr::map2(min_indicies, max_indicies, ~dplyr::slice(df, .x:.y))
+    #  small_tables <- purrr::map2(min_indicies, max_indicies, ~dplyr::slice(df, .x:.y))
 
       #name each of the mini dataframes in the list
-      names(small_tables) <- table_names
+    #  names(small_tables) <- table_names
 
       #return the list of dataframes
-      small_tables
+    #  small_tables
     
-    })
+    #})
 
     #if the purr map occured more than once, flatten the list of lists
     #if (!all(seq_along(retrieve_data) <= 1)){
-    list_of_dfs <- unlist(list_of_dfs, recursive = FALSE)#}
+    #list_of_dfs <- unlist(list_of_dfs, recursive = FALSE)#}
 
   } else {#if the user wants to keep each dataframe intact
 
