@@ -1,7 +1,8 @@
 
 #' Extract Rainfall Data from BOM AWO API
 #'
-#' @param Region An sf object
+#' @param CropObj Sf Object. An sf object used to define the area in which data is to be cropped to. Generally,
+#' the n3_region object from the [build_n3_region()] function is used.
 #' @param StartDate A character string in the format of YYYY-MM-DD. Defaults to "1911-01-31" (earliest value)
 #' @param EndDate A character string in the format of YYYY-MM-DD. Defaults to newest value
 #'
@@ -15,13 +16,13 @@
 #' rain_data <- extract_rainfall(n3_region, "2022-01-01", "2022-02-01")
 #' }
 #' 
-extract_rainfall <- function(Region, StartDate = NULL, EndDate = NULL){
+extract_rainfall <- function(CropObj, StartDate = NULL, EndDate = NULL){
 
   #check required arguments
-  if (missing(Region)){stop("You must supply at least the 'Region', parameter.")}
+  if (missing(CropObj)){stop("You must supply at least the 'CropObj', parameter.")}
   
   #continue to check argument types
-  if (!inherits(Region, "sf")){stop("You must supply an sf object to the 'Region' parameter.")}
+  if (!inherits(CropObj, "sf")){stop("You must supply an sf object to the 'CropObj' parameter.")}
   if (!is.null(StartDate) & !is.character(StartDate)){stop("You must supply a character string to the 'StartDate' parameter or leave it blank.")}
   if (!is.null(EndDate) & !is.character(EndDate)){stop("You must supply a character string to the 'EndDate' parameter or leave it blank.")}
 
@@ -51,7 +52,7 @@ extract_rainfall <- function(Region, StartDate = NULL, EndDate = NULL){
   lat <- ncdf4::ncvar_get(nc, "latitude")
 
   #convert the provided sf object into a bbox
-  target_bbox <- Region |> 
+  target_bbox <- CropObj |> 
     sf::st_bbox() |> 
     sf::st_as_sfc() |> 
     sf::st_as_sf() |> 

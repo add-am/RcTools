@@ -4,10 +4,11 @@
 \alias{extract_rainfall}
 \title{Extract Rainfall Data from BOM AWO API}
 \usage{
-extract_rainfall(Region, StartDate = NULL, EndDate = NULL)
+extract_rainfall(CropObj, StartDate = NULL, EndDate = NULL)
 }
 \arguments{
-\item{Region}{An sf object}
+\item{CropObj}{Sf Object. An sf object used to define the area in which data is to be cropped to. Generally,
+the n3_region object from the \code{\link[=build_n3_region]{build_n3_region()}} function is used.}
 
 \item{StartDate}{A character string in the format of YYYY-MM-DD. Defaults to "1911-01-31" (earliest value)}
 

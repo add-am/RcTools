@@ -1,6 +1,6 @@
 #' Extract Degree Heating Week Data from NOAA's API
 #'
-#' @param FullPath Character String. A path arguement to the location where each full file should be saved and retrived.
+#' @param RawPath Character String. A path arguement to the location where each full file should be saved and retrived.
 #' @param CroppedPath Character String. A path arguement to the location where each cropped file should be saved and retrived.
 #' @param CropObj Sf Object. An sf object used to define the area in which data is to be cropped to. Generally,
 #' the n3_region object from the [build_n3_region()] function is used.
@@ -21,15 +21,15 @@
 #' extract_dhw(p1, p2, n3_region)
 #' }
 #' 
-extract_dhw <- function(FullPath, CroppedPath, CropObj){
+extract_dhw <- function(RawPath, CroppedPath, CropObj){
 
   #check required arguments
-  if (any(missing(FullPath), missing(CroppedPath), missing(CropObj))){
-    stop("You must supply the 'FullPath', 'CroppedPath', and 'CropObj', parameters.")
+  if (any(missing(RawPath), missing(CroppedPath), missing(CropObj))){
+    stop("You must supply the 'RawPath', 'CroppedPath', and 'CropObj', parameters.")
   }
   
   #continue to check argument types
-  if (!is.character(FullPath)){stop("You must supply a character string to the 'FullPath' parameter.")}
+  if (!is.character(RawPath)){stop("You must supply a character string to the 'RawPath' parameter.")}
   if (!is.character(CroppedPath)){stop("You must supply a character string to the 'CroppedPath' parameter.")}
   if (!inherits(CropObj, "sf")){stop("You must supply an sf object to the 'CropObj' parameter.")}
     
@@ -51,7 +51,7 @@ extract_dhw <- function(FullPath, CroppedPath, CropObj){
   date_vect <- 1986:format(Sys.Date(), "%Y")
 
   #build an equal length vector of file name character strings to iterate on
-  raw_file_names <- glue::glue("{FullPath}/dhw_{date_vect}.nc")
+  raw_file_names <- glue::glue("{RawPath}/dhw_{date_vect}.nc")
 
   #build a second vector of file names for the cropped version
   cropped_file_names <- glue::glue("{CroppedPath}/cropped_dhw_{date_vect}.nc")

@@ -4,16 +4,17 @@
 \alias{extract_air_temp}
 \title{Extract, Crop, and Combine Air Temperature Data}
 \usage{
-extract_air_temp(CropObj, MinPath, MaxPath)
+extract_air_temp(MinPath, MaxPath, CropObj)
 }
 \arguments{
-\item{CropObj}{An sf object. Generally the object produced by \code{\link[=build_n3_region]{build_n3_region()}}. Defines the area in which to crop data}
-
 \item{MinPath}{A character string. Defines the full path to the folder in which all min temp sub folders are stored.
 Generally this will be user/.../.../raw/tmin2/}
 
 \item{MaxPath}{A character string. Defines the full path to the folder in which all max temp sub folders are stored.
 Generally this will be user/.../.../raw/tmax2/}
+
+\item{CropObj}{Sf Object. An sf object used to define the area in which data is to be cropped to. Generally,
+the n3_region object from the \code{\link[=build_n3_region]{build_n3_region()}} function is used.}
 }
 \value{
 A list of three netCDF objects. Specifically a min temp, max temp, and mean temp netCDF

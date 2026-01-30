@@ -4,10 +4,10 @@
 \alias{extract_sst}
 \title{Extract Sea Surface Temperature Data from NOAA's API}
 \usage{
-extract_sst(FullPath, CroppedPath, CropObj)
+extract_sst(RawPath, CroppedPath, CropObj)
 }
 \arguments{
-\item{FullPath}{Character String. A path arguement to the location where each full file should be saved and retrived.}
+\item{RawPath}{Character String. A path arguement to the location where each full file should be saved and retrived.}
 
 \item{CroppedPath}{Character String. A path arguement to the location where each cropped file should be saved and retrived.}
 
@@ -30,7 +30,7 @@ p2 <- "path/to/folder/processed/"
 
 n3_region <- build_n3_region()
 
-extract_sst(p1, p2, n3_region)
+sst_data <- extract_sst(p1, p2, n3_region)
 }
 
 }

@@ -1,10 +1,11 @@
 #' Extract, Crop, and Combine Air Temperature Data
 #'
-#' @param CropObj An sf object. Generally the object produced by [build_n3_region()]. Defines the area in which to crop data
 #' @param MinPath A character string. Defines the full path to the folder in which all min temp sub folders are stored.
 #' Generally this will be user/.../.../raw/tmin2/
 #' @param MaxPath A character string. Defines the full path to the folder in which all max temp sub folders are stored.
 #' Generally this will be user/.../.../raw/tmax2/
+#' @param CropObj Sf Object. An sf object used to define the area in which data is to be cropped to. Generally,
+#' the n3_region object from the [build_n3_region()] function is used.
 #'
 #' @returns A list of three netCDF objects. Specifically a min temp, max temp, and mean temp netCDF
 #'
@@ -21,7 +22,7 @@
 #' 
 #' }
 #' 
-extract_air_temp <- function(CropObj, MinPath, MaxPath){
+extract_air_temp <- function(MinPath, MaxPath, CropObj){
 
   #check required argument (all of them)
   if (any(missing(CropObj), missing(MinPath), missing(MaxPath))){stop("You must supply all parameters.")}
@@ -63,7 +64,7 @@ extract_air_temp <- function(CropObj, MinPath, MaxPath){
 
       nc <- stars::read_stars(x)
 
-      nc <- stars::st_warp(nc, crs = st_crs(buffed_obj))
+      nc <- stars::st_warp(nc, crs = sf::st_crs(buffed_obj))
 
       if(!dir.exists(dirname(y))){dir.create(dirname(y), recursive = TRUE)}
 

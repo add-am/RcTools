@@ -4,10 +4,10 @@
 \alias{extract_dhw}
 \title{Extract Degree Heating Week Data from NOAA's API}
 \usage{
-extract_dhw(FullPath, CroppedPath, CropObj)
+extract_dhw(RawPath, CroppedPath, CropObj)
 }
 \arguments{
-\item{FullPath}{Character String. A path arguement to the location where each full file should be saved and retrived.}
+\item{RawPath}{Character String. A path arguement to the location where each full file should be saved and retrived.}
 
 \item{CroppedPath}{Character String. A path arguement to the location where each cropped file should be saved and retrived.}
 

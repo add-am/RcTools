@@ -1,6 +1,6 @@
 #' Extract Sea Surface Temperature Data from NOAA's API
 #'
-#' @param FullPath Character String. A path arguement to the location where each full file should be saved and retrived.
+#' @param RawPath Character String. A path arguement to the location where each full file should be saved and retrived.
 #' @param CroppedPath Character String. A path arguement to the location where each cropped file should be saved and retrived.
 #' @param CropObj Sf Object. An sf object used to define the area in which data is to be cropped to. Generally,
 #' the n3_region object from the [build_n3_region()] function is used.
@@ -18,18 +18,18 @@
 #' 
 #' n3_region <- build_n3_region()
 #' 
-#' extract_sst(p1, p2, n3_region)
+#' sst_data <- extract_sst(p1, p2, n3_region)
 #' }
 #' 
-extract_sst <- function(FullPath, CroppedPath, CropObj){
+extract_sst <- function(RawPath, CroppedPath, CropObj){
 
   #check required arguments
-  if (any(missing(FullPath), missing(CroppedPath), missing(CropObj))){
-    stop("You must supply the 'FullPath', 'CroppedPath', and 'CropObj', parameters.")
+  if (any(missing(RawPath), missing(CroppedPath), missing(CropObj))){
+    stop("You must supply the 'RawPath', 'CroppedPath', and 'CropObj', parameters.")
   }
   
   #continue to check argument types
-  if (!is.character(FullPath)){stop("You must supply a character string to the 'FullPath' parameter.")}
+  if (!is.character(RawPath)){stop("You must supply a character string to the 'RawPath' parameter.")}
   if (!is.character(CroppedPath)){stop("You must supply a character string to the 'CroppedPath' parameter.")}
   if (!inherits(CropObj, "sf")){stop("You must supply an sf object to the 'CropObj' parameter.")}
   
@@ -57,7 +57,7 @@ extract_sst <- function(FullPath, CroppedPath, CropObj){
   folder_vect <- stringr::str_sub(date_vect, end = -3)
 
   #build an equal length vector of file name character strings to iterate on
-  raw_file_names <- glue::glue("{FullPath}/sst_{date_vect}.nc")
+  raw_file_names <- glue::glue("{RawPath}/sst_{date_vect}.nc")
 
   #build a second vector of file names for the cropped version
   cropped_file_names <- glue::glue("{CroppedPath}/cropped_sst_{date_vect}.nc")
