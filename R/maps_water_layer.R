@@ -27,10 +27,10 @@ maps_water_layer <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, Water
   if (length(StreamOrder) > 2){stop("You must supply either one or two numeric arguments to the 'StreamOrder' parameter.")}
 
   #standardised basin inputs
-  basin <- stringr::str_to_title(Basin)
+  Basin <- stringr::str_to_title(Basin)
 
   #catch the O'connell != O'Connell case
-  if ("O'connell" %in% basin) basin[stringr::str_detect(basin, "O'connell")] <- "O'Connell"
+  if ("O'connell" %in% Basin) Basin[stringr::str_detect(Basin, "O'connell")] <- "O'Connell"
 
   #construct a list of allowed basins to request
   allowed_basins <- c(
