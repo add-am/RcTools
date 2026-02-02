@@ -9,5 +9,5 @@ utils::globalVariables(
     "geom2", "EnvValueZone", "Combined", "NewSubBasin", "MarineWate", "Result_Chlorophyll",
     "Flags_Chlorophyll", "Units_Chlorophyll", "Result_Turbidity", "Flags_Turbidity", 
     "Units_Turbidity", "Indicator", "Units", "Latitude", "Longitude", "Logger", "Attribution",
-    "Result", "Flags", "Name", "shape"
+    "Result", "Flags", "Name", "shape", "PostCode", "PostValue", "PreCode", "PreValue"
 ))

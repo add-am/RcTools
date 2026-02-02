@@ -40,7 +40,7 @@ maps_inset_layer <- function(supplied_sf_1, background, aspect, use_bbox_1 = TRU
   if (!inherits(background, "sf")){stop("The object supplied to the 'background' parameter must be of type sf.")}
   if (!is.numeric(aspect)){stop("The object supplied to the 'aspect' parameter must be of numeric type.")}
   
-  #check other arguements
+  #check other arguments
   if (!is.logical(use_bbox_1)){stop("You must supply a boolean arguement to the 'use_bbox_1' parameter.")}
   if (!is.character(supplied_sf_1_colour)){stop("The object supplied to the 'supplied_sf_1_colour' parameter must be of character type.")}
   if (!is.character(background_colour)){stop("The object supplied to the 'background_colour' parameter must be of character type.")}
