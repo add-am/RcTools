@@ -141,13 +141,13 @@ value_to_score <- function(
             dplyr::across(
               {{ value }},
               ~ dplyr::case_when(
-                stringr::str_detect(temp_indicator, "low do") & .x > {{ wqo }} ~ 
+                !stringr::str_detect(temp_indicator, "low do") & .x > {{ wqo }} ~ 
                   round(pmax(60.9 - (60.9 * (abs((.x - {{ wqo }})/({{ sf }} - {{ wqo }})))), 0), 3), #scores from 0 to 61,
-                stringr::str_detect(temp_indicator, "low do") & .x <= {{ wqo }} & {{ eightieth }} > {{ wqo }} ~ 
+                !stringr::str_detect(temp_indicator, "low do") & .x <= {{ wqo }} & {{ eightieth }} > {{ wqo }} ~ 
                   round(80.99 - (19.9 * (abs(({{ eightieth }} - {{ wqo }})/({{ eightieth }} - .x )))), 3), #scores from 61 to 81, 
-                !stringr::str_detect(temp_indicator, "low do") & .x < {{ wqo }} ~ 
+                stringr::str_detect(temp_indicator, "low do") & .x < {{ wqo }} ~ 
                   round(pmax(60.9 - (60.9 * (abs((.x - {{ wqo }})/({{ sf }} - {{ wqo }})))), 0), 3), #scores from 0 to 61,
-                !stringr::str_detect(temp_indicator, "low do") & .x >= {{ wqo }} & {{ twentieth }} < {{ wqo }} ~ 
+                stringr::str_detect(temp_indicator, "low do") & .x >= {{ wqo }} & {{ twentieth }} < {{ wqo }} ~ 
                   round(80.99 - (19.9 * (abs(({{ wqo }} - {{ twentieth }})/(.x - {{ twentieth }})))), 3), #scores from 61 to 81,
                 TRUE ~ 90 #otherwise 90
               ),
