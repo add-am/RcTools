@@ -66,6 +66,13 @@ build_n3_region <- function(){
     dplyr::summarise(geom = sf::st_union(geom)) |> 
     sf::st_make_valid()
 
+  #clean up a few missnamed slivers
+  n3_land_marine <- n3_land_marine |> 
+    dplyr::filter(
+      !(BasinOrZone == "Ross" & SubBasinOrSubZone == "Black River"),
+      !(BasinOrZone == "Black" & SubBasinOrSubZone == "Ross River (Upper)")
+    )
+
   #return the final output
   return(n3_land_marine)
 
