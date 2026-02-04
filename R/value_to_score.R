@@ -3,8 +3,8 @@
 #' @param df Dataframe. The table that contains the value(s) you are interested in.
 #' @param value Numeric column. One numeric column that contain values to be scored. Values ranges can vary 
 #' significantly depending on the indicator.
-#' @param value_type String. Defines the type of values that will be scored. One of: "Water Quality", "Wetlands", 
-#' "Mangroves and Saltmarsh", "Riparian", or "Fish".
+#' @param value_type String. Defines the type of values that will be scored. One of: "Water Quality", "Pesticides",
+#'  "Wetlands", "Mangroves and Saltmarsh", "Riparian", or "Fish".
 #' @param indicator String column. Defines the indicator that will be scored. Only relevant for water quality and fish. 
 #' Should be sourced from the same df as the value column(s).
 #' @param water_type String. Defines the type of water quality scoring to use. Only relevant for water quality. One of 
@@ -63,7 +63,7 @@ value_to_score <- function(
   if (missing(value_type)) {stop("You must supply a value_type column")}
 
   #check value type input
-  value_type_choices <- c("Water Quality", "Wetlands", "Mangroves and Saltmarsh", "Riparian", "Fish")
+  value_type_choices <- c("Water Quality", "Pesticides", "Wetlands", "Mangroves and Saltmarsh", "Riparian", "Fish")
   if (!(value_type %in% value_type_choices)){
     stop("Invalid value_type: must be one of ", paste(value_type_choices, collapse = ", "))
   }
@@ -190,6 +190,25 @@ value_to_score <- function(
         return(df)
     }
 
+  }
+
+  if (value_type == "Pesticides"){
+
+    df <- df |> 
+      dplyr::mutate(
+        dplyr::across(
+          {{ value }},
+          ~ dplyr::case_when(
+            .x <= 1 ~ 81 + abs((19 - ((.x - 0) * (19/1)))),
+            .x > 1 & .x < 5 ~ 61 + abs((19.9 - ((.x - 1.01) * (19.9/3.99)))),
+            .x >= 5 & .x < 10 ~ 41 + abs((19.9 - ((.x - 5) * (19.9/4.99)))),
+            .x >= 10 & .x < 20 ~ 21 + abs((19.9 - ((.x - 10) * (19.9/9.99)))),
+            TRUE ~ 0 + abs((20.9 - ((.x - 20) * (20.9/79.99))))
+          ),
+          .names = "{.col}Score"
+        )
+      )
+    return(df)
   }
 
   if (value_type %in% c("Wetlands", "Mangroves and Saltmarsh")){
