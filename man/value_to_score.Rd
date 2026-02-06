@@ -22,8 +22,8 @@ value_to_score(
 \item{value}{Numeric column. One numeric column that contain values to be scored. Values ranges can vary
 significantly depending on the indicator.}
 
-\item{value_type}{String. Defines the type of values that will be scored. One of: "Water Quality", "Wetlands",
-"Mangroves and Saltmarsh", "Riparian", or "Fish".}
+\item{value_type}{String. Defines the type of values that will be scored. One of: "Water Quality", "Pesticides",
+"Wetlands", "Mangroves and Saltmarsh", "Riparian", or "Fish".}
 
 \item{water_type}{String. Defines the type of water quality scoring to use. Only relevant for water quality. One of
 "Freshwater", "Estuarine", or "Marine"}
