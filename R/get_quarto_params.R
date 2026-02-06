@@ -6,6 +6,7 @@
 #' @examples
 #' 
 #' params <- get_quarto_params()
+#' 
 get_quarto_params <- function(){
 
   #if the session calling this function is interactive
