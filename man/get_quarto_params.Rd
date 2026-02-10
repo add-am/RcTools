@@ -15,4 +15,5 @@ Return the YAML params during an interative session
 \examples{
 
 params <- get_quarto_params()
+
 }
