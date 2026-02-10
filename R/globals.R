@@ -10,5 +10,5 @@ utils::globalVariables(
     "Flags_Chlorophyll", "Units_Chlorophyll", "Result_Turbidity", "Flags_Turbidity", 
     "Units_Turbidity", "Indicator", "Units", "Latitude", "Longitude", "Logger", "Attribution",
     "Result", "Flags", "Name", "shape", "PostCode", "PostValue", "PreCode", "PreValue",
-    "area_m2", "re1", "area_km2"
+    "AreaM2", "Re1", "AreaKm2"
 ))
