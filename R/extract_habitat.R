@@ -52,7 +52,7 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
     #extract just the file name
     x_cropped_path <- x |> 
       stringr::str_extract("[^/]+$") |> 
-      stringr::str_replace("_[^_]*$", "") 
+      stringr::str_replace(".gpkg", "") 
     
     #create a path to where the cropped version of the data will/should be saved
     x_cropped_path <- paste0(OutPath, x_cropped_path, "_cropped.gpkg")
