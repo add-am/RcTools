@@ -92,14 +92,14 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
       #calculate the area of everything
       x_sf <- x_open |> 
         sf::st_transform("EPSG:7855") |> 
-        mutate(area_m2 = sf::st_area(geom))|> 
-        mutate(area_km2 = units::set_units(area_m2, "km2"))
+        dplyr::mutate(area_m2 = sf::st_area(geom))|> 
+        dplyr::mutate(area_km2 = units::set_units(area_m2, "km2"))
 
       #extract everything but geometry
       x_tbl <- sf::st_drop_geometry(x_sf)
 
       #save the table
-      write_csv(x_tbl, x_csv_path)
+      readr::write_csv(x_tbl, x_csv_path)
     }
   })
 
@@ -111,16 +111,16 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
 
     #figure out the data source (i.e. a simplified version of the name)
     data_source <- x |> 
-      str_extract("[^/]+$") |> 
-      str_replace("_[^_]*$", "")
+      stringr::str_extract("[^/]+$") |> 
+      stringr::str_replace("_[^_]*$", "")
 
     #open and edit the data
     x_open <- x |> 
-      read_csv() |> 
-      clean_names() |> 
-      group_by(re1) |> 
-      summarise(area_km2 = sum(area_km2)) |> 
-      mutate(source = data_source)
+      readr::read_csv() |> 
+      name_cleaning() |> 
+      dplyr::group_by(re1) |> 
+      dplyr::summarise(area_km2 = sum(area_km2)) |> 
+      dplyr::mutate(source = data_source)
 
     #return the data
     return(x_open)

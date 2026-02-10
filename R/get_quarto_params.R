@@ -4,8 +4,10 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{ #dont run because function only works in interactive quarto docs
 #' 
 #' params <- get_quarto_params()
+#' }
 #' 
 get_quarto_params <- function(){
 

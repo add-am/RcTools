@@ -77,7 +77,7 @@ sf_change_over_time <- function(sf, Col, StartYear, EndYear, Resolution = 1000){
   #write the after codes to the dataset and then vectorize the data
   value_after <- sf |> 
     dplyr::filter(Year == EndYear) |> 
-    dplyr::rename("PostValue" = all_of(Col)) |> 
+    dplyr::rename("PostValue" = dplyr::all_of(Col)) |> 
     dplyr::left_join(post_value_df) |> 
     dplyr::rename(Code = PostCode) |> 
     terra::vect()
