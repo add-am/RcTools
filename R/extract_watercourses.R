@@ -107,8 +107,8 @@ extract_watercourses <- function(Basin, WaterLines = TRUE, WaterAreas = FALSE, W
     
   #strip all information except for the geometry and an ID column
   water_data <- water_data |> 
-    dplyr::mutate(ID = x) |> 
-    dplyr::select(ID)
+    dplyr::mutate(ID = x, Basin = drainage_basin) |> 
+    dplyr::select(Basin, ID)
 
   return(water_data)
 
