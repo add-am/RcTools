@@ -80,10 +80,10 @@ value_to_score <- function(
   #check if the value column name exists in the dataframe
   if (!rlang::quo_name(rlang::enquo(value)) %in% names(df)){stop("The value column does not exists in the dataframe")}
 
-  #check the supplied indicator is correct (only relevant for water quality and fish)
-  if (value_type %in% c("Water Quality", "Fish")){
+  if (value_type == "Water Quality"){
 
-    if (missing(indicator)){stop("An indicator column name must be supplied when scoring water quality or fish values.")}
+    #check the supplied indicator is correct (only relevant for water quality)
+    if (missing(indicator)){stop("An indicator column name must be supplied when scoring water quality values.")}
 
     if (!rlang::quo_name(rlang::enquo(indicator)) %in% names(df)){stop("The indicator column does not exists in the dataframe")}
     
@@ -102,7 +102,6 @@ value_to_score <- function(
         temp_indicator = stringr::str_replace_all(temp_indicator, string_map)
       )
 
-
     #create a list of allowed indicator names
     allowed_indicator_names <- c(
       "din", "tp", "ammonia", "nox", "turbidity", "high do", "low do", 
@@ -120,10 +119,6 @@ value_to_score <- function(
         paste(allowed_indicator_names)
       )
     }
-
-  }
-
-  if (value_type == "Water Quality"){
 
     #all water quality scoring requires at least a wqo    
     if (!rlang::quo_name(rlang::enquo(wqo)) %in% names(df)){stop("The wqo column does not exists in the dataframe")}   
@@ -255,26 +250,33 @@ value_to_score <- function(
 
   if (value_type == "Fish"){
 
+    #standarised inputs
+    indicator <- stringr::str_to_upper(indicator)
+
+    #check indicator input
+    if (!(value_type %in% c("POISE", "PONIS"))){
+      stop("Invalid indicator: must be one of ", paste(value_type_choices, collapse = ", "))
+    }
+
     df <- df |> 
       dplyr::mutate(
         dplyr::across(
           {{ value }},
           ~ dplyr::case_when(
-            stringr::str_detect(temp_indicator, "poise") & .x > 0.8 ~ round(81 + abs((19 + ((.x - 1) * (19 / 0.2)))), 3), #scores from 100 to 81
-            stringr::str_detect(temp_indicator, "poise") & .x > 0.67 ~ round(61 + abs((19.9 + ((.x - 0.7999) * (19.9 / 0.1329)))), 3), #scores from 80 to 61
-            stringr::str_detect(temp_indicator, "poise") & .x > 0.53 ~ round(41 + abs((19.9 + ((.x - 0.6669) * (19.9 / 0.1339)))), 3), #scores from 60 to 41
-            stringr::str_detect(temp_indicator, "poise") & .x > 0.4 ~ round(21 + abs((19.9 + ((.x - 0.5329) * (19.9 / 0.1329)))), 3), #scores from 40 to 21
-            stringr::str_detect(temp_indicator, "poise") ~ round(pmax(abs(20.9 + ((.x - 0.3999) * (20.9 / 0.3999))), 0), 3), #scores from 20 to 0
-            stringr::str_detect(temp_indicator, "ponis") & .x < 0.03 ~ round(pmin(abs((19 - ((.x - 0) * (19 / 0.025)))), 100), 3), #scores from 100 to 81
-            stringr::str_detect(temp_indicator, "ponis") & .x < 0.05 ~ round(abs((19.9 - ((.x - 0.0251) * (19.9 / 0.0249)))), 3), #scores from 80 to 61
-            stringr::str_detect(temp_indicator, "ponis") & .x < 0.1 ~ round(abs((19.9 - ((.x - 0.051) * (19.9 / 0.049)))), 3), #scores from 60 to 41
-            stringr::str_detect(temp_indicator, "ponis") & .x < 0.2 ~ round(abs((19.9 - ((.x - 0.101) * (19.9 / 0.099)))), 3), #scores from 40 to 21
-            stringr::str_detect(temp_indicator, "ponis") ~ round(pmax(abs(20.9 - ((.x - 0.201) * (20.9 / 0.799))), 0), 3) #scores from 20 to 0
+            indicator == "POISE" & .x > 0.8 ~ round(81 + abs((19 + ((.x - 1) * (19 / 0.2)))), 3), #scores from 100 to 81
+            indicator == "POISE" & .x > 0.67 ~ round(61 + abs((19.9 + ((.x - 0.7999) * (19.9 / 0.1329)))), 3), #scores from 80 to 61
+            indicator == "POISE" & .x > 0.53 ~ round(41 + abs((19.9 + ((.x - 0.6669) * (19.9 / 0.1339)))), 3), #scores from 60 to 41
+            indicator == "POISE" & .x > 0.4 ~ round(21 + abs((19.9 + ((.x - 0.5329) * (19.9 / 0.1329)))), 3), #scores from 40 to 21
+            indicator == "POISE" ~ round(pmax(abs(20.9 + ((.x - 0.3999) * (20.9 / 0.3999))), 0), 3), #scores from 20 to 0
+            indicator == "PONIS" & .x < 0.03 ~ round(pmin(abs((19 - ((.x - 0) * (19 / 0.025)))), 100), 3), #scores from 100 to 81
+            indicator == "PONIS" & .x < 0.05 ~ round(abs((19.9 - ((.x - 0.0251) * (19.9 / 0.0249)))), 3), #scores from 80 to 61
+            indicator == "PONIS" & .x < 0.1 ~ round(abs((19.9 - ((.x - 0.051) * (19.9 / 0.049)))), 3), #scores from 60 to 41
+            indicator == "PONIS" & .x < 0.2 ~ round(abs((19.9 - ((.x - 0.101) * (19.9 / 0.099)))), 3), #scores from 40 to 21
+            indicator == "PONIS" ~ round(pmax(abs(20.9 - ((.x - 0.201) * (20.9 / 0.799))), 0), 3) #scores from 20 to 0
           ),
           .names = "{.col}Score"
         )
-      ) |> 
-      dplyr::select(-temp_indicator)
+      ) 
     
     return(df)
            
