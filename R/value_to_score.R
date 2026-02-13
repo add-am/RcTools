@@ -263,7 +263,7 @@ value_to_score <- function(
         dplyr::across(
           {{ value }},
           ~ dplyr::case_when(
-            indicator == "POISE" & .x > 0.8 ~ round(81 + abs((19 + ((.x - 1) * (19 / 0.2)))), 3), #scores from 100 to 81
+            indicator == "POISE" & .x > 0.8 ~ round(pmin(81 + abs((19 + ((.x - 1) * (19 / 0.2)))), 100), 3), #scores from 100 to 81
             indicator == "POISE" & .x > 0.67 ~ round(61 + abs((19.9 + ((.x - 0.7999) * (19.9 / 0.1329)))), 3), #scores from 80 to 61
             indicator == "POISE" & .x > 0.53 ~ round(41 + abs((19.9 + ((.x - 0.6669) * (19.9 / 0.1339)))), 3), #scores from 60 to 41
             indicator == "POISE" & .x > 0.4 ~ round(21 + abs((19.9 + ((.x - 0.5329) * (19.9 / 0.1329)))), 3), #scores from 40 to 21
