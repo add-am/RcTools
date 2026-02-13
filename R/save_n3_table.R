@@ -2,7 +2,7 @@
 #'
 #' @param df A standard dataframe, data.frame, table, spreadsheet, etc.
 #' @param file_name String. The name to save the output under, without an extension.
-#' @param target_columns Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.
+#' @param target_columns Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10. Defaults to all.
 #' @param target_rows Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.
 #' @param scheme String. One of several options: Report Card, Rainfall, Temperature, Summary Statistic, Presence Absence. 
 #' This determines the colour scheme and conditional formatting schemes used.
@@ -29,12 +29,15 @@
 #' )
 #' }
 #' 
-save_n3_table <- function(df, file_name, target_columns, target_rows, scheme, include_letter = FALSE){
+save_n3_table <- function(df, file_name, target_columns, target_rows = NULL, scheme, include_letter = FALSE){
 
   #standardise inputs
   scheme <- scheme |> 
     stringr::str_to_lower() |> 
     stringr::str_replace_all(" |\\.|-", "_")
+
+  #if target_rows is null, default to all rows
+  if (is.null(target_rows)){target_rows <- 1:nrow(df)}
 
   #create an empty workbook
   wb <- openxlsx2::wb_workbook()
