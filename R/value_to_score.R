@@ -254,8 +254,8 @@ value_to_score <- function(
     indicator <- stringr::str_to_upper(indicator)
 
     #check indicator input
-    if (!(value_type %in% c("POISE", "PONIS"))){
-      stop("Invalid indicator: must be one of ", paste(value_type_choices, collapse = ", "))
+    if (!(indicator %in% c("POISE", "PONIS"))){
+      stop("Invalid indicator: must be one of ", paste(c("POISE", "PONIS"), collapse = ", "))
     }
 
     df <- df |> 
