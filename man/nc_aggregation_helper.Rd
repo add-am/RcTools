@@ -4,12 +4,15 @@
 \alias{nc_aggregation_helper}
 \title{A function to help with various forms of netCDF aggregation}
 \usage{
-nc_aggregation_helper(nc, agg)
+nc_aggregation_helper(nc, agg, func)
 }
 \arguments{
 \item{nc}{A netCDF object}
 
 \item{agg}{The type of aggregation to complete, defaults to "Month". Options are "Month", "Season", "Financial", "Annual"}
+
+\item{func}{Function. (NO QUOTES). Defines the function to apply to the level of aggregation. Generally only "mean"
+and "sum" have been used so far. Again, without quotes.}
 }
 \value{
 A netCDF object

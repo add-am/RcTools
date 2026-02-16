@@ -2,6 +2,8 @@
 #'
 #' @param nc A netCDF object
 #' @param agg The type of aggregation to complete, defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
+#' @param func Function. (NO QUOTES). Defines the function to apply to the level of aggregation. Generally only "mean" 
+#' and "sum" have been used so far. Again, without quotes.
 #' 
 #' @returns A netCDF object
 #'
@@ -14,7 +16,7 @@
 #' 
 #' x <- nc_aggregation_helper(nc, "Month")
 #'  
-nc_aggregation_helper <- function(nc, agg){
+nc_aggregation_helper <- function(nc, agg, func){
 
   #pull out the attribute name/names
   attribute_names <- names(nc)
@@ -59,7 +61,7 @@ nc_aggregation_helper <- function(nc, agg){
     sliced_layers <- nc[,,,MinIndex:MaxIndex]
 
     #apply the mean function to the slice
-    aggregated_layer <- stars::st_apply(sliced_layers, 1:2, FUN = mean, keep = TRUE)
+    aggregated_layer <- stars::st_apply(sliced_layers, 1:2, FUN = func, keep = TRUE)
 
     #manually add the time dimension back in
     aggregated_layer <- stars::st_redimension(

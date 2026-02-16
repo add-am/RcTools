@@ -8,7 +8,7 @@ save_n3_table(
   df,
   file_name,
   target_columns,
-  target_rows,
+  target_rows = NULL,
   scheme,
   include_letter = FALSE
 )
@@ -18,7 +18,7 @@ save_n3_table(
 
 \item{file_name}{String. The name to save the output under, without an extension.}
 
-\item{target_columns}{Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10.}
+\item{target_columns}{Numeric Vector. The columns that colour grading should be applied to. e.g. 1:10. Defaults to all.}
 
 \item{target_rows}{Numeric Vector. The rows that colour grading should be applied to. e.g. 1:10.}
 
