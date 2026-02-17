@@ -4,6 +4,7 @@
 #' @param MapType Character String. Defines the type of map produced. One of "Concentration", "True Colour", or "Vector Field" (AKA wind)
 #' @param Aggregation Character String. Defines the level of aggregation to apply. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"
 #' @param LegendTitle Character String. The title of the legend. Defaults to the name of the netCDF's attribute
+#' @param LogScale Boolean. Do you want data to be displayed on a log scale?
 #' @param nrow Numeric String. The number of rows to be used when facetting maps. Defaults to NULL and uses underlying default value
 #'
 #' @returns A tmap object
@@ -22,7 +23,7 @@
 #'   Aggregation = "Annual"
 #' )
 #' 
-ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, nrow = NULL){
+ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, LogScale = FALSE, nrow = NULL){
 
   #conduct safety checks
   if (any(missing(nc), missing(MapType))){stop("You must supply at least the 'nc' and 'Aggregation' parameters.")}
@@ -61,7 +62,9 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
       tmap::tm_shape(nc, is.main = TRUE) +
       tmap::tm_raster(
         col = names(nc), 
-        col.scale = tmap::tm_scale_continuous(values = ereefs_get_palette(names(nc))),
+        col.scale = 
+          if (LogScale) {tmap::tm_scale_continuous_log10(values = ereefs_get_palette(names(nc)))
+          } else {tmap::tm_scale_continuous(values = ereefs_get_palette(names(nc)))},
         col.legend = tmap::tm_legend(
           reverse = TRUE,
           title = LegendTitle,
