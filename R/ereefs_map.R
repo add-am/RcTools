@@ -57,10 +57,7 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
 
     #create the concentration map
     m <- tmap::tm_shape(qld) +
-      tmap::tm_polygons(
-        fill = "#99B5B1",
-        col = "#7bba9d"
-      ) +
+      tmap::tm_polygons(fill = "grey80", col = "black") +
       tmap::tm_shape(nc, is.main = TRUE) +
       tmap::tm_raster(
         col = names(nc), 
@@ -78,10 +75,7 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
         col = "grey60",
         col_alpha = 0.4
       ) +
-      tmap::tm_layout(
-        bg.color = "#C1DEEA",
-        legend.position = tmap::tm_pos_out("right", "center")
-      )
+      tmap::tm_layout(legend.position = tmap::tm_pos_out("right", "center"))
     
     #if the user had a specific number of rows for facetting  
     if (!is.null(nrow)){m <- m + tmap::tm_facets(nrow = nrow)}
@@ -90,10 +84,7 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
 
     #create the true colour map
     m <- tmap::tm_shape(qld) +
-      tmap::tm_polygons(
-        fill = "#99B5B1",
-        col = "#7bba9d"
-      ) +
+      tmap::tm_polygons(fill = "grey80", col = "black") +
       tmap::tm_shape(nc, is.main = TRUE) +
       tmap::tm_rgb() +
       tmap::tm_shape(reefs) +
@@ -103,10 +94,7 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, n
         col = "grey60",
         col_alpha = 0.4
       ) +
-      tmap::tm_layout(
-        bg.color = "#C1DEEA",
-        legend.position = tmap::tm_pos_out("right", "center")
-      )
+      tmap::tm_layout(legend.position = tmap::tm_pos_out("right", "center"))
     
     #if the user had a specific number of rows for facetting  
     if (!is.null(nrow)){m <- m + tmap::tm_facets(nrow = nrow)}
