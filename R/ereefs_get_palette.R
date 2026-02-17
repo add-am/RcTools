@@ -18,16 +18,19 @@ ereefs_get_palette <- function(Variable){
   if (!any(stringr::str_detect(Variable, var_choices))){
     stop("Invalid 'Variable': must be one of ", paste(var_choices, collapse = ", "))
   }
+
+  #defined the match that occured
+  matched_name <- var_choices[stringr::str_detect(Variable, var_choices)]
   
   #define the list of colours to choose from
   colour_key <- list( 
     "Turbidity"      = oce::oceColorsTurbidity(9),
-    "Chlorophyll a"  = oce::oceColorsChlorophyll(9),
+    "Chl_a_sum"      = oce::oceColorsChlorophyll(9),
     "DIN"            = RColorBrewer::brewer.pal(9, "Blues"),
     "NH4"            = rcartocolor::carto_pal(9, "ag_GrnYl"),
     "NO3"            = rcartocolor::carto_pal(9, "Sunset"),
     "Secchi"         = RColorBrewer::brewer.pal(9, "OrRd"),
-    "pH"             = RColorBrewer::brewer.pal(9, "RdBu"),
+    "PH"             = RColorBrewer::brewer.pal(9, "RdBu"),
     "Wind"           = oce::oceColorsVelocity(9)
   )
 
