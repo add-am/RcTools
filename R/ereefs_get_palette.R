@@ -29,7 +29,7 @@ ereefs_get_palette <- function(Variable){
     "DIN"            = RColorBrewer::brewer.pal(9, "Blues"),
     "NH4"            = rcartocolor::carto_pal(9, "ag_GrnYl"),
     "NO3"            = rcartocolor::carto_pal(9, "Sunset"),
-    "Secchi"         = RColorBrewer::brewer.pal(9, "OrRd"),
+    "Secchi"         = rev(RColorBrewer::brewer.pal(9, "OrRd")),
     "PH"             = RColorBrewer::brewer.pal(9, "RdBu"),
     "Wind"           = oce::oceColorsVelocity(9)
   )
