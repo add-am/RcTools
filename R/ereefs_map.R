@@ -63,8 +63,13 @@ ereefs_map <- function(nc, MapType, Aggregation = "Month", LegendTitle = NULL, L
       tmap::tm_raster(
         col = names(nc), 
         col.scale = 
-          if (LogScale) {tmap::tm_scale_continuous_log10(values = ereefs_get_palette(names(nc)))
-          } else {tmap::tm_scale_continuous(values = ereefs_get_palette(names(nc)))},
+          if (LogScale) {
+            tmap::tm_scale_continuous_log10(
+              values = ereefs_get_palette(names(nc)))
+          } else {
+            tmap::tm_scale_continuous(
+              values = ereefs_get_palette(names(nc)))
+          },
         col.legend = tmap::tm_legend(
           reverse = TRUE,
           title = LegendTitle,
