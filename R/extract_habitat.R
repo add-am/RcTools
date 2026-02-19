@@ -152,7 +152,7 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
     x_open <- x |> 
       readr::read_csv() |> 
       name_cleaning() |> 
-      dplyr::group_by(Re1) |> 
+      dplyr::group_by(Re1, Basin) |> 
       dplyr::summarise(AreaKm2 = sum(AreaKm2)) |> 
       dplyr::mutate(Source = data_source)
 
