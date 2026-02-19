@@ -33,6 +33,10 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
   if (!Habitat %in% c("RV", "MS")){
     stop("You must supply either 'RV' (Riparian Vegetation) or 'MS' (Mangrove and Saltmarsh) to the 'Habitat' parameter.")}
   
+  if (!"Basin" %in% colnames(CropObj)){
+    stop("The CropObj argument must contain the 'Basin' column or a column renamed to 'Basin'. This column is used to divide the spatial work into more managable chunks.")
+  }
+  
   #build the relevant output directory
   if (Habitat == "RV"){
     dir.create(glue::glue("{dirname(RawPath)}/riparian_vegetation/"))
@@ -63,10 +67,40 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
         #open the data
         x_open <- sf::st_read(x)
 
-        #crop the data
-        x_cropped <- x_open |>
-          sf::st_transform(sf::st_crs(CropObj)) |> 
-          sf::st_intersection(CropObj)
+        #iterate over the unique basins in the crop object
+        x_cropped <- purrr::map(unique(CropObj$Basin), \(bas) {
+
+          #filter the crop object
+          crop_filt <- CropObj |> 
+            filter(Basin == bas) |> 
+            sf::st_transform(sf::st_crs(x_open))
+
+          #create a bbox of the same filtered object
+          crop_filt_bbox <- crop_filt |> 
+            st_bbox() |> 
+            st_as_sfc()
+
+          #first cut down using the bbox, then 
+          x_bbox_crop <- x_open |> 
+            st_intersection(crop_filt_bbox) |> 
+            st_make_valid() |> 
+            nngeo::st_remove_holes()
+
+          #intersect the datasets properly, using terra (for speed)
+          x_crop_final <- x_bbox_crop |> 
+            terra::vect() |> 
+            terra::intersect(terra::vect(crop_filt))
+
+          #convert back to an sf object
+          x_crop_final <- sf::st_as_sf(x_crop_final)
+          
+          #return
+          return(x_crop_final)
+          
+        })
+
+        #bind each individual dataset back into a single dataset
+        x_cropped <- bind_rows(x_cropped)
         
         #save the data
         sf::st_write(x_cropped, x_cropped_path)
