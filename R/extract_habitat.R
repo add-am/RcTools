@@ -67,6 +67,9 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
         #open the data
         x_open <- sf::st_read(x)
 
+        #standardise names
+        x_open <- name_cleaning(x_open)
+
         #iterate over the unique basins in the crop object
         x_cropped <- purrr::map(unique(CropObj$Basin), \(bas) {
 
