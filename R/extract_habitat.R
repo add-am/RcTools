@@ -101,10 +101,24 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
 
         #bind each individual dataset back into a single dataset
         x_cropped <- bind_rows(x_cropped)
+
+        #if the habitat specified is MS, further edits can be done
+        if (Habitat == "MS"){
+
+          #assign custom vegetation names to data
+          x_cropped <- x_cropped |> 
+            mutate(
+              Vegetation = case_when(
+                str_detect(Re1, "7.1.1|7.1.4|8.1.1|11.1.4") ~ "Mangroves",
+                str_detect(Re1, "7.1.2|7.1.3|7.1.5|8.1.2|8.1.3|8.1.4|8.1.5|11.1.1|11.1.2|11.1.3") ~ "Saltmarshes",
+                str_detect(Re1, "estuary|shallow|ocean|water") ~ "Water",
+                str_detect(Re1, "non-remnant") ~ "Non-Remnant Vegetation",
+                TRUE ~ "Other Vegetation"))
         
         #save the data
         sf::st_write(x_cropped, x_cropped_path)
 
+        }
       }
   })
 
