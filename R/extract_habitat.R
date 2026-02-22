@@ -61,7 +61,7 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
     #create a path to where the cropped version of the data will/should be saved
     x_cropped_path <- paste0(OutPath, x_cropped_path, "_cropped.gpkg")
     
-      #if the cropped version does not exist
+      #if the cropped version does not exist, create it
       if (!file.exists(x_cropped_path)){
 
         #open the data
@@ -117,12 +117,16 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
                 str_detect(Re1, "estuary|shallow|ocean|water") ~ "Water",
                 str_detect(Re1, "non-remnant") ~ "Non-Remnant Vegetation",
                 TRUE ~ "Other Vegetation"))
-        
-        #save the data
-        sf::st_write(x_cropped, x_cropped_path)
 
         }
+
+        #return
+        return(x_cropped)
       }
+    
+    #save the cropped file
+    sf::st_write(x_cropped, x_cropped_path)
+
   })
 
   #list all files in the processed folder with the .gpkg extension
