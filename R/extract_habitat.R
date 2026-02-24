@@ -117,10 +117,10 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
 
       }
 
+      #save the cropped file
+      sf::st_write(x_cropped, x_cropped_path)
+
     }
-    
-    #save the cropped file
-    sf::st_write(x_cropped, x_cropped_path)
 
   })
 
