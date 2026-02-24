@@ -97,9 +97,6 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
         #convert back to an sf object
         x_crop_final <- sf::st_as_sf(x_crop_final)
           
-        #return
-        return(x_crop_final)
-          
       })
 
       #bind each individual dataset back into a single dataset
@@ -120,8 +117,6 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
 
       }
 
-      #return
-      return(x_cropped)
     }
     
     #save the cropped file
