@@ -61,52 +61,52 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
     #create a path to where the cropped version of the data will/should be saved
     x_cropped_path <- paste0(OutPath, x_cropped_path, "_cropped.gpkg")
     
-      #if the cropped version does not exist, create it
-      if (!file.exists(x_cropped_path)){
+    #if the cropped version does not exist, create it
+    if (!file.exists(x_cropped_path)){
 
-        #open the data
-        x_open <- sf::st_read(x)
+      #open the data
+      x_open <- sf::st_read(x)
 
-        #standardise names
-        x_open <- name_cleaning(x_open)
+      #standardise names
+      x_open <- name_cleaning(x_open)
 
-        #iterate over the unique basins in the crop object
-        x_cropped <- purrr::map(unique(CropObj$Basin), \(bas) {
+      #iterate over the unique basins in the crop object
+      x_cropped <- purrr::map(unique(CropObj$Basin), \(bas) {
+        
+        #filter the crop object
+        crop_filt <- CropObj |> 
+          filter(Basin == bas) |> 
+          sf::st_transform(sf::st_crs(x_open))
 
-          #filter the crop object
-          crop_filt <- CropObj |> 
-            filter(Basin == bas) |> 
-            sf::st_transform(sf::st_crs(x_open))
+        #create a bbox of the same filtered object
+        crop_filt_bbox <- crop_filt |> 
+          st_bbox() |> 
+          st_as_sfc()
 
-          #create a bbox of the same filtered object
-          crop_filt_bbox <- crop_filt |> 
-            st_bbox() |> 
-            st_as_sfc()
+        #first cut down using the bbox, then 
+        x_bbox_crop <- x_open |> 
+          st_intersection(crop_filt_bbox) |> 
+          st_make_valid() |> 
+          nngeo::st_remove_holes()
 
-          #first cut down using the bbox, then 
-          x_bbox_crop <- x_open |> 
-            st_intersection(crop_filt_bbox) |> 
-            st_make_valid() |> 
-            nngeo::st_remove_holes()
+        #intersect the datasets properly, using terra (for speed)
+        x_crop_final <- x_bbox_crop |> 
+          terra::vect() |> 
+          terra::intersect(terra::vect(crop_filt))
 
-          #intersect the datasets properly, using terra (for speed)
-          x_crop_final <- x_bbox_crop |> 
-            terra::vect() |> 
-            terra::intersect(terra::vect(crop_filt))
-
-          #convert back to an sf object
-          x_crop_final <- sf::st_as_sf(x_crop_final)
+        #convert back to an sf object
+        x_crop_final <- sf::st_as_sf(x_crop_final)
           
-          #return
-          return(x_crop_final)
+        #return
+        return(x_crop_final)
           
-        })
+      })
 
-        #bind each individual dataset back into a single dataset
-        x_cropped <- bind_rows(x_cropped)
+      #bind each individual dataset back into a single dataset
+      x_cropped <- bind_rows(x_cropped)
 
-        #if the habitat specified is MS, further edits can be done
-        if (Habitat == "MS"){
+      #if the habitat specified is MS, further edits can be done
+      if (Habitat == "MS"){
 
           #assign custom vegetation names to data
           x_cropped <- x_cropped |> 
@@ -118,11 +118,11 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
                 str_detect(Re1, "non-remnant") ~ "Non-Remnant Vegetation",
                 TRUE ~ "Other Vegetation"))
 
-        }
-
-        #return
-        return(x_cropped)
       }
+
+      #return
+      return(x_cropped)
+    }
     
     #save the cropped file
     sf::st_write(x_cropped, x_cropped_path)
