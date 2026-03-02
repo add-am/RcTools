@@ -75,18 +75,18 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
         
         #filter the crop object
         crop_filt <- CropObj |> 
-          filter(Basin == bas) |> 
+          dplyr::filter(Basin == bas) |> 
           sf::st_transform(sf::st_crs(x_open))
 
         #create a bbox of the same filtered object
         crop_filt_bbox <- crop_filt |> 
-          st_bbox() |> 
-          st_as_sfc()
+          sf::st_bbox() |> 
+          sf::st_as_sfc()
 
         #first cut down using the bbox, then 
         x_bbox_crop <- x_open |> 
-          st_intersection(crop_filt_bbox) |> 
-          st_make_valid() |> 
+          sf::st_intersection(crop_filt_bbox) |> 
+          sf::st_make_valid() |> 
           nngeo::st_remove_holes()
 
         #intersect the datasets properly, using terra (for speed)
@@ -100,15 +100,15 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
       })
 
       #bind each individual dataset back into a single dataset
-      x_cropped <- bind_rows(x_cropped)
+      x_cropped <- dplyr::bind_rows(x_cropped)
 
       #if the habitat specified is MS, further edits can be done
       if (Habitat == "MS"){
 
           #assign custom vegetation names to data
           x_cropped <- x_cropped |> 
-            mutate(
-              Vegetation = case_when(
+            dplyr::mutate(
+              Vegetation = dplyr::case_when(
                 str_detect(Re1, "7.1.1|7.1.4|8.1.1|11.1.4") ~ "Mangroves",
                 str_detect(Re1, "7.1.2|7.1.3|7.1.5|8.1.2|8.1.3|8.1.4|8.1.5|11.1.1|11.1.2|11.1.3") ~ "Saltmarshes",
                 str_detect(Re1, "estuary|shallow|ocean|water") ~ "Water",
@@ -131,7 +131,7 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
   purrr::walk(cropped_files_gpkg, \(x) {
 
     #create a path to a csv version
-    x_csv_path <- str_replace(x, ".gpkg", ".csv")
+    x_csv_path <- stringr::str_replace(x, ".gpkg", ".csv")
 
     #if the csv version does not exist
     if (!file.exists(x_csv_path)){

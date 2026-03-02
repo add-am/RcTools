@@ -4,7 +4,14 @@
 \alias{ereefs_map}
 \title{Mapping eReefs Data}
 \usage{
-ereefs_map(nc, MapType, Aggregation = "Month", LegendTitle = NULL, nrow = NULL)
+ereefs_map(
+  nc,
+  MapType,
+  Aggregation = "Month",
+  LegendTitle = NULL,
+  LogScale = FALSE,
+  nrow = NULL
+)
 }
 \arguments{
 \item{nc}{A single NetCDF (stars) object OR a list of NetCDF (stars) objects, generally produced by the \code{\link[=extract_ereefs]{extract_ereefs()}} function}
@@ -14,6 +21,8 @@ ereefs_map(nc, MapType, Aggregation = "Month", LegendTitle = NULL, nrow = NULL)
 \item{Aggregation}{Character String. Defines the level of aggregation to apply. Defaults to "Month". Options are "Month", "Season", "Financial", "Annual"}
 
 \item{LegendTitle}{Character String. The title of the legend. Defaults to the name of the netCDF's attribute}
+
+\item{LogScale}{Boolean. Do you want data to be displayed on a log scale?}
 
 \item{nrow}{Numeric String. The number of rows to be used when facetting maps. Defaults to NULL and uses underlying default value}
 }

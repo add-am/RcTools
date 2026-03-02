@@ -114,8 +114,9 @@ extract_logger <- function(
       #open the url
       nc <- ncdf4::nc_open(completed_url)
 
-      #extract the attribution text
+      #extract the attribution text and the logger id (a serial number that changes for each deployment)
       att_text <- ncdf4::ncatt_get(nc, 0, "acknowledgement")$value
+      log_serial <- nc$id
 
       #clean the text up
       att_text <- stringr::str_extract(att_text, "(?<=\")([^\"]*)(?=\")")
@@ -176,9 +177,11 @@ extract_logger <- function(
       pivot_df <- pivot_df |> 
         tidyr::unite("Indicator", c(Indicator, Units), sep = "_")
       
-      #include one final column (acknowledgement)
+      #include two final columns (acknowledgement and serial number)
       pivot_df <- pivot_df |> 
-        dplyr::mutate(Attribution = att_text)
+        dplyr::mutate(
+          Attribution = att_text,
+          SerialNumber = log_serial)
 
       #return the df as an element in the over arching list
       return(pivot_df)

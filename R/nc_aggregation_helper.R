@@ -14,7 +14,7 @@
 #' nc <- system.file("extdata/turb_reg.nc", package = "RcTools")
 #' nc <- stars::read_mdim(nc)
 #' 
-#' x <- nc_aggregation_helper(nc, "Month")
+#' x <- nc_aggregation_helper(nc, "Month", mean)
 #'  
 nc_aggregation_helper <- function(nc, agg, func){
 
