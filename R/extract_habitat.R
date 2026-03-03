@@ -142,7 +142,7 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
       #calculate the area of everything
       x_sf <- x_open |> 
         sf::st_transform("EPSG:7855") |> 
-        dplyr::mutate(AreaM2 = sf::st_area(geom))|> 
+        dplyr::mutate(AreaM2 = sf::st_area(geom)) |> 
         dplyr::mutate(AreaKm2 = units::set_units(AreaM2, "km2"))
 
       #extract everything but geometry
