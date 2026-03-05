@@ -164,13 +164,23 @@ extract_habitat <- function(RawPath, CropObj, Habitat){
       stringr::str_extract("[^/]+$") |> 
       stringr::str_replace("_[^_]*$", "")
 
-    #open and edit the data
+    #open
     x_open <- x |> 
       readr::read_csv() |> 
-      name_cleaning() |> 
-      dplyr::group_by(Re1, Basin, Environment) |> 
-      dplyr::summarise(AreaKm2 = sum(AreaKm2)) |> 
-      dplyr::mutate(Source = data_source)
+      name_cleaning()
+
+    #and edit the data
+    if (Habitat == "MS"){
+      x_open <- x_open |> 
+        dplyr::group_by(Vegetation, Basin, Environment) |> 
+        dplyr::summarise(AreaKm2 = sum(AreaKm2)) |> 
+        dplyr::mutate(Source = data_source)
+    } else {
+      x_open <- x_open |> 
+        dplyr::group_by(Re1, Basin, Environment) |> 
+        dplyr::summarise(AreaKm2 = sum(AreaKm2)) |> 
+        dplyr::mutate(Source = data_source)
+    }
 
     #return the data
     return(x_open)
